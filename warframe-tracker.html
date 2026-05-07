@@ -77,13 +77,15 @@ code{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);b
 .tab:hover{color:var(--tx2)}.tab.active{color:var(--acc);border-bottom-color:var(--acc)}
 
 /* Mastery bar */
-.mbar{background:var(--s2);border-bottom:1px solid var(--bd);padding:.6rem 1.4rem;display:flex;gap:1.25rem;align-items:center;flex-wrap:wrap}
+.mbar{background:var(--s2);border-bottom:1px solid var(--bd);padding:.6rem 1.4rem;display:flex;flex-direction:column;gap:.45rem}
+.mbar-row{display:flex;gap:1.1rem;align-items:center;flex-wrap:wrap}
 .mbi{display:flex;flex-direction:column;gap:1px}
-.mbl{font-size:.6rem;letter-spacing:.1em;color:var(--tx3)}
-.mbv{font-family:'Share Tech Mono',monospace;font-size:.88rem;color:var(--acc)}
+.mbl{font-size:.58rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase}
+.mbv{font-family:'Share Tech Mono',monospace;font-size:.9rem;color:var(--acc)}
 .mbsep{width:1px;height:26px;background:var(--bd2);flex-shrink:0}
-.catbd{display:flex;gap:.3rem;flex-wrap:wrap;margin-left:auto}
-.cmini{font-size:.65rem;padding:2px 6px;border-radius:3px;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.02em}
+.mbar-cats{display:flex;gap:.28rem;flex-wrap:wrap}
+.cmini{font-size:.73rem;padding:3px 8px;border-radius:4px;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.03em;display:inline-flex;align-items:center;gap:.35rem;cursor:default;white-space:nowrap}
+.cmini-val{font-family:'Share Tech Mono',monospace;font-size:.67rem;opacity:.8}
 
 /* Filter rows */
 .frow{background:var(--s1);border-bottom:1px solid var(--bd);padding:.75rem 1.4rem;display:flex;flex-direction:column;align-items:flex-start;gap:.5rem}
@@ -101,7 +103,41 @@ code{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);b
 .chip.on{color:var(--cc);border-color:color-mix(in srgb,var(--cc) 50%,transparent);background:color-mix(in srgb,var(--cc) 10%,transparent)}
 .cn{font-family:'Share Tech Mono',monospace;font-size:.62rem;opacity:.65}
 
-/* Controls bar */
+/* MR Calculator panel */
+.mbar-calc{border-top:1px solid var(--bd);padding-top:.4rem;display:none;flex-direction:column;gap:.45rem}
+.mbar-calc.open{display:flex}
+.mbar-calc-toggle{background:none;border:none;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.6rem;letter-spacing:.14em;color:var(--tx3);cursor:pointer;text-transform:uppercase;padding:0;transition:color .12s}
+.mbar-calc-toggle:hover{color:var(--tx2)}
+.calc-row{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.calc-stat{display:flex;flex-direction:column;gap:1px}
+.calc-lbl{font-size:.56rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase}
+.calc-val{font-family:'Share Tech Mono',monospace;font-size:.82rem;color:var(--tx)}
+.calc-val.accent{color:var(--acc)}
+.calc-bar-wrap{flex:1;min-width:100px;height:6px;background:var(--bg);border-radius:3px;overflow:hidden;position:relative}
+.calc-bar-fill{position:absolute;left:0;top:0;height:100%;background:var(--acc);border-radius:3px;transition:width .3s}
+.calc-bar-proj{position:absolute;top:0;height:100%;background:rgba(74,173,158,.28);transition:left .3s,width .3s;border-left:1px solid rgba(74,173,158,.45)}
+.calc-bar-rankup{font-size:.58rem;color:var(--tx3);font-family:'Share Tech Mono',monospace;margin-top:2px;letter-spacing:.04em}
+.calc-bar-overflow{display:none;flex-direction:column;gap:2px;margin-top:2px}
+.calc-bar-overflow.show{display:flex}
+.calc-inputs{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.calc-input-grp{display:flex;align-items:center;gap:.3rem;font-size:.7rem;color:var(--tx2)}
+.calc-input-grp input{width:52px;background:var(--bg);border:1px solid var(--bd2);border-radius:4px;padding:.22rem .4rem;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.75rem;text-align:center;outline:none}
+.calc-input-grp input:focus{border-color:var(--acc)}
+.calc-result{font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--acc);padding:.15rem .5rem;background:rgba(74,173,158,.1);border-radius:4px;border:1px solid rgba(74,173,158,.2)}
+
+/* Entity status badges */
+.status-prio{font-size:.54rem;font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--acc);border:1px solid rgba(74,173,158,.4);padding:1px 4px;border-radius:3px;letter-spacing:.04em;cursor:pointer;user-select:none;transition:all .12s}
+.status-prio:hover{background:rgba(74,173,158,.12)}
+.status-build{font-size:.54rem;font-family:'Rajdhani',sans-serif;font-weight:700;color:#8890a0;border:1px solid rgba(136,144,160,.35);padding:1px 4px;border-radius:3px;letter-spacing:.04em;cursor:pointer;user-select:none;transition:all .12s}
+.status-build:hover{background:rgba(136,144,160,.1)}
+
+/* Wiki link in node rows */
+.sc-node-wiki{font-size:.55rem;font-family:'Share Tech Mono',monospace;color:var(--tx3);text-decoration:none;border:1px solid transparent;padding:1px 3px;border-radius:3px;transition:all .12s;flex-shrink:0;opacity:0}
+.sc-node:hover .sc-node-wiki{opacity:1;border-color:var(--bd2);color:var(--tx2)}
+.sc-node-wiki:hover{border-color:var(--acc)!important;color:var(--acc)!important}
+
+/* List chip progress */
+.list-chip-prog{font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--tx3);margin-left:.2rem}
 .ctrls{display:flex;gap:.5rem;padding:.55rem 1.4rem;align-items:center;background:var(--s2);border-bottom:1px solid var(--bd);flex-wrap:wrap}
 .sw{position:relative;flex:1;min-width:140px;max-width:260px}
 .si{position:absolute;left:.5rem;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:.9rem;pointer-events:none}
@@ -140,7 +176,7 @@ body.hide-update .utag{display:none}
 .igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem}
 
 /* Card */
-.card{user-select: none;-webkit-user-select: none;background:var(--s2);border:1px solid var(--bd);border-radius:7px;padding:.65rem;display:flex;flex-direction:column;gap:.28rem;transition:border-color .12s,background .12s;position:relative;overflow:hidden}
+.card{background:var(--s2);border:1px solid var(--bd);border-radius:7px;padding:.65rem;display:flex;flex-direction:column;gap:.28rem;transition:border-color .12s,background .12s;position:relative;overflow:hidden}
 .card:hover{border-color:color-mix(in srgb,var(--cc) 55%,transparent);background:var(--s3)}
 .card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cc);border-radius:7px 0 0 7px;opacity:.8}
 
@@ -158,9 +194,11 @@ body.hide-update .utag{display:none}
 .sbtn{position:absolute;top:.4rem;right:.4rem;background:none;border:none;cursor:pointer;font-size:.7rem;color:var(--tx3);padding:2px;line-height:1;transition:color .12s}
 .sbtn:hover,.sbtn.on{color:#c0a030}
 
-/* Card: extra — hidden by default, revealed via global Details toggle */
-.card-extra{display:none;padding-top:.3rem;border-top:1px solid var(--bd);margin-top:.15rem;flex-direction:column;gap:.28rem}
-body.details-open .card-extra{display:flex}
+/* Card: extra — always shown; individual sub-elements controlled by body classes */
+.card-extra{display:flex;padding-top:.3rem;border-top:1px solid var(--bd);margin-top:.15rem;flex-direction:column;gap:.28rem}
+body.hide-xpbar .xbw,
+body.hide-xpbar .cbot{display:none}
+body.hide-notes .card-note{display:none}
 
 /* Column layout — used when grouping by category */
 .col-wrap{display:flex;gap:.6rem;overflow-x:auto;padding:.9rem 1.4rem;align-items:flex-start}
@@ -266,21 +304,10 @@ body.details-open .card-extra{display:flex}
 .ab-btn:hover{border-color:var(--acc);color:var(--acc)}
 .ab-btn-clear{margin-left:auto;color:var(--tx3)}
 .ab-btn-clear:hover{border-color:var(--err);color:var(--err)}
-.ab-kb-hint {
-  font-size: 0.65rem;
-  color: var(--tx3);
-  display: flex;
-  gap: 0.8rem;
-  align-items: center;
-}
-.ab-kb-hint code {
-  color: var(--tx2);
-  background: var(--s2);
-  border: 1px solid var(--bd);
-  padding: 1px 4px;
-  border-radius: 3px;
-  font-family: 'Share Tech Mono', monospace;
-}
+.ab-hints{display:flex;gap:.28rem;flex-wrap:wrap;align-items:center}
+.ab-hint{display:inline-flex;align-items:center;gap:.22rem;font-size:.62rem;color:var(--tx3);white-space:nowrap}
+.ab-hint kbd{display:inline-flex;align-items:center;height:15px;padding:0 4px;border-radius:3px;border:1px solid var(--bd2);background:var(--s2);color:var(--tx2);font-family:'Share Tech Mono',monospace;font-size:.58rem;line-height:1;letter-spacing:0}
+.ab-sep{color:var(--bd2);font-size:.7rem;user-select:none}
 
 /* Node row — 3-state colour coding */
 .sc-node.done .sc-node-status{color:var(--acc)}
@@ -293,7 +320,33 @@ body.details-open .card-extra{display:flex}
 #toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--s3);border:1px solid var(--acc);border-radius:6px;padding:.45rem .85rem;font-size:.78rem;color:var(--acc);z-index:100;opacity:0;transition:opacity .25s;pointer-events:none}
 #toast.show{opacity:1}
 
-/* Footer note */
+/* Refresh panel (shown when player ID is known) */
+.refresh-panel{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:.75rem 1rem;margin-bottom:.9rem;display:none}
+.refresh-panel.visible{display:block}
+.rp-top{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem}
+.rp-label{font-size:.62rem;letter-spacing:.12em;color:var(--tx3);text-transform:uppercase;flex-shrink:0}
+.rp-id{font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--acc);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rp-actions{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.rp-url{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--tx2);background:var(--bg);border:1px solid var(--bd2);border-radius:5px;padding:.3rem .6rem;word-break:break-all;line-height:1.4;margin-bottom:.5rem}
+.rp-note{font-size:.65rem;color:var(--tx3);line-height:1.5}
+
+/* List styles */
+.list-bar{background:var(--s1);border-bottom:1px solid var(--bd);padding:.45rem 1.4rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.list-chip{display:flex;align-items:center;gap:.22rem;padding:.16rem .55rem;border-radius:3px;border:1px solid var(--bd2);font-size:.7rem;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;transition:all .12s;background:var(--s2);color:var(--tx2);user-select:none}
+.list-chip:hover{border-color:var(--acc);color:var(--acc)}
+.list-chip.active{color:var(--acc);border-color:var(--acc);background:rgba(74,173,158,.1)}
+.list-chip-del{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:.65rem;padding:0 1px;line-height:1;margin-left:.1rem}
+.list-chip-del:hover{color:var(--err)}
+.list-new-btn{padding:.16rem .55rem;border-radius:3px;border:1px dashed var(--bd2);font-size:.7rem;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;background:transparent;color:var(--tx3);transition:all .12s}
+.list-new-btn:hover{border-color:var(--acc);color:var(--acc)}
+
+/* Add to list popover in action bar */
+.ab-list-wrap{position:relative}
+.ab-list-pop{position:absolute;top:100%;left:0;margin-top:4px;background:var(--s1);border:1px solid var(--bd2);border-radius:6px;padding:.3rem;min-width:160px;z-index:30;display:none;flex-direction:column;gap:2px;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.ab-list-pop.open{display:flex}
+.ab-list-opt{padding:.25rem .6rem;border-radius:4px;font-size:.75rem;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;color:var(--tx2);transition:background .1s;border:none;background:none;text-align:left;width:100%}
+.ab-list-opt:hover{background:var(--s2);color:var(--tx)}
+.ab-list-opt.new{color:var(--acc);border-top:1px solid var(--bd);margin-top:2px;padding-top:.3rem}
 .fnote{padding:.4rem 1.4rem;font-size:.66rem;color:var(--tx3);background:var(--s2);border-top:1px solid var(--bd);display:flex;gap:1rem;flex-wrap:wrap;line-height:1.6}
 .fnote span{color:var(--tx2)}
 </style>
@@ -309,9 +362,32 @@ body.details-open .card-extra{display:flex}
     </div>
     <div class="steps">
       <div class="step"><span class="sn">01</span><span>Find your account ID in <code>%localappdata%\Warframe\EE.log</code> — search "Logged in"</span></div>
-      <div class="step"><span class="sn">02</span><span>Fetch your profile JSON from the URL below and paste it here:</span></div>
+      <div class="step"><span class="sn">02</span><span>Paste your ID below, open the profile URL, copy the full page content and paste it in the field.</span></div>
     </div>
-    <div class="ep">http://content.warframe.com/dynamic/getProfileViewingData.php?playerId=<span>YOUR_ID</span></div>
+
+    <!-- Shown on first import: ID entry -->
+    <div id="id-entry" style="margin-bottom:.75rem">
+      <input type="text" id="player-id-input" placeholder="Paste your player ID here…"
+        style="width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:6px;padding:.5rem .75rem;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.8rem;outline:none;transition:border-color .2s;margin-bottom:.4rem"
+        oninput="onPlayerIdInput(this.value)">
+      <div id="id-url-preview" class="ep" style="display:none">http://content.warframe.com/dynamic/getProfileViewingData.php?playerId=<span id="id-url-val">—</span>
+        <button onclick="openProfileUrl()" class="btn btn-g" style="margin-left:.6rem;padding:.2rem .6rem;font-size:.7rem">Open URL</button>
+      </div>
+    </div>
+
+    <!-- Shown on re-import when ID already known -->
+    <div class="refresh-panel" id="refresh-panel">
+      <div class="rp-top">
+        <span class="rp-label">Saved ID</span>
+        <span class="rp-id" id="rp-id-display">—</span>
+        <button class="btn btn-g" style="padding:.2rem .6rem;font-size:.7rem" onclick="clearSavedId()">Change</button>
+      </div>
+      <div class="rp-url" id="rp-url-display"></div>
+      <div class="rp-actions">
+        <button class="btn btn-p" onclick="openProfileUrl()">Open profile URL →</button>
+        <span class="rp-note">Opens in new tab — copy the full page content and paste below.</span>
+      </div>
+    </div>
     <textarea id="json-input" placeholder="Paste the full JSON response here, or use Load from file…"></textarea>
     <div id="import-err" style="display:none"></div>
     <div class="ir">
@@ -346,7 +422,8 @@ body.details-open .card-extra{display:flex}
       <div class="sp"><div class="spv" id="s-vis">0</div><div class="spl">SHOWN</div></div>
     </div>
     <div class="hact">
-      <button class="hbtn" onclick="copyFilteredNames()">📋 Copy Names</button>
+      <button class="hbtn" onclick="copyFilteredNames()">Copy Names</button>
+      <button class="hbtn" id="hbtn-refresh" onclick="refreshProfile()" style="display:none">Refresh Profile</button>
       <button class="hbtn" onclick="exportData()">Export ↓</button>
       <button class="hbtn" onclick="document.getElementById('imp-in').click()">Import ↑</button>
       <input type="file" id="imp-in" accept=".json" style="display:none" onchange="importData(this)">
@@ -361,7 +438,16 @@ body.details-open .card-extra{display:flex}
   </div>
 
   <div id="view-items">
-    <div class="mbar" id="mbar"></div>
+    <div class="mbar" id="mbar">
+      <button class="mbar-calc-toggle" onclick="toggleCalc(this)">Calculator ▾</button>
+    </div>
+
+    <!-- Active list filter bar (hidden until lists exist) -->
+    <div class="list-bar" id="list-bar" style="display:none">
+      <span class="flbl" style="font-size:.58rem;letter-spacing:.18em;color:var(--tx3);text-transform:uppercase;flex-shrink:0">Lists</span>
+      <div id="list-chips"></div>
+      <button class="list-new-btn" onclick="promptNewList()">+ New list</button>
+    </div>
 
     <!-- Category filter — grouped -->
     <div class="frow">
@@ -399,30 +485,53 @@ body.details-open .card-extra{display:flex}
       <select class="csel" id="upd-sel" onchange="onUpdateFilter(this.value)">
         <option value="">All updates</option>
       </select>
-      <label class="ctog"><input type="checkbox" id="tog-founders" onchange="render()"> Founders</label>
-      <label class="ctog"><input type="checkbox" id="tog-forma" onchange="render()"> Needs Forma</label>
-      <label class="ctog"><input type="checkbox" id="tog-unmaxed" onchange="render()"> Unmaxed</label>
-      <label class="ctog"><input type="checkbox" id="tog-starred" onchange="render()"> Starred</label>
-      <label class="ctog"><input type="checkbox" id="tog-unowned" onchange="render()" checked> Unowned</label>
+      <label class="ctog"><input type="checkbox" id="tog-founders" onchange="render()"> Show Founders</label>
+      <label class="ctog"><input type="checkbox" id="tog-forma" onchange="render()"> Needs Forma only</label>
+      <label class="ctog"><input type="checkbox" id="tog-unmaxed" onchange="render()"> Unmaxed only</label>
+      <label class="ctog"><input type="checkbox" id="tog-starred" onchange="render()"> Starred only</label>
+      <label class="ctog"><input type="checkbox" id="tog-unowned" onchange="render()" checked> Show Unowned</label>
       <div class="display-group">
         <span class="ftog" id="ftog-badge" onclick="toggleField('badge',this)">Badge</span>
         <span class="ftog" id="ftog-rank" onclick="toggleField('rank',this)">Rank</span>
         <span class="ftog" id="ftog-update" onclick="toggleField('update',this)">Update</span>
         <div class="dg-sep"></div>
-        <label class="ctog"><input type="checkbox" id="tog-details" onchange="toggleDetails(this.checked)"> Details</label>
+        <span class="ftog off" id="ftog-xpbar" onclick="toggleField('xpbar',this)">XP Bar</span>
+        <span class="ftog off" id="ftog-notes" onclick="toggleField('notes',this)">Notes</span>
       </div>
     </div>
 
     <div id="action-bar" class="action-bar">
       <span class="ab-count" id="ab-count">0 selected</span>
-      <div class="hdivider" style="height:14px; opacity:0.3"></div>
-      <div class="ab-kb-hint">
-        <code>Esc</code> Clear · <code>S</code> Star · <code>Del</code> Unselect
+      <div class="hdivider" style="height:14px;opacity:.25;margin:0 .1rem"></div>
+      <div class="ab-hints">
+        <span class="ab-hint"><kbd>click</kbd> select</span>
+        <span class="ab-sep">·</span>
+        <span class="ab-hint"><kbd>ctrl</kbd><kbd>click</kbd> toggle</span>
+        <span class="ab-sep">·</span>
+        <span class="ab-hint"><kbd>shift</kbd><kbd>click</kbd> range</span>
+        <span class="ab-sep">·</span>
+        <span class="ab-hint"><kbd>S</kbd> star</span>
+        <span class="ab-sep">·</span>
+        <span class="ab-hint"><kbd>W</kbd> wiki</span>
+        <span class="ab-sep">·</span>
+        <span class="ab-hint"><kbd>P</kbd> priority</span>
+        <span class="ab-sep">·</span>
+        <span class="ab-hint"><kbd>B</kbd> building</span>
+        <span class="ab-sep">·</span>
+        <span class="ab-hint"><kbd>ctrl+A</kbd> all</span>
+        <span class="ab-sep">·</span>
+        <span class="ab-hint"><kbd>esc</kbd> clear</span>
       </div>
       <button class="ab-btn" onclick="selectAll()">Select all visible</button>
       <button class="ab-btn" onclick="starSelected()">★ Star</button>
       <button class="ab-btn" onclick="unstarSelected()">☆ Unstar</button>
-      <button class="ab-btn" onclick="copySelectedNames()">📋 Copy</button>
+      <button class="ab-btn" onclick="setStatusSelected('priority')">▲ Priority</button>
+      <button class="ab-btn" onclick="setStatusSelected('building')">⚙ Building</button>
+      <button class="ab-btn" onclick="copySelectedNames()">Copy Names</button>
+      <div class="ab-list-wrap">
+        <button class="ab-btn" onclick="toggleListPop(this)">Add to list ▾</button>
+        <div class="ab-list-pop" id="ab-list-pop"></div>
+      </div>
       <button class="ab-btn ab-btn-clear" onclick="clearSelection()">✕ Clear</button>
     </div>
 
@@ -521,6 +630,8 @@ const ST = {
   selection: new Set(),
   _lastSelIdx: null,
   _visibleItems: [],
+  _hoveredItem: null,
+  activeList: null,   // list ID currently being filtered by
   userData: {
     version: 3,
     meta: {},
@@ -558,7 +669,43 @@ function getMajorVersion(rawIntro) {
   return match ? match[1] : '0';
 }
 
-// ── Entity helpers ──
+// ── MR Threshold ──
+function mrThreshold(rank) {
+  if (rank <= 0) return 0;
+  if (rank <= 30) return 2500 * rank * rank;
+  return 2250000 + 147500 * (rank - 30);
+}
+function rankFromMastery(xp) {
+  if (xp <= 0) return 0;
+  // Binary search across ranks 1-40
+  let lo = 0, hi = 40;
+  while (lo < hi) {
+    const mid = (lo + hi + 1) >> 1;
+    if (mrThreshold(mid) <= xp) lo = mid; else hi = mid - 1;
+  }
+  return lo;
+}
+function calcTotalMastery() {
+  const itemMxp = ST.items.reduce((s,i) => s+(i.mastery||0), 0);
+  const scMxp   = calcStarChartMxp(ST.missions);
+  return itemMxp + scMxp;
+}
+
+// ── Wiki ──
+function openWikiPage(name) {
+  if (!name) return;
+  window.open('https://wiki.warframe.com/w/' + name.replace(/ /g, '_'), '_blank');
+}
+
+// ── Entity status ──
+function toggleEntityStatus(path, status, btn) {
+  const item = ST.items.find(i => i.path === path);
+  const e = getOrCreateEntity(path, item?.cat || 'item');
+  if (e.status === status) { delete e.status; if (btn) btn.classList.remove('on'); }
+  else { e.status = status; if (btn) btn.classList.add('on'); }
+  pruneEntity(path);
+  saveUserData();
+}
 function getOrCreateEntity(id, type) {
   if (!ST.userData.entities[id]) ST.userData.entities[id] = { type };
   return ST.userData.entities[id];
@@ -584,6 +731,165 @@ function toggleEntityStar(id, type, btn) {
   if (type !== 'node') { if (on) ST.starred.add(id); else ST.starred.delete(id); }
   saveUserData();
   return on;
+}
+
+// ── Player ID helpers ──
+function getPlayerId()  { return localStorage.getItem('wft3_playerid') || ''; }
+function savePlayerId(id) { if (id) localStorage.setItem('wft3_playerid', id.trim()); }
+function clearSavedId() {
+  localStorage.removeItem('wft3_playerid');
+  document.getElementById('refresh-panel').classList.remove('visible');
+  document.getElementById('id-entry').style.display = 'block';
+  document.getElementById('hbtn-refresh').style.display = 'none';
+}
+function profileUrl(id) { return `http://content.warframe.com/dynamic/getProfileViewingData.php?playerId=${id}`; }
+function openProfileUrl() {
+  const id = getPlayerId() || document.getElementById('player-id-input')?.value.trim();
+  if (!id) { toast('Enter your player ID first'); return; }
+  window.open(profileUrl(id), '_blank');
+}
+function onPlayerIdInput(val) {
+  const id = val.trim();
+  const preview = document.getElementById('id-url-preview');
+  const urlVal  = document.getElementById('id-url-val');
+  if (id && preview && urlVal) {
+    preview.style.display = 'block';
+    urlVal.textContent = id;
+  } else if (preview) {
+    preview.style.display = 'none';
+  }
+}
+function refreshProfile() {
+  // Show import screen in refresh mode (ID already known)
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('import-screen').style.display = 'flex';
+  document.getElementById('json-input').value = '';
+  initImportScreen();
+}
+
+// ── List management ──
+function listById(id) { return ST.userData.lists.find(l => l.id === id); }
+
+function promptNewList(initialPaths) {
+  const name = prompt('List name:');
+  if (!name?.trim()) return;
+  const id = 'list_' + Date.now();
+  ST.userData.lists.push({ id, name: name.trim(), created: Date.now() });
+  if (initialPaths?.size) {
+    initialPaths.forEach(path => {
+      const e = getOrCreateEntity(path, 'item');
+      if (!e.lists) e.lists = [];
+      if (!e.lists.includes(id)) e.lists.push(id);
+    });
+  }
+  saveUserData();
+  buildListBar();
+  toast(`List "${name.trim()}" created`);
+}
+
+function deleteList(id) {
+  ST.userData.lists = ST.userData.lists.filter(l => l.id !== id);
+  Object.values(ST.userData.entities).forEach(e => {
+    if (e.lists) e.lists = e.lists.filter(lid => lid !== id);
+  });
+  if (ST.activeList === id) ST.activeList = null;
+  saveUserData();
+  buildListBar();
+  render();
+}
+
+function addSelectionToList(listId) {
+  if (!ST.selection.size) return;
+  ST.selection.forEach(path => {
+    const item = ST.items.find(i => i.path === path);
+    const e = getOrCreateEntity(path, item?.cat || 'item');
+    if (!e.lists) e.lists = [];
+    if (!e.lists.includes(listId)) e.lists.push(listId);
+  });
+  saveUserData();
+  const list = listById(listId);
+  toast(`Added ${ST.selection.size} to "${list?.name}"`);
+  closeListPop();
+}
+
+function toggleListPop(btn) {
+  const pop = document.getElementById('ab-list-pop');
+  if (!pop) return;
+  const isOpen = pop.classList.toggle('open');
+  if (!isOpen) return;
+  // Build pop contents
+  pop.innerHTML = '';
+  ST.userData.lists.forEach(l => {
+    const opt = document.createElement('button');
+    opt.className = 'ab-list-opt';
+    opt.textContent = l.name;
+    opt.onclick = () => addSelectionToList(l.id);
+    pop.appendChild(opt);
+  });
+  const newOpt = document.createElement('button');
+  newOpt.className = 'ab-list-opt new';
+  newOpt.textContent = '+ New list';
+  newOpt.onclick = () => { promptNewList(ST.selection); closeListPop(); };
+  pop.appendChild(newOpt);
+  // Close on outside click
+  setTimeout(() => {
+    const close = e => { if (!pop.contains(e.target) && e.target !== btn) { closeListPop(); document.removeEventListener('click', close); } };
+    document.addEventListener('click', close);
+  }, 0);
+}
+function closeListPop() { document.getElementById('ab-list-pop')?.classList.remove('open'); }
+
+function buildListBar() {
+  const bar = document.getElementById('list-bar');
+  const chips = document.getElementById('list-chips');
+  if (!bar || !chips) return;
+  const hasLists = ST.userData.lists.length > 0;
+  bar.style.display = hasLists ? 'flex' : 'none';
+  chips.innerHTML = '';
+  ST.userData.lists.forEach(l => {
+    const chip = document.createElement('span');
+    chip.className = 'list-chip' + (ST.activeList === l.id ? ' active' : '');
+    chip.dataset.listId = l.id;
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = l.name;
+    chip.appendChild(nameSpan);
+
+    // Progress pill: X/Y maxed
+    const listItems = ST.items.filter(it => ST.userData.entities[it.path]?.lists?.includes(l.id));
+    if (listItems.length > 0) {
+      const maxedCount = listItems.filter(i => i.rank >= i.maxRank && i.maxRank > 0).length;
+      const prog = document.createElement('span');
+      prog.className = 'list-chip-prog';
+      prog.textContent = `${maxedCount}/${listItems.length}`;
+      chip.appendChild(prog);
+    }
+    const delBtn = document.createElement('button');
+    delBtn.className = 'list-chip-del';
+    delBtn.title = 'Delete list';
+    delBtn.textContent = '✕';
+    delBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      // Inline confirm: replace del button with yes/no
+      delBtn.style.display = 'none';
+      const confirmSpan = document.createElement('span');
+      confirmSpan.style.cssText = 'display:inline-flex;gap:3px;align-items:center;margin-left:3px';
+      confirmSpan.innerHTML = `<span style="font-size:.6rem;color:var(--err);margin-right:2px">Delete?</span>`;
+      const yes = document.createElement('button');
+      yes.className = 'list-chip-del'; yes.style.color='var(--err)'; yes.textContent = 'Yes';
+      yes.addEventListener('click', ev => { ev.stopPropagation(); deleteList(l.id); });
+      const no = document.createElement('button');
+      no.className = 'list-chip-del'; no.textContent = 'No';
+      no.addEventListener('click', ev => { ev.stopPropagation(); buildListBar(); });
+      confirmSpan.appendChild(yes); confirmSpan.appendChild(no);
+      chip.appendChild(confirmSpan);
+    });
+    chip.appendChild(delBtn);
+    chip.addEventListener('click', () => {
+      ST.activeList = ST.activeList === l.id ? null : l.id;
+      buildListBar(); renderMbar(); render();
+    });
+    chips.appendChild(chip);
+  });
 }
 
 /* ── INDEXEDDB ──────────────────────────────── */
@@ -829,11 +1135,25 @@ async function fetchUpdateNames() {
 
     // Fill well-known older ones the regex may miss
     const fallbacks = {
-      '16':'The Jovian Concord','17':'Buried Debts','18':'The Second Dream',
-      '19':'The War Within','20':"Octavia's Anthem",'21':'Chains of Harrow',
-      '22':'Plains of Eidolon','23':'The Sacrifice','24':'Fortuna',
-      '25':'The Jovian Concord','26':'Empyrean','27':'The Deadlock Protocol',
-      '28':'The Deadlock Protocol','29':'Sisters of Parvos','30':'The New War',
+      '18':'The Second Dream',
+      '19':'The War Within',
+      '20':"Octavia's Anthem",
+      '21':'Chains of Harrow',
+      '22':'Plains of Eidolon',
+      '23':'The Sacrifice',
+      '24':'Fortuna',
+      '25':'The Jovian Concord',
+      '26':'Empyrean',
+      '27':'Heart of Deimos',
+      '28':'The Deadlock Protocol',
+      '29':'Sisters of Parvos',
+      '30':'The New War',
+      '31':'Angels of the Zariman',
+      '32':'Veilbreaker',
+      '33':"Citrine's Last Wish",
+      '34':'Whispers in the Walls',
+      '35':'Dante Unbound',
+      '36':'Jade Shadows',
     };
     Object.entries(fallbacks).forEach(([v, t]) => { if (!map[v]) map[v] = t; });
 
@@ -1012,9 +1332,9 @@ function processStarChart(missions, nodeDb, missionDb) {
     {tag:'PlutoToErisJunction',     planet:'Pluto',   dest:'Eris'     },
     {tag:'ErisToSednaJunction',     planet:'Eris',    dest:'Sedna'    },
   ];
-  
   const manifestTags = new Set(JUNCTION_MANIFEST.map(j => j.tag));
   const JUNK_TYPES   = new Set(['ancient retribution','conclave','pvp']);
+
   const baseDone     = new Set(missions.map(m => m.tag).filter(Boolean));
   const spDone       = new Set(missions.filter(m => m.tier >= 1).map(m => m.tag));
   const completesMap = Object.fromEntries(missions.map(m => [m.tag, m.completes]));
@@ -1022,50 +1342,44 @@ function processStarChart(missions, nodeDb, missionDb) {
 
   const mkNode = (tag, name, type, extra, md) => ({
     tag, name, type,
-    enemy:      md?.enemy     || '',
-    minLevel:   md?.minLevel  || 0,
-    maxLevel:   md?.maxLevel  || 0,
-    done:       baseDone.has(tag),
-    spDone:     spDone.has(tag),
-    completes:  completesMap[tag] || 0,
-    masteryExp: md?.masteryExp || 0,
-    isJunction: false,
+    enemy:     md?.enemy     || '',
+    minLevel:  md?.minLevel  || 0,
+    maxLevel:  md?.maxLevel  || 0,
+    done:      baseDone.has(tag),
+    spDone:    spDone.has(tag),
+    completes: completesMap[tag] || 0,
+    masteryExp:md?.masteryExp || 0,
+    isJunction:false,
     ...extra,
   });
 
   for (const [tag, node] of Object.entries(nodeDb)) {
     if (!node) continue;
     if (/hub/i.test(tag)) continue;
-
     const mdata    = missionDb?.[tag] || {};
     const rawType  = node.type || node.missionType || '';
     const effType  = (mdata.type || rawType).toLowerCase();
-
     if (JUNK_TYPES.has(effType)) continue;
     if (effType === 'relay' && !mdata.type) continue;
     if (!rawType && !mdata.type && !baseDone.has(tag)) continue;
-
     const rawValue = node.value || '';
     const planet   = node.planet
       || (rawValue.match(/\(([^)]+)\)$/)?.[1] || '')
       || mdata.planet || node.systemName || '';
     const name     = rawValue.replace(/\s*\([^)]+\)$/,'').trim() || mdata.name || tag;
-
-    // --- DEDUPLICATION CHECK (MUST BE AFTER NAME/PLANET DEFINITION) ---
-    const namePlanetKey = `${name}-${planet}`;
-    if (seenNodes.has(namePlanetKey) && !baseDone.has(tag)) continue;
-    seenNodes.add(namePlanetKey);
-    // ------------------------------------------------------------------
-
-    const isRJ = tag.startsWith('CrewBattle') || effType.includes('proxima')
+    const isRJ     = tag.startsWith('CrewBattle') || effType.includes('proxima')
                   || planet.toLowerCase().includes('proxima');
 
+    // Ghost node filter: skip unvisited nodes not validated by missionDb
+    if (!baseDone.has(tag) && !missionDb?.[tag]) continue;
+
+    // Name+planet dedup: keep the completed version if dupes exist
+    const dedupKey = `${name}||${planet}`;
+    if (seenNodes.has(dedupKey) && !baseDone.has(tag)) continue;
+    seenNodes.add(dedupKey);
     const nd = mkNode(tag, name, mdata.type || rawType, {}, mdata);
     if (isRJ) railjack.push(nd);
-    else if (planet) { 
-      if (!planets[planet]) planets[planet]=[]; 
-      planets[planet].push(nd); 
-    }
+    else if (planet) { if (!planets[planet]) planets[planet]=[]; planets[planet].push(nd); }
   }
 
   JUNCTION_MANIFEST.forEach(j => {
@@ -1089,20 +1403,13 @@ function processStarChart(missions, nodeDb, missionDb) {
   Object.values(planets).forEach(nodes =>
     nodes.sort((a,b)=>(a.isJunction===b.isJunction)?a.name.localeCompare(b.name):a.isJunction?-1:1)
   );
-
   const sorted = Object.entries(planets).sort(([a],[b])=>{
     const ai=PLANET_ORDER.indexOf(a),bi=PLANET_ORDER.indexOf(b);
     if(ai===-1&&bi===-1)return a.localeCompare(b);
     return(ai===-1)?1:(bi===-1)?-1:ai-bi;
   });
-
-  return {
-    planets: sorted.map(([name,nodes])=>({name,nodes})),
-    railjack: railjack.sort((a,b)=>a.name.localeCompare(b.name))
-  };
+  return {planets:sorted.map(([name,nodes])=>({name,nodes})),railjack:railjack.sort((a,b)=>a.name.localeCompare(b.name))};
 }
-
-
 function renderStarChart() {
   const el = document.getElementById('scgrid');
   if (!el) return;
@@ -1153,6 +1460,7 @@ function renderStarChart() {
       ${n.completes>0?`<span class="sc-node-runs">${n.completes}×</span>`:''}
       ${!n.spDone&&n.masteryExp>0?`<span class="sc-node-mxp" title="SP completion awards ${n.masteryExp} mastery XP">+${n.masteryExp}</span>`:''}
       ${n.isJunction?`<span class="sc-node-mastery">${n.done?'MASTERY ✓':'MASTERY'}</span>`:''}
+      <a class="sc-node-wiki" href="https://wiki.warframe.com/w/${n.name.replace(/ /g,'_')}" target="_blank" title="Open wiki" onclick="event.stopPropagation()">wiki ↗</a>
       <button class="sc-node-star">★</button>
       <input class="sc-node-note" type="text" placeholder="note…">`;
     const sb=row.querySelector('.sc-node-star');
@@ -1229,6 +1537,10 @@ function filteredItems() {
     if (unmaxed && it.rank >= it.maxRank && it.maxRank > 0) return false;
     if (onlyStar && !ST.starred.has(it.path)) return false;
     if (needsForma && !(it.maxRank===40 && it.rank<40)) return false;
+    if (ST.activeList) {
+      const entityLists = ST.userData.entities[it.path]?.lists || [];
+      if (!entityLists.includes(ST.activeList)) return false;
+    }
     if (ST.search && !it.name.toLowerCase().includes(ST.search.toLowerCase())) return false;
     return true;
   });
@@ -1268,6 +1580,7 @@ function buildChips() {
       grp.keys.forEach(k => {
         const cfg = CAT[k];
         if (!cfg) return;
+        if (!(cc[k]||0)) return; // hide empty categories
         const b = document.createElement('button');
         b.className = 'chip' + (ST.cats[k] ? ' on' : '');
         b.style.setProperty('--cc', cfg.c);
@@ -1311,18 +1624,236 @@ function buildUpdateSel() {
 }
 
 /* ── RENDER: MASTERY BAR ────────────────────── */
+function calcStarChartMxp(missions) {
+  if (!missions?.length) return 0;
+  const JUNCTION_TAGS = new Set([
+    'VenusToMercuryJunction','EarthToVenusJunction','EarthToMarsJunction',
+    'MarsToPhobosJunction','MarsToCeresJunction','CeresToJupiterJunction',
+    'JupiterToEuropaJunction','JupiterToSaturnJunction','SaturnToUranusJunction',
+    'UranusToNeptuneJunction','NeptuneToPlutoJunction','PlutoToErisJunction',
+    'ErisToSednaJunction'
+  ]);
+  let total = 0;
+  missions.forEach(m => {
+    if (JUNCTION_TAGS.has(m.tag)) total += 1000;
+    if (m.tier >= 1 && ST.missionDb?.[m.tag]?.masteryExp) total += ST.missionDb[m.tag].masteryExp;
+  });
+  return total;
+}
 function renderMbar() {
-  const totalM = ST.items.reduce((s,i) => s+(i.mastery||0), 0);
-  const maxed  = ST.items.filter(i => i.rank>=i.maxRank && i.maxRank>0).length;
-  const bycat  = {};
+  const totalM  = ST.items.reduce((s,i) => s+(i.mastery||0), 0);
+  const maxed   = ST.items.filter(i => i.rank>=i.maxRank&&i.maxRank>0).length;
+  const scMxp   = calcStarChartMxp(ST.missions);
+  const bycat   = {};
   for (const it of ST.items) { if (!bycat[it.cat]) bycat[it.cat]=0; bycat[it.cat]+=(it.mastery||0); }
-  const top5 = Object.entries(bycat).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const cats = Object.entries(bycat).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+
+  // List mastery potential (when list is active)
+  let listPotential = null;
+  if (ST.activeList) {
+    const listItems = filteredItems(); // already filtered by list
+    const unmaxedInList = listItems.filter(i => i.rank < i.maxRank);
+    const potential = unmaxedInList.reduce((s,i) => {
+      const mult = (i.cat==='warframe'||i.cat==='necramech'||i.cat==='archwing'||i.cat==='sentinel') ? 200 : 100;
+      return s + (i.maxRank - i.rank) * mult;
+    }, 0);
+    listPotential = { potential, count: unmaxedInList.length };
+  }
+
   const mbar = document.getElementById('mbar');
-  if (mbar) mbar.innerHTML = `
-    <div class="mbi"><div class="mbl">MASTERY XP</div><div class="mbv">${fmtM(totalM)}</div></div>
+  if (!mbar) return;
+
+  // Preserve calc toggle state
+  const calcOpen = mbar.querySelector('.mbar-calc')?.classList.contains('open');
+
+  mbar.innerHTML = '';
+
+  // Toggle button
+  const tog = document.createElement('button');
+  tog.className = 'mbar-calc-toggle';
+  tog.textContent = 'Calculator ▾';
+  tog.onclick = () => toggleCalc(tog);
+  mbar.appendChild(tog);
+
+  // Stats row
+  const row = document.createElement('div'); row.className = 'mbar-row';
+  row.innerHTML = `
+    <div class="mbi"><div class="mbl">Item MXP</div><div class="mbv">${fmtM(totalM)}</div></div>
     <div class="mbsep"></div>
-    <div class="mbi"><div class="mbl">MAXED / TOTAL</div><div class="mbv">${maxed} / ${ST.items.length}</div></div>
-    <div class="catbd">${top5.map(([k,v])=>`<span class="cmini" style="background:${CAT[k]?.c||'#607080'}18;color:${CAT[k]?.c||'#607080'};border:1px solid ${CAT[k]?.c||'#607080'}30">${CAT[k]?.l||k} ${fmtM(v)}</span>`).join('')}</div>`;
+    <div class="mbi"><div class="mbl">Maxed</div><div class="mbv">${maxed} / ${ST.items.length}</div></div>
+    ${scMxp>0 ? `<div class="mbsep"></div><div class="mbi"><div class="mbl">Star Chart MXP</div><div class="mbv">${fmtM(scMxp)}</div></div>` : ''}
+    ${listPotential ? `<div class="mbsep"></div><div class="mbi"><div class="mbl">List potential</div><div class="mbv" style="color:#b89030">+${fmtM(listPotential.potential)}</div></div>` : ''}`;
+  mbar.appendChild(row);
+
+  // Category row
+  const catRow = document.createElement('div'); catRow.className = 'mbar-cats';
+  catRow.innerHTML = cats.map(([k,v]) => `<span class="cmini" style="background:${CAT[k]?.c||'#607080'}14;color:${CAT[k]?.c||'#607080'};border:1px solid ${CAT[k]?.c||'#607080'}32">${CAT[k]?.l||k}<span class="cmini-val">${fmtM(v)}</span></span>`).join('');
+  mbar.appendChild(catRow);
+
+  // Calculator panel (hidden by default)
+  const calc = document.createElement('div'); calc.className = 'mbar-calc' + (calcOpen ? ' open' : '');
+  renderCalcPanel(calc, totalM + scMxp);
+  mbar.appendChild(calc);
+}
+
+function renderCalcPanel(el, currentMxp) {
+  const playerMR  = ST.userData.meta.playerLevel || 0;
+  const nextMR    = playerMR + 1;
+  const threshold = mrThreshold(nextMR);
+  const gap       = Math.max(0, threshold - currentMxp);
+  const pct       = threshold > 0 ? Math.min(100, Math.round(currentMxp / threshold * 100)) : 100;
+  const wepsNeeded = gap > 0 ? Math.ceil(gap / 3000) : 0;
+  const frmsNeeded = gap > 0 ? Math.ceil(gap / 6000) : 0;
+
+  // Potential from all unleveled items
+  const potential = ST.items.reduce((s,i) => {
+    const mult = (i.cat==='warframe'||i.cat==='necramech'||i.cat==='archwing'||i.cat==='sentinel') ? 200 : 100;
+    return s + (i.maxRank - i.rank) * mult;
+  }, 0);
+  const ceilMR = rankFromMastery(currentMxp + potential);
+
+  // List projection (when list filter is active)
+  let listHtml = '';
+  if (ST.activeList) {
+    const list = listById(ST.activeList);
+    const listItems = ST.items.filter(it => ST.userData.entities[it.path]?.lists?.includes(ST.activeList));
+    const listGain = listItems.reduce((s,i) => {
+      const mult = (i.cat==='warframe'||i.cat==='necramech'||i.cat==='archwing'||i.cat==='sentinel') ? 200 : 100;
+      return s + (i.maxRank - i.rank) * mult;
+    }, 0);
+    const listNewTotal = currentMxp + listGain;
+    const listNewMR    = rankFromMastery(listNewTotal);
+    const mrGain       = listNewMR - playerMR;
+    listHtml = `
+      <div class="calc-row" style="background:rgba(74,173,158,.06);border-radius:5px;padding:.35rem .5rem;border:1px solid rgba(74,173,158,.15)">
+        <div class="calc-stat">
+          <div class="calc-lbl">Max all in "${list?.name || 'list'}"</div>
+          <div class="calc-val accent">+${fmtM(listGain)} → MR ${listNewMR}${mrGain > 0 ? ` <span style="color:#b89030">(+${mrGain} rank${mrGain!==1?'s':''})</span>` : ' <span style="color:var(--tx3)">(no change)</span>'}</div>
+        </div>
+      </div>`;
+  }
+
+  el.innerHTML = `
+    <div class="calc-row">
+      <div class="calc-stat"><div class="calc-lbl">Progress to MR ${nextMR}</div><div class="calc-val accent">${fmtM(currentMxp)} / ${fmtM(threshold)}</div></div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:100px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="calc-bar-wrap" style="flex:1">
+            <div class="calc-bar-fill" id="cbar-cur" style="width:${pct}%"></div>
+            <div class="calc-bar-proj" id="cbar-proj" style="left:${pct}%;width:0%"></div>
+          </div>
+          <span class="calc-bar-rankup" id="cbar-rank-lbl">MR ${playerMR}→${nextMR}</span>
+        </div>
+        <div class="calc-bar-overflow" id="cbar-overflow">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="calc-bar-wrap" style="flex:1">
+              <div class="calc-bar-proj" id="cbar-over" style="left:0%;width:0%"></div>
+            </div>
+            <span class="calc-bar-rankup" id="cbar-over-lbl">MR ${nextMR}→${nextMR+1}</span>
+          </div>
+        </div>
+      </div>
+      <div class="calc-stat" style="align-items:flex-end"><div class="calc-lbl">Gap</div><div class="calc-val" id="cbar-gap">+${fmtM(gap)}</div></div>
+    </div>
+    ${gap > 0 ? `<div class="calc-row" style="font-size:.68rem;color:var(--tx3)">
+      To reach MR ${nextMR}: <span style="color:var(--tx)">~${wepsNeeded} weapons</span> or <span style="color:var(--tx)">~${frmsNeeded} frames</span> at max rank
+    </div>` : `<div style="font-size:.68rem;color:var(--acc)">Ready to rank up!</div>`}
+    ${listHtml}
+    <div class="calc-row">
+      <div class="calc-stat"><div class="calc-lbl">Mastery ceiling</div><div class="calc-val">+${fmtM(potential)} available → MR ${ceilMR} max</div></div>
+    </div>
+    <div class="calc-inputs">
+      <div class="calc-input-grp">
+        <input type="number" id="wi-weapons" min="0" value="0" oninput="updateWhatIf()"> weapons
+      </div>
+      <div class="calc-input-grp">
+        <input type="number" id="wi-frames" min="0" value="0" oninput="updateWhatIf()"> frames
+      </div>
+      <div class="calc-result" id="wi-result">Enter items to see projection</div>
+    </div>`;
+
+  // Seed bars with list projection if a list is active
+  if (ST.activeList) {
+    const listGain = ST.items
+      .filter(it => ST.userData.entities[it.path]?.lists?.includes(ST.activeList))
+      .reduce((s,i) => {
+        const mult = (i.cat==='warframe'||i.cat==='necramech'||i.cat==='archwing'||i.cat==='sentinel') ? 200 : 100;
+        return s + (i.maxRank - i.rank) * mult;
+      }, 0);
+    // Use setTimeout to let the DOM settle first
+    setTimeout(() => updateCalcBars(listGain), 0);
+  }
+}
+
+function toggleCalc(btn) {
+  const calc = document.querySelector('.mbar-calc');
+  if (!calc) return;
+  const open = calc.classList.toggle('open');
+  btn.textContent = `Calculator ${open ? '▴' : '▾'}`;
+}
+
+function updateCalcBars(projMxp) {
+  const current  = calcTotalMastery();
+  const playerMR = ST.userData.meta.playerLevel || 0;
+  const nextMR   = playerMR + 1;
+  const th1 = mrThreshold(nextMR);
+  const th2 = mrThreshold(nextMR + 1);
+
+  const currentPct = Math.min(100, Math.round(current / th1 * 100));
+  const remaining  = Math.max(0, th1 - Math.min(current, th1));
+
+  // Capped projection on first bar
+  const projOnBar1 = Math.min(projMxp, remaining);
+  const projPct1   = Math.round(projOnBar1 / th1 * 100);
+
+  // Overflow into next rank
+  const overflow    = Math.max(0, projMxp - remaining);
+  const overflowPct = th2 > th1 ? Math.min(100, Math.round(overflow / (th2 - th1) * 100)) : 0;
+
+  const barP  = document.getElementById('cbar-proj');
+  const barO  = document.getElementById('cbar-over');
+  const ovDiv = document.getElementById('cbar-overflow');
+  const gapEl = document.getElementById('cbar-gap');
+  const rankLbl = document.getElementById('cbar-rank-lbl');
+  const overLbl = document.getElementById('cbar-over-lbl');
+
+  if (barP)  { barP.style.left = currentPct + '%'; barP.style.width = projPct1 + '%'; }
+  if (ovDiv) ovDiv.classList.toggle('show', overflow > 0);
+  if (barO)  barO.style.width = overflowPct + '%';
+  if (gapEl) {
+    const remaining2 = Math.max(0, th1 - current - projMxp);
+    gapEl.textContent = remaining2 > 0 ? `+${fmtM(remaining2)} left` : '✓ Rank up!';
+    gapEl.style.color = remaining2 <= 0 ? 'var(--acc)' : '';
+  }
+  if (rankLbl) rankLbl.textContent = `MR ${playerMR}→${nextMR}`;
+  if (overLbl) overLbl.textContent = `MR ${nextMR}→${nextMR+1} (+${fmtM(overflow)})`;
+}
+
+function updateWhatIf() {
+  const w = parseInt(document.getElementById('wi-weapons')?.value) || 0;
+  const f = parseInt(document.getElementById('wi-frames')?.value)  || 0;
+  const extra = w * 3000 + f * 6000;
+
+  // If user hasn't entered anything, show list projection on bar instead
+  const listGain = (() => {
+    if (!ST.activeList) return 0;
+    return ST.items.filter(it => ST.userData.entities[it.path]?.lists?.includes(ST.activeList))
+      .reduce((s,i) => {
+        const mult = (i.cat==='warframe'||i.cat==='necramech'||i.cat==='archwing'||i.cat==='sentinel') ? 200 : 100;
+        return s + (i.maxRank - i.rank) * mult;
+      }, 0);
+  })();
+
+  updateCalcBars(extra > 0 ? extra : listGain);
+
+  const res = document.getElementById('wi-result');
+  if (res) {
+    if (extra === 0) { res.textContent = 'Enter items to see projection'; return; }
+    const newTotal = calcTotalMastery() + extra;
+    const newRank  = rankFromMastery(newTotal);
+    const mr = ST.userData.meta.playerLevel || 0;
+    res.textContent = `+${fmtM(extra)} → MR ${newRank}${newRank > mr ? ` (+${newRank - mr} rank${newRank-mr!==1?'s':''})` : ' (no change)'}`;
+  }
 }
 
 /* ── RENDER: CARD ────────────────────────────── */
@@ -1344,6 +1875,9 @@ function makeCard(it, catMax) {
   d.className = 'card' + (it.isOwned ? '' : ' unowned');
   d.style.setProperty('--cc', cfg.c);
 
+  const entity  = ST.userData.entities[it.path] || {};
+  const status  = entity.status || null;
+
   d.innerHTML = `
     <button class="sbtn${starred?' on':''}">★</button>
     <div class="ctop">
@@ -1352,6 +1886,8 @@ function makeCard(it, catMax) {
     </div>
     <div class="ccore">
       <span class="rank-info">${rankDisplay}<span class="rank-max">/${it.maxRank}</span></span>
+      ${status === 'priority' ? '<span class="status-prio on">▲ Priority</span>' : ''}
+      ${status === 'building' ? '<span class="status-build on">⚙ Building</span>' : ''}
       ${it.update && it.update !== 'Unknown' ? `<span class="utag" title="${ST.updateNames[it.majorUpdate] ? ST.updateNames[it.majorUpdate] + ' · ' + it.update : 'Update ' + it.update}">${it.update}</span>` : ''}
     </div>
     <div class="card-extra">
@@ -1368,6 +1904,7 @@ function makeCard(it, catMax) {
     </div>`;
 
   d.dataset.path = it.path;
+  d.addEventListener('mouseenter', () => { ST._hoveredItem = it; });
   d.addEventListener('click', e => handleCardClick(e, it));
 
   // Attach listeners post-render (avoids HTML injection issues with note content)
@@ -1485,7 +2022,6 @@ function clearSearch() { ST.search=''; document.getElementById('search-input').v
 function onSort(v)   { ST.sort=v; render(); saveSettings(); }
 function onGroup(v)  { ST.group=v; render(); saveSettings(); }
 function onUpdateFilter() { render(); }
-function toggleDetails(on) { document.body.classList.toggle('details-open', on); }
 function toggleField(field, el) {
   const isOn = el.classList.toggle('off');
   document.body.classList.toggle(`hide-${field}`, isOn);
@@ -1495,9 +2031,7 @@ function toggleStar(path, btn) { toggleEntityStar(path, 'item', btn); if (ST.sta
 
 /* ── SELECTION ───────────────────────────────── */
 function handleCardClick(e, it) {
-  if (e.shiftKey) {
-    window.getSelection().removeAllRanges(); // Clears the blue text highlight
-  }
+  if (e.shiftKey) window.getSelection()?.removeAllRanges();
   if (e.target.closest('button,input,textarea,select')) return;
   const idx = ST._visibleItems.findIndex(i => i.path === it.path);
   if (e.shiftKey && ST._lastSelIdx !== null && idx !== -1) {
@@ -1597,6 +2131,20 @@ function loadSettings() {
   // loadUserData handles this — this is a no-op kept for call-site compatibility
 }
 
+function setStatusSelected(status) {
+  if (!ST.selection.size) return;
+  const allHave = [...ST.selection].every(path => ST.userData.entities[path]?.status === status);
+  ST.selection.forEach(path => {
+    const item = ST.items.find(i => i.path === path);
+    const e = getOrCreateEntity(path, item?.cat || 'item');
+    if (allHave) delete e.status; else e.status = status;
+    pruneEntity(path);
+  });
+  saveUserData();
+  render();
+  toast(allHave ? `Cleared status` : `${status === 'priority' ? '▲' : '⚙'} ${status} set on ${ST.selection.size} items`);
+}
+
 function copyFilteredNames() {
   const items = filteredItems();
   if (!items.length) { toast('Nothing to copy! (Adjust filters)'); return; }
@@ -1637,17 +2185,27 @@ function importData(inp) {
 
 /* ── IMPORT FLOW ────────────────────────────── */
 async function handleImport() {
-  const text=document.getElementById('json-input').value.trim();
-  const errEl=document.getElementById('import-err');
-  if(errEl) errEl.style.display='none';
+  const text = document.getElementById('json-input').value.trim();
+  const errEl = document.getElementById('import-err');
+  if (errEl) errEl.style.display = 'none';
   if (!text) { showE('Paste your JSON first.'); return; }
   let profile;
-  try { profile=parseProfile(text); }
-  catch(e) { showE(e instanceof SyntaxError?'Invalid JSON — try "Load from file" instead.':'Parse error: '+e.message); return; }
+  try { profile = parseProfile(text); }
+  catch(e) { showE(e instanceof SyntaxError ? 'Invalid JSON — try "Load from file" instead.' : 'Parse error: ' + e.message); return; }
   if (!profile.xpData.length) { showE('No XP data found in this JSON.'); return; }
-  localStorage.setItem('wft3_profile',text);
+  // Extract and persist player ID from the raw JSON if present
+  try {
+    const raw = JSON.parse(text);
+    const r = raw.Results?.[0] || raw;
+    const id = r.PlayerId || r.playerId || r.AccountId || r.accountId || '';
+    if (id) savePlayerId(id);
+    // Also try to find ID in the URL query if injected somehow (fallback to manual input)
+    const manualId = document.getElementById('player-id-input')?.value.trim();
+    if (!id && manualId) savePlayerId(manualId);
+  } catch(e) {}
+  localStorage.setItem('wft3_profile', text);
   await loadAndShow(profile);
-  function showE(m){ if(errEl){ errEl.textContent=m; errEl.className='err-box'; errEl.style.display='block'; } }
+  function showE(m) { if (errEl) { errEl.textContent=m; errEl.className='err-box'; errEl.style.display='block'; } }
 }
 
 async function loadAndShow(profile) {
@@ -1667,10 +2225,36 @@ async function loadAndShow(profile) {
   document.getElementById('player-info').textContent=`${profile.playerName} · MR ${profile.playerLevel}`;
   buildChips();
   buildUpdateSel();
+  buildListBar();
   renderMbar();
   render();
+  // Show refresh button if player ID is stored
+  const pid = getPlayerId();
+  const rbtn = document.getElementById('hbtn-refresh');
+  if (rbtn) rbtn.style.display = pid ? 'block' : 'none';
   saveUserData();
   toast(`Sync complete: ${ST.items.length} items tracked.`);
+}
+
+function initImportScreen() {
+  const id = getPlayerId();
+  const idEntry = document.getElementById('id-entry');
+  const refreshPanel = document.getElementById('refresh-panel');
+  if (id) {
+    // Known ID — show refresh panel
+    if (idEntry) idEntry.style.display = 'none';
+    if (refreshPanel) {
+      refreshPanel.classList.add('visible');
+      const disp = document.getElementById('rp-id-display');
+      const url  = document.getElementById('rp-url-display');
+      if (disp) disp.textContent = id;
+      if (url)  url.textContent  = profileUrl(id);
+    }
+  } else {
+    // No ID — show entry fields
+    if (idEntry) idEntry.style.display = 'block';
+    if (refreshPanel) refreshPanel.classList.remove('visible');
+  }
 }
 
 function resetApp() {
@@ -1678,6 +2262,7 @@ function resetApp() {
   document.getElementById('import-screen').style.display='flex';
   document.getElementById('json-input').value='';
   ST.items=[]; ST.missions=[];
+  initImportScreen();
 }
 
 /* ── AUDIT ──────────────────────────────────── */
@@ -1717,6 +2302,16 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' || e.key === 'Delete') { clearSelection(); return; }
   if ((e.key === 'a' || e.key === 'A') && (e.ctrlKey || e.metaKey)) { e.preventDefault(); selectAll(); return; }
   if (e.key === 's' || e.key === 'S') { if (ST.selection.size) { starSelected(); } return; }
+  if (e.key === 'w' || e.key === 'W') {
+    const target = ST.selection.size === 1
+      ? ST.items.find(i => i.path === [...ST.selection][0])
+      : ST._hoveredItem;
+    if (target) openWikiPage(target.name);
+    else toast('Hover or select an item to open its wiki page');
+    return;
+  }
+  if (e.key === 'p' || e.key === 'P') { if (ST.selection.size) setStatusSelected('priority'); return; }
+  if (e.key === 'b' || e.key === 'B') { if (ST.selection.size) setStatusSelected('building'); return; }
 });
 
 document.getElementById('file-in')?.addEventListener('change',e=>{
@@ -1728,7 +2323,9 @@ document.getElementById('file-in')?.addEventListener('change',e=>{
 
 (async function init() {
   await loadUserData();
-  // Restore group selector UI from settings
+  // XP Bar and Notes pills start as off — sync body classes
+  document.body.classList.add('hide-xpbar', 'hide-notes');
+  initImportScreen();
   const gs = document.getElementById('grp-sel');
   if (gs && ST.group) gs.value = ST.group;
   const saved = localStorage.getItem('wft3_profile');
