@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Warframe Mastery Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#030810;--s1:#060d18;--s2:#091422;--s3:#0c1928;
+  --bd:#112030;--bd2:#1c3048;
+  --acc:#4aad9e;
+  --tx:#9ab8ce;--tx2:#4e7088;--tx3:#2c4860;
+  --err:#b84060;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--tx);font-family:'Exo 2',sans-serif;font-size:14px;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--s1)}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+code{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);background:rgba(74,173,158,.1);padding:1px 5px;border-radius:3px}
+.btn{padding:.45rem 1.1rem;border-radius:6px;font-family:'Rajdhani',sans-serif;font-size:.88rem;font-weight:600;letter-spacing:.05em;cursor:pointer;border:none;transition:opacity .15s,transform .1s}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--acc);color:#001a14}.btn-p:hover{opacity:.85}.btn-p:disabled{opacity:.3;cursor:not-allowed}
+.btn-g{background:transparent;color:var(--tx2);border:1px solid var(--bd2)}.btn-g:hover{color:var(--tx);border-color:var(--acc)}
+
+/* ── IMPORT ── */
+#import-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
+.ic{background:var(--s1);border:1px solid var(--bd2);border-radius:12px;padding:2.5rem;max-width:640px;width:100%}
+.logo{display:flex;align-items:center;gap:1rem;margin-bottom:1.75rem}
+.logo-hex{font-size:2.2rem;color:var(--acc);line-height:1}
+.logo-title{font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;letter-spacing:.12em;color:#fff}
+.logo-sub{font-size:.72rem;letter-spacing:.2em;color:var(--tx2)}
+.steps{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;flex-direction:column;gap:.6rem}
+.step{display:flex;gap:.75rem;align-items:flex-start;font-size:.86rem;color:var(--tx2)}
+.sn{color:var(--acc);font-family:'Share Tech Mono',monospace;font-size:.68rem;margin-top:2px;flex-shrink:0}
+.ep{background:var(--bg);border:1px solid var(--bd2);border-radius:6px;padding:.55rem .9rem;margin-bottom:1rem;font-family:'Share Tech Mono',monospace;font-size:.76rem;color:var(--tx2);word-break:break-all}
+.ep span{color:var(--acc)}
+#json-input{width:100%;height:110px;background:var(--bg);border:1px solid var(--bd2);border-radius:8px;padding:.7rem;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.76rem;resize:vertical;outline:none;transition:border-color .2s}
+#json-input:focus{border-color:var(--acc)}
+#json-input::placeholder{color:var(--tx3)}
+.ir{display:flex;gap:.7rem;margin-top:.9rem;align-items:center}
+.inote{margin-left:auto;font-size:.7rem;color:var(--tx3)}
+.err-box{color:var(--err);font-size:.82rem;padding:.5rem .75rem;background:rgba(184,64,96,.08);border-radius:5px;border-left:2px solid var(--err);margin-top:.5rem}
+
+/* ── LOADING ── */
+#loading-screen{display:none;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:1.5rem}
+.load-hex{font-size:2rem;color:var(--acc);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.load-msg{font-family:'Rajdhani',sans-serif;font-size:1rem;letter-spacing:.1em;color:var(--tx2)}
+.load-bar-wrap{width:280px;height:3px;background:var(--s3);border-radius:2px;overflow:hidden}
+.load-bar{height:100%;background:var(--acc);border-radius:2px;transition:width .4s ease;width:0%}
+.load-note{font-size:.72rem;color:var(--tx3);text-align:center;max-width:320px;line-height:1.5}
+
+/* ── APP ── */
+#app{display:none;min-height:100vh;flex-direction:column}
+
+/* Header */
+.app-hdr{background:var(--s1);border-bottom:1px solid var(--bd);padding:.6rem 1.4rem;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:20;flex-wrap:wrap}
+.hbrand{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.hhex{color:var(--acc);font-size:1.05rem}
+.htitle{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.9rem;letter-spacing:.15em;color:#d0e8f8}
+.hplayer{font-size:.68rem;color:var(--tx2);letter-spacing:.06em;margin-top:1px}
+.hdivider{width:1px;height:28px;background:var(--bd2);flex-shrink:0}
+.hstats{display:flex;gap:.35rem;align-items:center}
+.sp{display:flex;flex-direction:column;align-items:center;padding:.15rem .6rem;background:var(--s2);border:1px solid var(--bd);border-radius:4px}
+.spv{font-family:'Share Tech Mono',monospace;font-size:.82rem;color:var(--acc)}
+.spl{font-size:.55rem;letter-spacing:.1em;color:var(--tx3)}
+.hact{display:flex;gap:.35rem;flex-shrink:0;margin-left:auto}
+.hbtn{padding:.28rem .65rem;background:transparent;border:1px solid var(--bd2);border-radius:4px;color:var(--tx2);font-size:.7rem;cursor:pointer;font-family:'Exo 2',sans-serif;transition:all .15s;white-space:nowrap}
+.hbtn:hover{border-color:var(--acc);color:var(--acc)}
+.hbtn-warn{border-color:rgba(200,112,24,.4);color:#b87020}
+.hbtn-warn:hover{border-color:#c87018;color:#c87018}
+
+/* Tabs */
+.tabs{display:flex;background:var(--s1);border-bottom:1px solid var(--bd)}
+.tab{padding:.48rem 1.2rem;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.83rem;letter-spacing:.08em;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab:hover{color:var(--tx2)}.tab.active{color:var(--acc);border-bottom-color:var(--acc)}
+
+/* Mastery bar */
+.mbar{background:var(--s2);border-bottom:1px solid var(--bd);padding:.6rem 1.4rem;display:flex;gap:1.25rem;align-items:center;flex-wrap:wrap}
+.mbi{display:flex;flex-direction:column;gap:1px}
+.mbl{font-size:.6rem;letter-spacing:.1em;color:var(--tx3)}
+.mbv{font-family:'Share Tech Mono',monospace;font-size:.88rem;color:var(--acc)}
+.mbsep{width:1px;height:26px;background:var(--bd2);flex-shrink:0}
+.catbd{display:flex;gap:.3rem;flex-wrap:wrap;margin-left:auto}
+.cmini{font-size:.65rem;padding:2px 6px;border-radius:3px;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.02em}
+
+/* Filter rows */
+.frow{background:var(--s1);border-bottom:1px solid var(--bd);padding:.75rem 1.4rem;display:flex;flex-direction:column;align-items:flex-start;gap:.5rem}
+.flbl{font-size:.58rem;letter-spacing:.18em;color:var(--tx3);flex-shrink:0;text-transform:uppercase}
+
+/* Chip groups */
+.chips{display:flex;gap:.28rem;flex-wrap:wrap;align-items:center}
+.chip-group{display:flex;gap:.28rem;flex-wrap:wrap;align-items:center}
+.chip-grp-lbl{background:none;border:none;color:var(--tx3);font-size:.58rem;letter-spacing:.12em;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600;padding:.15rem .3rem;transition:color .15s;text-transform:uppercase;flex-shrink:0}
+.chip-grp-lbl:hover{color:var(--tx2)}
+.chip-sep{width:1px;height:18px;background:var(--bd2);margin:0 .2rem;flex-shrink:0;align-self:center}
+
+.chip{display:flex;align-items:center;gap:.22rem;padding:.15rem .5rem;border-radius:3px;border:1px solid transparent;font-size:.7rem;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.03em;cursor:pointer;transition:all .12s;background:var(--s2);color:var(--tx3);user-select:none}
+.chip:hover{opacity:.85}
+.chip.on{color:var(--cc);border-color:color-mix(in srgb,var(--cc) 50%,transparent);background:color-mix(in srgb,var(--cc) 10%,transparent)}
+.cn{font-family:'Share Tech Mono',monospace;font-size:.62rem;opacity:.65}
+
+/* Controls bar */
+.ctrls{display:flex;gap:.5rem;padding:.55rem 1.4rem;align-items:center;background:var(--s2);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.sw{position:relative;flex:1;min-width:140px;max-width:260px}
+.si{position:absolute;left:.5rem;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:.9rem;pointer-events:none}
+#search-input{width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:5px;padding:.36rem 1.7rem;color:var(--tx);font-family:'Exo 2',sans-serif;font-size:.82rem;outline:none;transition:border-color .15s}
+#search-input:focus{border-color:var(--acc)}
+#search-input::placeholder{color:var(--tx3)}
+.cx{position:absolute;right:.38rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--tx3);cursor:pointer;font-size:.9rem;padding:2px 4px;line-height:1}
+.cx:hover{color:var(--tx)}
+.csel{background:var(--bg);border:1px solid var(--bd2);border-radius:5px;padding:.36rem .55rem;color:var(--tx);font-family:'Exo 2',sans-serif;font-size:.82rem;outline:none;cursor:pointer}
+.csel:focus{border-color:var(--acc)}
+.ctog{display:flex;align-items:center;gap:.3rem;font-size:.73rem;color:var(--tx2);cursor:pointer;user-select:none;white-space:nowrap}
+.ctog input{cursor:pointer;accent-color:var(--acc)}
+.rc{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--tx3);white-space:nowrap}
+
+/* Group headers */
+.ghdr{display:flex;align-items:center;gap:.75rem;padding:.45rem 1.4rem;background:var(--s1);border-bottom:1px solid var(--bd);border-top:1px solid var(--bd)}
+.gtitle{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.08em;color:var(--tx)}
+.gdate{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--tx3)}
+.gm{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--acc)}
+.gcnt{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--tx3);margin-left:auto}
+
+/* Display group — field toggles + Details, right-aligned in controls */
+.display-group{display:flex;align-items:center;gap:.28rem;margin-left:auto;flex-shrink:0;padding-left:.5rem;border-left:1px solid var(--bd2)}
+.dg-sep{width:1px;height:14px;background:var(--bd2);margin:0 .1rem;flex-shrink:0}
+.ftog{padding:.16rem .46rem;border-radius:3px;border:1px solid var(--bd2);background:var(--s3);font-size:.68rem;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.04em;cursor:pointer;transition:all .12s;user-select:none;color:var(--tx2)}
+.ftog:hover{border-color:var(--acc);color:var(--acc)}
+.ftog.off{color:var(--tx3);opacity:.45;border-color:transparent;text-decoration:line-through}
+
+/* Body-level field visibility toggles */
+body.hide-badge .cbadge{display:none}
+body.hide-rank .rank-info{display:none}
+body.hide-update .utag{display:none}
+
+/* Grid */
+.isect{padding:.8rem 1.4rem}
+.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem}
+
+/* Card */
+.card{user-select: none;-webkit-user-select: none;background:var(--s2);border:1px solid var(--bd);border-radius:7px;padding:.65rem;display:flex;flex-direction:column;gap:.28rem;transition:border-color .12s,background .12s;position:relative;overflow:hidden}
+.card:hover{border-color:color-mix(in srgb,var(--cc) 55%,transparent);background:var(--s3)}
+.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cc);border-radius:7px 0 0 7px;opacity:.8}
+
+/* Card: always-visible */
+.ctop{display:flex;align-items:flex-start;gap:.4rem;padding-right:1.2rem}
+.cbadge{font-family:'Share Tech Mono',monospace;font-size:.6rem;padding:2px 5px;border-radius:3px;border:1px solid;flex-shrink:0;margin-top:1px;line-height:1.2;letter-spacing:.03em;white-space:nowrap}
+.cname{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.9rem;line-height:1.2;word-break:break-word;flex:1;color:#c8dce8}
+.ccore{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.rank-info{font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--tx);display:flex;align-items:center;gap:.15rem}
+.rank-cur{color:var(--acc)}
+.rank-max{color:var(--tx3)}
+.utag{font-size:.58rem;color:var(--tx3);font-family:'Share Tech Mono',monospace;margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px}
+
+/* Card: star button */
+.sbtn{position:absolute;top:.4rem;right:.4rem;background:none;border:none;cursor:pointer;font-size:.7rem;color:var(--tx3);padding:2px;line-height:1;transition:color .12s}
+.sbtn:hover,.sbtn.on{color:#c0a030}
+
+/* Card: extra — hidden by default, revealed via global Details toggle */
+.card-extra{display:none;padding-top:.3rem;border-top:1px solid var(--bd);margin-top:.15rem;flex-direction:column;gap:.28rem}
+body.details-open .card-extra{display:flex}
+
+/* Column layout — used when grouping by category */
+.col-wrap{display:flex;gap:.6rem;overflow-x:auto;padding:.9rem 1.4rem;align-items:flex-start}
+.col-wrap::-webkit-scrollbar{height:5px}
+.col-wrap::-webkit-scrollbar-track{background:var(--s1)}
+.col-wrap::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+.cat-col{flex-shrink:0;width:230px;display:flex;flex-direction:column;gap:.38rem}
+.cat-col .card{width:100%}
+.cat-col-hdr{border-radius:6px;padding:.38rem .65rem;display:flex;justify-content:space-between;align-items:center;background:var(--s1);border:1px solid var(--bd);border-left:3px solid var(--cc);margin-bottom:.06rem}
+.col-cat-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.82rem;letter-spacing:.06em;color:var(--cc)}
+.col-cat-meta{display:flex;gap:.4rem;align-items:baseline}
+.col-cat-mxp{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--acc)}
+.col-cat-cnt{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--tx3)}
+.cmeta{display:flex;gap:.28rem;flex-wrap:wrap;align-items:center}
+.abadge{font-size:.58rem;padding:1px 5px;border-radius:3px;border:1px solid;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.03em}
+.xbw{background:var(--bg);border-radius:2px;height:3px;overflow:hidden}
+.xbf{height:100%;border-radius:2px;transition:width .35s ease}
+.cbot{display:flex;align-items:center;gap:.35rem}
+.xlbl{font-size:.58rem;letter-spacing:.09em;color:var(--tx3)}
+.xval{font-family:'Share Tech Mono',monospace;font-size:.75rem;margin-left:auto}
+.mval{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--tx2)}
+
+/* Rank input (for rank-40 items) */
+.rank-input{width:36px;background:var(--s3);border:1px solid var(--bd2);color:var(--acc);font-family:'Share Tech Mono',monospace;font-size:.75rem;text-align:center;border-radius:3px;padding:1px}
+
+/* Unowned */
+.card.unowned{opacity:.55;filter:grayscale(.3);border-style:dashed}
+.card.unowned:hover{opacity:.85;filter:grayscale(0)}
+
+/* Empty state */
+.empty{grid-column:1/-1;text-align:center;padding:4rem 2rem;color:var(--tx3);font-size:.86rem}
+
+/* Star Chart */
+#view-sc{display:none;padding:1.4rem}
+#scgrid{display:flex;flex-direction:column;gap:.5rem}
+.scbw{flex:1;height:4px;background:var(--bg);border-radius:2px;overflow:hidden}
+.scb{height:100%;border-radius:2px;background:var(--acc)}
+.sc-summary{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:.7rem 1rem;display:flex;align-items:center;gap:1.25rem}
+.sc-sum-stat{display:flex;flex-direction:column;gap:1px;flex-shrink:0}
+.sc-sum-num{font-family:'Share Tech Mono',monospace;font-size:1rem;color:var(--acc)}
+.sc-sum-lbl{font-size:.56rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase}
+.sc-section{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:.16em;color:var(--tx3);text-transform:uppercase;padding-bottom:.3rem;border-bottom:1px solid var(--bd);margin-top:.25rem}
+
+/* Planet accordion list */
+.sc-planet-list{display:flex;flex-direction:column;gap:.3rem}
+.sc-planet{border:1px solid var(--bd);border-radius:7px;overflow:hidden;background:var(--s2)}
+.sc-planet-hdr{display:flex;align-items:center;gap:.5rem;padding:.48rem .75rem;cursor:pointer;user-select:none;transition:background .12s}
+.sc-planet-hdr:hover{background:var(--s3)}
+.sc-chevron{color:var(--tx3);font-size:.58rem;transition:transform .15s;flex-shrink:0}
+.sc-planet.open .sc-chevron{transform:rotate(90deg)}
+.sc-planet-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.88rem;letter-spacing:.05em;color:var(--tx);flex:1}
+.sc-planet-stats{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--tx3);white-space:nowrap}
+.sc-planet-pct{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--acc);min-width:28px;text-align:right}
+.sc-planet.complete .sc-planet-pct{color:#4aad9e}
+.sc-planet-bar{height:2px;background:var(--bg)}
+.sc-planet-bar-fill{height:100%;background:var(--acc)}
+.sc-planet.complete .sc-planet-bar-fill{background:#4aad9e}
+.sc-body{display:none;border-top:1px solid var(--bd)}
+.sc-planet.open .sc-body{display:block}
+
+/* Individual node rows */
+.sc-node{display:flex;align-items:center;gap:.48rem;padding:.26rem .75rem;border-bottom:1px solid var(--bd);font-size:.78rem}
+.sc-node:last-child{border-bottom:none}
+.sc-node.junction{background:rgba(192,160,48,.04)}
+.sc-node-icon{font-size:.52rem;flex-shrink:0;color:var(--tx3)}
+.sc-node.junction .sc-node-icon{color:#b89830}
+.sc-node-name{flex:1;font-family:'Rajdhani',sans-serif;font-weight:500;font-size:.82rem;color:var(--tx2)}
+.sc-node-type{font-size:.58rem;color:var(--tx3);font-family:'Share Tech Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.sc-node-mastery{font-size:.54rem;font-family:'Rajdhani',sans-serif;font-weight:700;color:#b89830;border:1px solid rgba(184,152,48,.35);padding:1px 4px;border-radius:3px;letter-spacing:.05em;flex-shrink:0}
+.sc-node-status{font-size:.66rem;flex-shrink:0;width:14px;text-align:center;color:var(--tx3)}
+
+/* Steel Path planet toggle */
+.sc-sp-btn{background:none;border:1px solid var(--bd2);border-radius:3px;color:var(--tx3);font-size:.58rem;font-family:'Rajdhani',sans-serif;font-weight:600;padding:1px 5px;cursor:pointer;transition:all .12s;white-space:nowrap;flex-shrink:0;letter-spacing:.03em}
+.sc-sp-btn:hover{border-color:rgba(184,152,48,.5);color:#b89830}
+.sc-sp-btn.on{border-color:rgba(184,152,48,.45);color:#b89830;background:rgba(184,152,48,.08)}
+
+/* Card note */
+.card-note{width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:4px;padding:.28rem .42rem;color:var(--tx);font-family:'Exo 2',sans-serif;font-size:.72rem;resize:none;outline:none;min-height:40px;line-height:1.45;transition:border-color .15s;display:block}
+.card-note:focus{border-color:var(--acc)}
+.card-note::placeholder{color:var(--tx3)}
+
+/* Node row extras */
+.sc-node-star{background:none;border:none;cursor:pointer;font-size:.65rem;color:var(--tx3);padding:0 2px;line-height:1;transition:color .12s;flex-shrink:0}
+.sc-node-star:hover,.sc-node-star.on{color:#c0a030}
+.sc-node-runs{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--tx3);flex-shrink:0}
+.sc-node-mxp{font-size:.54rem;font-family:'Rajdhani',sans-serif;font-weight:700;color:#b89830;border:1px solid rgba(184,152,48,.35);padding:1px 4px;border-radius:3px;letter-spacing:.05em;flex-shrink:0;cursor:help}
+.sc-node-note{background:none;border:none;border-bottom:1px solid transparent;color:var(--tx2);font-size:.68rem;font-family:'Exo 2',sans-serif;outline:none;width:90px;padding:0 2px;transition:border-color .12s;min-width:0;flex-shrink:1}
+.sc-node-note:focus{border-bottom-color:var(--acc)}
+.sc-node-note::placeholder{color:var(--tx3)}
+.sc-planet-sp{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--tx3);white-space:nowrap}
+.sc-planet-sp .sp-done{color:#6888c8}
+.sc-mxp-available{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:#b89830}
+
+/* Card selection */
+.card.selected{border-color:color-mix(in srgb,var(--cc) 70%,transparent);background:color-mix(in srgb,var(--cc) 7%,var(--s3));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--cc) 25%,transparent)}
+.card.selected::after{content:'✓';position:absolute;bottom:.38rem;right:.42rem;font-size:.55rem;color:var(--cc);font-family:'Share Tech Mono',monospace;opacity:.8;pointer-events:none}
+
+/* Action bar */
+.action-bar{display:none;align-items:center;gap:.5rem;padding:.45rem 1.4rem;background:var(--s1);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.action-bar.visible{display:flex}
+.ab-count{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--acc);flex-shrink:0}
+.ab-btn{padding:.22rem .6rem;border-radius:4px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-size:.72rem;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;transition:all .12s;white-space:nowrap}
+.ab-btn:hover{border-color:var(--acc);color:var(--acc)}
+.ab-btn-clear{margin-left:auto;color:var(--tx3)}
+.ab-btn-clear:hover{border-color:var(--err);color:var(--err)}
+.ab-kb-hint {
+  font-size: 0.65rem;
+  color: var(--tx3);
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+.ab-kb-hint code {
+  color: var(--tx2);
+  background: var(--s2);
+  border: 1px solid var(--bd);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* Node row — 3-state colour coding */
+.sc-node.done .sc-node-status{color:var(--acc)}
+.sc-node.done .sc-node-name{color:var(--tx)}
+.sc-node.sp-done{background:rgba(68,104,168,.06)}
+.sc-node.sp-done .sc-node-status{color:#6888c8}
+.sc-node.sp-done .sc-node-name{color:#8aaae0}
+.sc-node.sp-done .sc-node-icon{color:#6888c8}
+.sc-node:not(.done) .sc-node-status{color:var(--tx3)}
+#toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--s3);border:1px solid var(--acc);border-radius:6px;padding:.45rem .85rem;font-size:.78rem;color:var(--acc);z-index:100;opacity:0;transition:opacity .25s;pointer-events:none}
+#toast.show{opacity:1}
+
+/* Footer note */
+.fnote{padding:.4rem 1.4rem;font-size:.66rem;color:var(--tx3);background:var(--s2);border-top:1px solid var(--bd);display:flex;gap:1rem;flex-wrap:wrap;line-height:1.6}
+.fnote span{color:var(--tx2)}
+</style>
+</head>
+<body>
+
+<!-- ─── IMPORT ─────────────────────────────────── -->
+<div id="import-screen">
+  <div class="ic">
+    <div class="logo">
+      <div class="logo-hex">⬡</div>
+      <div><div class="logo-title">MASTERY TRACKER</div><div class="logo-sub">WARFRAME · v2</div></div>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="sn">01</span><span>Find your account ID in <code>%localappdata%\Warframe\EE.log</code> — search "Logged in"</span></div>
+      <div class="step"><span class="sn">02</span><span>Fetch your profile JSON from the URL below and paste it here:</span></div>
+    </div>
+    <div class="ep">http://content.warframe.com/dynamic/getProfileViewingData.php?playerId=<span>YOUR_ID</span></div>
+    <textarea id="json-input" placeholder="Paste the full JSON response here, or use Load from file…"></textarea>
+    <div id="import-err" style="display:none"></div>
+    <div class="ir">
+      <button class="btn btn-g" onclick="document.getElementById('file-in').click()">Load from file</button>
+      <input type="file" id="file-in" accept=".json,.txt" style="display:none">
+      <button class="btn btn-p" onclick="handleImport()">Import →</button>
+      <span class="inote">Data stays local — never sent anywhere</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── LOADING ───────────────────────────────── -->
+<div id="loading-screen">
+  <div class="load-hex">⬡</div>
+  <div class="load-msg" id="load-msg">Initialising…</div>
+  <div class="load-bar-wrap"><div class="load-bar" id="load-bar"></div></div>
+  <div class="load-note">Fetching item database from warframestat.us — cached locally for 7 days. Works offline after first load.</div>
+</div>
+
+<!-- ─── APP ──────────────────────────────────── -->
+<div id="app">
+
+  <header class="app-hdr">
+    <div class="hbrand">
+      <span class="hhex">⬡</span>
+      <div><div class="htitle">MASTERY TRACKER</div><div class="hplayer" id="player-info">—</div></div>
+    </div>
+    <div class="hdivider"></div>
+    <div class="hstats">
+      <div class="sp"><div class="spv" id="s-mxp">0</div><div class="spl">MXP</div></div>
+      <div class="sp"><div class="spv" id="s-maxed">0</div><div class="spl">MAXED</div></div>
+      <div class="sp"><div class="spv" id="s-vis">0</div><div class="spl">SHOWN</div></div>
+    </div>
+    <div class="hact">
+      <button class="hbtn" onclick="copyFilteredNames()">📋 Copy Names</button>
+      <button class="hbtn" onclick="exportData()">Export ↓</button>
+      <button class="hbtn" onclick="document.getElementById('imp-in').click()">Import ↑</button>
+      <input type="file" id="imp-in" accept=".json" style="display:none" onchange="importData(this)">
+      <button class="hbtn" onclick="resetApp()">↺ New</button>
+      <button class="hbtn hbtn-warn" onclick="auditDatabase()">⚠ Audit</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-items" onclick="switchTab('items')">Items</div>
+    <div class="tab" id="tab-sc" onclick="switchTab('sc')">Star Chart</div>
+  </div>
+
+  <div id="view-items">
+    <div class="mbar" id="mbar"></div>
+
+    <!-- Category filter — grouped -->
+    <div class="frow">
+      <span class="flbl">Category</span>
+      <div class="chips" id="cat-chips"></div>
+    </div>
+
+    <!-- Source filter -->
+    <div class="frow">
+      <span class="flbl">Source</span>
+      <div class="chips" id="acq-chips"></div>
+    </div>
+
+    <!-- Controls (single, deduplicated) -->
+    <div class="ctrls">
+      <div class="sw">
+        <span class="si">⌕</span>
+        <input type="text" id="search-input" placeholder="Search…" oninput="onSearch(this.value)">
+        <button class="cx" id="cx" style="display:none" onclick="clearSearch()">×</button>
+      </div>
+      <select class="csel" id="sort-sel" onchange="onSort(this.value)">
+        <option value="mastery-desc">Mastery ↓</option>
+        <option value="xp-desc">XP ↓</option>
+        <option value="xp-asc">XP ↑</option>
+        <option value="name-asc">Name A–Z</option>
+        <option value="rank-asc">Rank ↑</option>
+        <option value="cat">By category</option>
+      </select>
+      <select class="csel" id="grp-sel" onchange="onGroup(this.value)">
+        <option value="">No grouping</option>
+        <option value="update">By update</option>
+        <option value="acq">By source</option>
+        <option value="cat">By category</option>
+      </select>
+      <select class="csel" id="upd-sel" onchange="onUpdateFilter(this.value)">
+        <option value="">All updates</option>
+      </select>
+      <label class="ctog"><input type="checkbox" id="tog-founders" onchange="render()"> Founders</label>
+      <label class="ctog"><input type="checkbox" id="tog-forma" onchange="render()"> Needs Forma</label>
+      <label class="ctog"><input type="checkbox" id="tog-unmaxed" onchange="render()"> Unmaxed</label>
+      <label class="ctog"><input type="checkbox" id="tog-starred" onchange="render()"> Starred</label>
+      <label class="ctog"><input type="checkbox" id="tog-unowned" onchange="render()" checked> Unowned</label>
+      <div class="display-group">
+        <span class="ftog" id="ftog-badge" onclick="toggleField('badge',this)">Badge</span>
+        <span class="ftog" id="ftog-rank" onclick="toggleField('rank',this)">Rank</span>
+        <span class="ftog" id="ftog-update" onclick="toggleField('update',this)">Update</span>
+        <div class="dg-sep"></div>
+        <label class="ctog"><input type="checkbox" id="tog-details" onchange="toggleDetails(this.checked)"> Details</label>
+      </div>
+    </div>
+
+    <div id="action-bar" class="action-bar">
+      <span class="ab-count" id="ab-count">0 selected</span>
+      <div class="hdivider" style="height:14px; opacity:0.3"></div>
+      <div class="ab-kb-hint">
+        <code>Esc</code> Clear · <code>S</code> Star · <code>Del</code> Unselect
+      </div>
+      <button class="ab-btn" onclick="selectAll()">Select all visible</button>
+      <button class="ab-btn" onclick="starSelected()">★ Star</button>
+      <button class="ab-btn" onclick="unstarSelected()">☆ Unstar</button>
+      <button class="ab-btn" onclick="copySelectedNames()">📋 Copy</button>
+      <button class="ab-btn ab-btn-clear" onclick="clearSelection()">✕ Clear</button>
+    </div>
+
+    <div id="items-wrap"></div>
+  </div>
+
+  <div id="view-sc">
+    <div class="scgrid" id="scgrid"></div>
+    <div class="fnote">Star chart data from warframestat.us — <span>Steel Path completions cannot be separated from Normal in this profile format.</span> Node counts may vary slightly as DE adds missions.</div>
+  </div>
+
+  <div class="fnote" id="fnote">
+    <span>Mastery formula:</span> weapons rank 30 = 465K XP · frames rank 30 = 930K XP
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* ── CONFIG ─────────────────────────────────── */
+const API_BASE  = 'https://api.warframestat.us';
+const CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
+const MISSION_DB_TTL = 30 * 24 * 60 * 60 * 1000;
+
+const CAT = {
+  warframe:        {l:'Warframes',      c:'#c86838', g:'WF'},
+  primary:         {l:'Primary',        c:'#b89030', g:'PR'},
+  secondary:       {l:'Secondary',      c:'#38a858', g:'SC'},
+  melee:           {l:'Melee',          c:'#3aa898', g:'ML'},
+  zaw:             {l:'Zaws',           c:'#9a7838', g:'ZW'},
+  kitgun:          {l:'Kitguns',        c:'#6070a0', g:'KG'},
+  archwing:        {l:'Archwing',       c:'#4878b8', g:'AW'},
+  archgun:         {l:'Arch-Gun',       c:'#3868b0', g:'AG'},
+  archmelee:       {l:'Arch-Melee',     c:'#2850a0', g:'AME'},
+  sentinel:        {l:'Sentinels',      c:'#7848c0', g:'SEN'},
+  sentinel_weapon: {l:'Sntnl Wep',      c:'#5878b8', g:'SW'},
+  moa:             {l:'MOAs',           c:'#3888c0', g:'MOA'},
+  hound:           {l:'Hounds',         c:'#8038b8', g:'HND'},
+  kubrow:          {l:'Kubrows',        c:'#b06050', g:'KB'},
+  kavat:           {l:'Kavats',         c:'#c07880', g:'KV'},
+  vulpaphyla:      {l:'Vulpaphyla',     c:'#a05878', g:'VLP'},
+  predasite:       {l:'Predasites',     c:'#906070', g:'PRS'},
+  companion:       {l:'Companions',     c:'#c04878', g:'CP'},
+  kdrive:          {l:'K-Drives',       c:'#68a038', g:'KD'},
+  amp:             {l:'Amps',           c:'#48a8c0', g:'AMP'},
+  necramech:       {l:'Necramechs',     c:'#c07018', g:'NM'},
+  other:           {l:'Other',          c:'#506070', g:'??'},
+};
+
+// Visual groupings for category chip filter
+const CAT_GROUPS = [
+  { label: 'Warframes',   keys: ['warframe'] },
+  { label: 'Weapons',     keys: ['primary','secondary','melee','zaw','kitgun'] },
+  { label: 'Arch',        keys: ['archwing','archgun','archmelee'] },
+  { label: 'Companions',  keys: ['sentinel','sentinel_weapon','moa','hound','kubrow','kavat','vulpaphyla','predasite','companion'] },
+  { label: 'Other',       keys: ['amp','necramech','kdrive','other'] },
+];
+
+const API_CAT_MAP = {
+  'Warframes':'warframe','Primary':'primary','Secondary':'secondary','Melee':'melee',
+  'Zaws':'zaw','Kitguns':'kitgun','Archwing':'archwing','Arch-Gun':'archgun',
+  'Arch-Melee':'archmelee','Sentinels':'sentinel','Sentinel Weapons':'sentinel_weapon',
+  'Amps':'amp','Necramechs':'necramech','Necramech':'necramech','MOAs':'moa','Hounds':'hound',
+  'Kubrow':'kubrow','Kavat':'kavat','Vulpaphyla':'vulpaphyla','Predasite':'predasite',
+  'K-Drive':'kdrive','Plexus':'other',
+  'Pets':'companion','Robotic':'companion','Companions':'companion','Gear':'other',
+};
+
+const ACQ = {
+  relic:    {l:'Relic',     c:'#b89030'},
+  lich:     {l:'Lich',      c:'#b84040'},
+  sister:   {l:'Sister',    c:'#a840c0'},
+  coda:     {l:'Coda',      c:'#78c030'},
+  syndicate:{l:'Syndicate', c:'#4070c8'},
+  clan:     {l:'Clan',      c:'#c07030'},
+  baro:     {l:'Baro',      c:'#a8a830'},
+  quest:    {l:'Quest',     c:'#38a8a8'},
+  event:    {l:'Event ★',   c:'#c05080'},
+  login:    {l:'Login',     c:'#506080'},
+  standard: {l:'Standard',  c:'#506070'},
+};
+
+/* ── STATE ──────────────────────────────────── */
+const ST = {
+  items:[], missions:[],
+  cats: Object.fromEntries(Object.keys(CAT).map(k=>[k,true])),
+  acqs: Object.fromEntries(Object.keys(ACQ).map(k=>[k,true])),
+  search:'', sort:'mastery-desc', group:'', update:'',
+  starred: new Set(),   // runtime mirror of userData.entities starred flags
+  overrides: {},        // runtime mirror of userData.entities rank overrides
+  updateNames: {},
+  nodeDb: null,
+  missionDb: null,
+  selection: new Set(),
+  _lastSelIdx: null,
+  _visibleItems: [],
+  userData: {
+    version: 3,
+    meta: {},
+    entities: {},
+    lists: [],
+    journal: [],
+    settings: {}
+  }
+};
+
+/* ── HELPERS ─────────────────────────────────── */
+function saveOverride(path, rank) {
+  const val = Math.max(0, Math.min(40, parseInt(rank) || 0));
+  if (!ST.userData.entities[path]) ST.userData.entities[path] = { type: 'item' };
+  ST.userData.entities[path].rank = val;
+  ST.overrides[path] = val;
+  const item = ST.items.find(i => i.path === path);
+  if (item) {
+    item.rank = val;
+    const mult = (item.cat==='warframe'||item.cat==='necramech'||item.cat==='archwing'||item.cat==='sentinel') ? 200 : 100;
+    item.mastery = val * mult;
+  }
+  saveUserData();
+  render();
+}
+
+function xpToRank(xp, multiplier, maxRank) {
+  if (!xp || xp <= 0) return 0;
+  return Math.min(Math.round((-1 + Math.sqrt(1 + (8 * xp) / multiplier)) / 2), maxRank);
+}
+
+function getMajorVersion(rawIntro) {
+  if (!rawIntro) return '0';
+  const match = String(rawIntro).match(/(\d+)/);
+  return match ? match[1] : '0';
+}
+
+// ── Entity helpers ──
+function getOrCreateEntity(id, type) {
+  if (!ST.userData.entities[id]) ST.userData.entities[id] = { type };
+  return ST.userData.entities[id];
+}
+function pruneEntity(id) {
+  const e = ST.userData.entities[id]; if (!e) return;
+  if (!Object.keys(e).some(k => k !== 'type')) delete ST.userData.entities[id];
+}
+function saveEntityNote(id, type, text) {
+  const e = getOrCreateEntity(id, type);
+  const t = text.trim();
+  if (t) e.note = t; else delete e.note;
+  pruneEntity(id); saveUserData();
+}
+function isEntityStarred(id) { return !!ST.userData.entities[id]?.starred; }
+function toggleEntityStar(id, type, btn) {
+  const e = getOrCreateEntity(id, type);
+  e.starred = !e.starred;
+  if (!e.starred) delete e.starred;
+  pruneEntity(id);
+  const on = !!ST.userData.entities[id]?.starred;
+  if (btn) btn.classList.toggle('on', on);
+  if (type !== 'node') { if (on) ST.starred.add(id); else ST.starred.delete(id); }
+  saveUserData();
+  return on;
+}
+
+/* ── INDEXEDDB ──────────────────────────────── */
+let _idb = null;
+function openDB() {
+  if (_idb) return Promise.resolve(_idb);
+  return new Promise((ok,err)=>{
+    const r = indexedDB.open('wft3',1);
+    r.onupgradeneeded = e => {
+      ['cache','user'].forEach(s => {
+        if (!e.target.result.objectStoreNames.contains(s))
+          e.target.result.createObjectStore(s,{keyPath:'k'});
+      });
+    };
+    r.onsuccess = ()=>{ _idb=r.result; ok(_idb); };
+    r.onerror   = ()=>err(r.error);
+  });
+}
+async function dbGet(store, key) {
+  const db = await openDB();
+  return new Promise(ok=>{
+    const req = db.transaction(store,'readonly').objectStore(store).get(key);
+    req.onsuccess = ()=>ok(req.result||null);
+    req.onerror   = ()=>ok(null);
+  });
+}
+async function dbSet(store, key, val) {
+  const db = await openDB();
+  return new Promise((ok,err)=>{
+    const tx = db.transaction(store,'readwrite');
+    tx.objectStore(store).put({k:key,v:val,t:Date.now()});
+    tx.oncomplete = ok; tx.onerror = ()=>err(tx.error);
+  });
+}
+
+/* ── USER DATA ───────────────────────────────── */
+async function saveUserData() {
+  ST.userData.meta.lastSynced = Date.now();
+  await dbSet('user', 'userData', ST.userData);
+}
+
+async function loadUserData() {
+  const stored = await dbGet('user', 'userData');
+  if (stored?.v?.version === 3) {
+    ST.userData = stored.v;
+  } else {
+    // First run — migrate old scattered localStorage keys
+    migrateOldData();
+  }
+  // Populate runtime mirrors from userData
+  ST.starred = new Set(
+    Object.entries(ST.userData.entities)
+      .filter(([,e]) => e.starred && e.type !== 'node')
+      .map(([k]) => k)
+  );
+  ST.overrides = Object.fromEntries(
+    Object.entries(ST.userData.entities)
+      .filter(([,e]) => e.rank !== undefined)
+      .map(([k,e]) => [k, e.rank])
+  );
+  // Restore settings
+  const s = ST.userData.settings;
+  if (s.cats)  Object.assign(ST.cats, s.cats);
+  if (s.acqs)  Object.assign(ST.acqs, s.acqs);
+  if (s.sort)  ST.sort  = s.sort;
+  if (s.group) ST.group = s.group;
+}
+
+function migrateOldData() {
+  // Migrate wft3 (settings + starred items)
+  try {
+    const old = JSON.parse(localStorage.getItem('wft3') || '{}');
+    if (old.cats)    ST.userData.settings.cats  = old.cats;
+    if (old.acqs)    ST.userData.settings.acqs  = old.acqs;
+    if (old.sort)    ST.userData.settings.sort  = old.sort;
+    if (old.group)   ST.userData.settings.group = old.group;
+    if (old.starred) old.starred.forEach(path => {
+      getOrCreateEntity(path, 'item').starred = true;
+    });
+    localStorage.removeItem('wft3');
+  } catch(e) {}
+  // Migrate wft3_overrides
+  try {
+    const ov = JSON.parse(localStorage.getItem('wft3_overrides') || '{}');
+    Object.entries(ov).forEach(([path, rank]) => {
+      getOrCreateEntity(path, 'item').rank = rank;
+    });
+    localStorage.removeItem('wft3_overrides');
+  } catch(e) {}
+  // Migrate wft3_sp (planet-level SP toggles — convert to entity flags)
+  try { localStorage.removeItem('wft3_sp'); } catch(e) {}
+}
+
+/* ── PROGRESS ────────────────────────────────── */
+function setProgress(pct,msg) {
+  const bar = document.getElementById('load-bar');
+  const txt = document.getElementById('load-msg');
+  if(bar) bar.style.width = pct+'%';
+  if(txt && msg) txt.textContent = msg;
+}
+
+/* ── ITEM CLASSIFICATION ─────────────────────── */
+const DB_CONFIG = {
+  VALID_CATS: [
+    'Warframes','Primary','Secondary','Melee','Archwing','Arch-Gun','Arch-Melee',
+    'Sentinels','Sentinel Weapons','Pets','Amps','Necramechs','Zaws','Kitguns',
+    'MOAs','Hounds','Kubrow','Kavat','Vulpaphyla','Predasite','K-Drive','Plexus'
+  ],
+  KITGUN_CHAMBERS: ['catchmoon','gaze','rattleguts','tombfinger','sporelacer','vermisplicer'],
+  ZAW_STRIKES: ['balla','cyath','dehtat','dokrahm','kronsh','mewan','ooltha','rabvee','sepfahn','plague keewar','plague kripath'],
+  RESCUE_LIST: ['mausolon','morgha','cortege','mandonel','grimoire','bo prime','kuva ghoulsaw','ghoulsaw','dark split-sword','bo','mk1-bo','prisma veritux','prisma dual decurions','imperator','imperator vandal','prisma imperator','jat kittag','innodem','wyrm prime','quassus prime','prisma sybaris','prisma gammacor','rathbone','lato','strun','paris','lex','enkaus','phahd','runway'],
+};
+
+function classifyItem(item) {
+  const name = item.name || '';
+  const nameKey = name.toLowerCase();
+  const path = (item.uniqueName || '').toLowerCase();
+  const apiCat = item.category || 'Other';
+
+  if (nameKey === 'runway') return { finalCat:'K-Drive', isRescued:true, scoreBoost:500000 };
+  if (nameKey === 'helminth charger') return { finalCat:'Kubrow', isRescued:true, scoreBoost:500000 };
+
+  const ZAW_SLOP = ['jai','ruhang','ekwana','vargeet','jayap','laka','korb','shtung','peye','kwath','kroostra','seekalla'];
+  const junkKeywords = [
+    'glyph','noggle','theme','shawzin','floof','mandala','pattern','narta','display','poster','scene',
+    'extractor','decoration','syandana','finish','lacquer','ephemera','sigil','skin','blueprint',
+    'helmet','stencil','vignette','globule','token','steel path','domestik','pedestal','maggot',
+    'ascaris','tag','casing','capsule','engine','weapon pod','barrel','receiver','stock','statue',
+    'necramite','cells','component','node','misc','resource','gear','fish','quest','box','basket',
+    'book','bop','trophy','shard','instrument','debt-bond','booster','segment','pizza','lunch',
+    'cardboard','theorem','lure','pheromone','genetic','upgrade','bust','egg','collar','code',
+    'specter','howl of','lucky','twin kavats','core','gyro','bracket','stabilizer','mutagen',
+    'antigen','incarnon genesis','helminth'
+  ];
+  if (junkKeywords.some(k=>nameKey.includes(k)) || ZAW_SLOP.some(s=>nameKey.includes(s)) || apiCat==='Mods' || path.includes('/upgrades/'))
+    return { isJunk:true };
+
+  const isZaw = DB_CONFIG.ZAW_STRIKES.includes(nameKey);
+  const isKitgun = DB_CONFIG.KITGUN_CHAMBERS.includes(nameKey);
+  const isMoa = path.includes('moapethead') || (path.includes('/moapets/') && (nameKey.includes('moa') || path.includes('head')));
+  const isHound = path.includes('zanukapetparthead') || nameKey.includes('hound');
+  const isKDrive = path.includes('kdrives/boards') || ['bad baby','feverspine','flatbelly','needlenose','runway'].some(k=>nameKey.includes(k));
+  const isMech = nameKey==='voidrig' || nameKey==='bonewidow' || path.includes('entratimech');
+  const isAmp = (nameKey.includes('prism') && !nameKey.includes('prisma')) || nameKey==='sirocco' || nameKey.includes('phahd') || apiCat==='Amps';
+  const isSentinelWep = apiCat==='Sentinel Weapons' || path.includes('sentinelweapons') || ['akaten','batoten','cryotra','helstrum','lacerten','multron','tazicor','vulcax','deconstructor','verglas','sweeper','stinger','vulklok','artax','burst laser'].some(k=>nameKey.includes(k));
+
+  let finalCat = apiCat;
+  if (isMech) finalCat='Necramechs';
+  else if (isAmp) finalCat='Amps';
+  else if (isMoa) finalCat='MOAs';
+  else if (isHound) finalCat='Hounds';
+  else if (isZaw) finalCat='Zaws';
+  else if (isKitgun) finalCat='Kitguns';
+  else if (isKDrive) finalCat='K-Drive';
+  else if (isSentinelWep) finalCat='Sentinel Weapons';
+  else if (nameKey.includes('vulpaphyla')) finalCat='Vulpaphyla';
+  else if (nameKey.includes('predasite')) finalCat='Predasite';
+  else if (nameKey.includes('kavat') || nameKey.includes('venari')) finalCat='Kavat';
+  else if (nameKey.includes('kubrow')) finalCat='Kubrow';
+  else if (nameKey==='wyrm prime' || (apiCat==='Sentinels' && !isSentinelWep)) finalCat='Sentinels';
+  else if (nameKey.includes('sybaris') || ['strun','paris','enkaus'].includes(nameKey)) finalCat='Primary';
+  else if (nameKey.includes('gammacor') || ['lato','lex'].includes(nameKey) || nameKey==='grimoire') finalCat='Secondary';
+
+  const isRescued = DB_CONFIG.RESCUE_LIST.includes(nameKey) || isMoa || isHound || isKDrive || isMech || isZaw || isKitgun || isSentinelWep || isAmp;
+  return { finalCat, isRescued, isZaw, isKitgun, isMoa, isHound, isKDrive, isMech, isAmp, scoreBoost: isRescued?400000:0, isJunk:false };
+}
+
+/* ── API FETCH ──────────────────────────────── */
+async function fetchItemDb() {
+  try {
+    const cached = await dbGet('cache','item_db');
+    if (cached && (Date.now()-cached.t)<CACHE_TTL) return cached.v;
+
+    const resp = await fetch('https://raw.githubusercontent.com/wfcd/warframe-items/master/data/json/All.json');
+    const items = await resp.json();
+    const db = {}, dbByName = {};
+
+    items.forEach(item => {
+      if (!item || !item.uniqueName || !item.name) return;
+      const res = classifyItem(item);
+      if (res.isJunk) return;
+
+      const { finalCat, isRescued, isZaw, isKitgun, isMoa, isHound, isKDrive, isMech, isAmp, scoreBoost } = res;
+      const pathLower = item.uniqueName.toLowerCase();
+
+      const isModular = pathLower.includes('/modular/') || pathLower.includes('/zaw/') || pathLower.includes('/kitgun/') || pathLower.includes('/kdrive/') || pathLower.includes('/pets/');
+      if (isModular && !isZaw && !isKitgun && !isMoa && !isHound && !isKDrive && !isMech && !isAmp && !isRescued) return;
+
+      const isRecognized = DB_CONFIG.VALID_CATS.some(c => c===finalCat || (c.endsWith('s') && c.slice(0,-1)===finalCat));
+      if (!isRecognized && !isRescued) return;
+
+      let score = (item.masteryExp||0) + scoreBoost;
+      if (item.introduced) score += 5000;
+      if (pathLower.includes('/npc/')) score -= 500000;
+
+      const nameKey = item.name.toLowerCase();
+      if (dbByName[nameKey] && score <= dbByName[nameKey].score) return;
+
+      // Fix: store introduced as a plain string
+      const rawIntro = item.introduced
+        ? (typeof item.introduced === 'object' ? (item.introduced.name || '') : String(item.introduced))
+        : 'Unknown';
+      const majorVer = getMajorVersion(rawIntro);
+
+      dbByName[nameKey] = {
+        path: pathLower, score,
+        data: {
+          name: item.name,
+          apiCat: finalCat,
+          introduced: rawIntro,
+          majorUpdate: majorVer,
+          maxRank: (pathLower.includes('kuva') || pathLower.includes('tenet') || pathLower.includes('lich') || pathLower.includes('coda') || isMech) ? 40 : 30
+        }
+      };
+    });
+
+    Object.values(dbByName).forEach(winner => { db[winner.path] = winner.data; });
+    await dbSet('cache','item_db',db);
+    return db;
+  } catch(err) { return {}; }
+}
+
+/* ── UPDATE NAMES ───────────────────────────── */
+async function fetchUpdateNames() {
+  try {
+    const cached = await dbGet('cache', 'update_names');
+    if (cached && (Date.now() - cached.t) < CACHE_TTL) return cached.v;
+
+    const resp = await fetch('https://raw.githubusercontent.com/WFCD/warframe-patchlogs/master/data/patchlogs.json');
+    if (!resp.ok) throw new Error('Patchlog fetch failed');
+    const logs = await resp.json();
+    const map = {};
+
+    logs.filter(l => l.type === 'Update').forEach(l => {
+      // Handles both "Update 35: Title" and "Title: Update 35" orderings
+      const m = l.name.match(/Update\s+(\d+)[.\d]*\s*[:\-–]?\s*(.+)|(.+?)\s*[:\-–]\s*Update\s+(\d+)/i);
+      if (m) {
+        const ver = m[1] || m[4];
+        const title = (m[2] || m[3] || '').replace(/\s*\|\s*Warframe.*/i, '').trim();
+        if (ver && title && !map[ver]) map[ver] = title;
+      }
+    });
+
+    // Fill well-known older ones the regex may miss
+    const fallbacks = {
+      '16':'The Jovian Concord','17':'Buried Debts','18':'The Second Dream',
+      '19':'The War Within','20':"Octavia's Anthem",'21':'Chains of Harrow',
+      '22':'Plains of Eidolon','23':'The Sacrifice','24':'Fortuna',
+      '25':'The Jovian Concord','26':'Empyrean','27':'The Deadlock Protocol',
+      '28':'The Deadlock Protocol','29':'Sisters of Parvos','30':'The New War',
+    };
+    Object.entries(fallbacks).forEach(([v, t]) => { if (!map[v]) map[v] = t; });
+
+    await dbSet('cache', 'update_names', map);
+    return map;
+  } catch(e) {
+    console.warn('Update names fetch failed:', e);
+    return {};
+  }
+}
+
+/* ── MISSION DB (wiki mastery data) ─────────── */
+async function fetchMissionDb() {
+  if (ST.missionDb) return;
+  try {
+    const cached = await dbGet('cache', 'mission_db');
+    if (cached && (Date.now() - cached.t) < MISSION_DB_TTL) { ST.missionDb = cached.v; return; }
+
+    const resp = await fetch('https://wiki.warframe.com/api.php?action=parse&page=Module:Missions/data&prop=wikitext&format=json&origin=*');
+    if (!resp.ok) throw new Error('Mission wiki fetch failed');
+    const data = await resp.json();
+    const text = data.parse?.wikitext?.['*'] || '';
+
+    const db = {};
+    // Split on top-level node blocks — each starts with { and contains InternalName
+    const blocks = text.split(/(?=\s*\{[^{}]*InternalName)/);
+    blocks.forEach(block => {
+      const internalName = block.match(/InternalName\s*=\s*"([^"]+)"/)?.[1];
+      if (!internalName) return;
+      const masteryExp  = block.match(/MasteryExp\s*=\s*(\d+)/)?.[1];
+      const name        = block.match(/\bName\s*=\s*"([^"]+)"/)?.[1];
+      const planet      = block.match(/Planet\s*=\s*"([^"]+)"/)?.[1];
+      const type        = block.match(/\bType\s*=\s*"([^"]+)"/)?.[1];
+      const enemy       = block.match(/Enemy\s*=\s*"([^"]+)"/)?.[1];
+      const minLevel    = block.match(/MinLevel\s*=\s*(\d+)/)?.[1];
+      const maxLevel    = block.match(/MaxLevel\s*=\s*(\d+)/)?.[1];
+      db[internalName] = {
+        name:      name || internalName,
+        planet:    planet || '',
+        type:      type || '',
+        enemy:     enemy || '',
+        minLevel:  minLevel ? parseInt(minLevel) : 0,
+        maxLevel:  maxLevel ? parseInt(maxLevel) : 0,
+        masteryExp: masteryExp ? parseInt(masteryExp) : 0,
+      };
+    });
+
+    ST.missionDb = db;
+    await dbSet('cache', 'mission_db', db);
+  } catch(e) {
+    console.warn('Mission DB fetch failed:', e);
+    ST.missionDb = {};
+  }
+}
+
+/* ── PROFILE PARSING ────────────────────────── */
+function parseProfile(text) {
+  const data = JSON.parse(text);
+  const r = data.Results?.[0] || data;
+  const srcA = (r.XPInfo||r.xpInfo||[]).filter(e=>e&&(e.ItemType||e.itemType)&&(e.XP||e.xp))
+    .map(e=>({path:e.ItemType||e.itemType, xp:e.XP||e.xp}));
+  const srcB = (data.Stats?.Weapons||[]).filter(w=>w&&w.type&&(w.xp||0)>0)
+    .map(w=>({path:w.type, xp:w.xp}));
+  const seen = new Set(srcA.map(e=>e.path));
+  const xpData = [...srcA];
+  for (const e of srcB) if (!seen.has(e.path)) { xpData.push(e); seen.add(e.path); }
+  const missions = (r.Missions||[])
+    .filter(m => m && (m.Tag||m.tag))
+    .map(m => ({
+      tag:      m.Tag      || m.tag      || '',
+      tier:     m.Tier     || m.tier     || 0,
+      completes:m.Completes|| m.completes|| 1,
+    }));
+  return {
+    playerName:  r.DisplayName||r.displayName||'Tenno',
+    playerLevel: r.PlayerLevel||r.playerLevel||0,
+    xpData, missions,
+  };
+}
+
+/* ── ITEM ENRICHMENT ────────────────────────── */
+function detectAcq(path, name) {
+  const p = (path||'').toLowerCase();
+  const n = (name||'').toLowerCase();
+  if (p.includes('infestationlich') || p.includes('coda')) return 'coda';
+  if (p.includes('kuvalich')) return 'lich';
+  if (p.includes('tenet') || p.includes('sister')) return 'sister';
+  if (n.endsWith(' prime')) return 'relic';
+  if (p.includes('voidtrader')) return 'baro';
+  if (p.includes('clantech')) return 'clan';
+  if (['rakta','sancti','vaykor','telos','synoid','secura'].some(pfx => n.startsWith(pfx + ' '))) return 'syndicate';
+  return 'standard';
+}
+
+function enrichAll(xpData, itemDb) {
+  if (!itemDb || Object.keys(itemDb).length===0) return [];
+  const userXPMap = {};
+  xpData.forEach(e => { if (e.path) userXPMap[e.path.toLowerCase()] = e.xp; });
+
+  return Object.entries(itemDb).map(([dbPath, api]) => {
+    const userXP = userXPMap[dbPath] || 0;
+    const { finalCat } = classifyItem({ name:api.name, uniqueName:dbPath, category:api.apiCat });
+    const catKey = API_CAT_MAP[finalCat] || 'other';
+    const multiplier = (catKey==='warframe'||catKey==='necramech'||catKey==='archwing'||catKey==='sentinel') ? 200 : 100;
+    const maxR = api.maxRank || 30;
+    // For rank-40 items, XP is cumulative across Forma cycles so xpToRank can mislead.
+    // Cap the XP-derived rank at 30; user sets the real rank via the input.
+    const xpCap = maxR === 40 ? 30 : maxR;
+    const rank = ST.overrides[dbPath] !== undefined
+      ? ST.overrides[dbPath]
+      : xpToRank(userXP, multiplier, xpCap);
+
+    return {
+      path: dbPath,
+      name: api.name,
+      cat: catKey,
+      acq: detectAcq(dbPath, api.name),
+      xp: userXP,
+      rank,
+      maxRank: maxR,
+      mastery: rank * multiplier,
+      isOwned: userXP > 0,
+      isFounder: api.isFounder,
+      // Fix: api.introduced is now a plain string, not an object
+      update: api.introduced || 'Unknown',
+      majorUpdate: api.majorUpdate || '0',
+    };
+  });
+}
+
+/* ── STAR CHART ─────────────────────────────── */
+
+async function loadStarChartData() {
+  await Promise.all([loadNodeDb(), fetchMissionDb()]);
+}
+
+async function loadNodeDb() {
+  if (ST.nodeDb) return;
+  try {
+    const cached = await dbGet('cache', 'node_db');
+    if (cached && (Date.now() - cached.t) < CACHE_TTL) { ST.nodeDb = cached.v; return; }
+    const resp = await fetch('https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/solNodes.json');
+    if (!resp.ok) throw new Error('Nodes fetch failed');
+    const raw = await resp.json();
+    // Normalise: static data is already an object keyed by node ID
+    const db = Array.isArray(raw)
+      ? Object.fromEntries(raw.map(n => [n.id || n.tag, n]))
+      : raw;
+    ST.nodeDb = db;
+    await dbSet('cache', 'node_db', db);
+  } catch(e) {
+    console.warn('Node DB failed:', e);
+    ST.nodeDb = {};
+  }
+}
+
+function processStarChart(missions, nodeDb, missionDb) {
+  const seenNodes = new Set();
+  const PLANET_ORDER = [
+    'Mercury','Venus','Earth','Mars','Phobos','Ceres','Jupiter','Europa',
+    'Saturn','Uranus','Neptune','Pluto','Sedna','Eris','Lua',
+    'Kuva Fortress','Void','Deimos','Zariman','Duviri'
+  ];
+  const JUNCTION_MANIFEST = [
+    {tag:'VenusToMercuryJunction',  planet:'Venus',   dest:'Mercury'  },
+    {tag:'EarthToVenusJunction',    planet:'Earth',   dest:'Venus'    },
+    {tag:'EarthToMarsJunction',     planet:'Earth',   dest:'Mars'     },
+    {tag:'MarsToPhobosJunction',    planet:'Mars',    dest:'Phobos'   },
+    {tag:'MarsToCeresJunction',     planet:'Mars',    dest:'Ceres'    },
+    {tag:'CeresToJupiterJunction',  planet:'Ceres',   dest:'Jupiter'  },
+    {tag:'JupiterToEuropaJunction', planet:'Jupiter', dest:'Europa'   },
+    {tag:'JupiterToSaturnJunction', planet:'Jupiter', dest:'Saturn'   },
+    {tag:'SaturnToUranusJunction',  planet:'Saturn',  dest:'Uranus'   },
+    {tag:'UranusToNeptuneJunction', planet:'Uranus',  dest:'Neptune'  },
+    {tag:'NeptuneToPlutoJunction',  planet:'Neptune', dest:'Pluto'    },
+    {tag:'PlutoToErisJunction',     planet:'Pluto',   dest:'Eris'     },
+    {tag:'ErisToSednaJunction',     planet:'Eris',    dest:'Sedna'    },
+  ];
+  
+  const manifestTags = new Set(JUNCTION_MANIFEST.map(j => j.tag));
+  const JUNK_TYPES   = new Set(['ancient retribution','conclave','pvp']);
+  const baseDone     = new Set(missions.map(m => m.tag).filter(Boolean));
+  const spDone       = new Set(missions.filter(m => m.tier >= 1).map(m => m.tag));
+  const completesMap = Object.fromEntries(missions.map(m => [m.tag, m.completes]));
+  const planets = {}, railjack = [];
+
+  const mkNode = (tag, name, type, extra, md) => ({
+    tag, name, type,
+    enemy:      md?.enemy     || '',
+    minLevel:   md?.minLevel  || 0,
+    maxLevel:   md?.maxLevel  || 0,
+    done:       baseDone.has(tag),
+    spDone:     spDone.has(tag),
+    completes:  completesMap[tag] || 0,
+    masteryExp: md?.masteryExp || 0,
+    isJunction: false,
+    ...extra,
+  });
+
+  for (const [tag, node] of Object.entries(nodeDb)) {
+    if (!node) continue;
+    if (/hub/i.test(tag)) continue;
+
+    const mdata    = missionDb?.[tag] || {};
+    const rawType  = node.type || node.missionType || '';
+    const effType  = (mdata.type || rawType).toLowerCase();
+
+    if (JUNK_TYPES.has(effType)) continue;
+    if (effType === 'relay' && !mdata.type) continue;
+    if (!rawType && !mdata.type && !baseDone.has(tag)) continue;
+
+    const rawValue = node.value || '';
+    const planet   = node.planet
+      || (rawValue.match(/\(([^)]+)\)$/)?.[1] || '')
+      || mdata.planet || node.systemName || '';
+    const name     = rawValue.replace(/\s*\([^)]+\)$/,'').trim() || mdata.name || tag;
+
+    // --- DEDUPLICATION CHECK (MUST BE AFTER NAME/PLANET DEFINITION) ---
+    const namePlanetKey = `${name}-${planet}`;
+    if (seenNodes.has(namePlanetKey) && !baseDone.has(tag)) continue;
+    seenNodes.add(namePlanetKey);
+    // ------------------------------------------------------------------
+
+    const isRJ = tag.startsWith('CrewBattle') || effType.includes('proxima')
+                  || planet.toLowerCase().includes('proxima');
+
+    const nd = mkNode(tag, name, mdata.type || rawType, {}, mdata);
+    if (isRJ) railjack.push(nd);
+    else if (planet) { 
+      if (!planets[planet]) planets[planet]=[]; 
+      planets[planet].push(nd); 
+    }
+  }
+
+  JUNCTION_MANIFEST.forEach(j => {
+    if (!planets[j.planet]) planets[j.planet] = [];
+    planets[j.planet].push(mkNode(j.tag, j.dest + ' Junction', 'Junction',
+      {isJunction:true, masteryExp:1000}, null));
+  });
+
+  missions.forEach(m => {
+    if (!m.tag.endsWith('Junction') || manifestTags.has(m.tag)) return;
+    const match = m.tag.match(/^([A-Z][a-zA-Z]+?)To([A-Z][a-zA-Z]+?)Junction$/);
+    if (!match) return;
+    const planet = PLANET_ORDER.find(p => p.replace(/\s/g,'') === match[1]) || match[1].replace(/([A-Z])/g,' $1').trim();
+    const dest   = match[2].replace(/([A-Z])/g,' $1').trim();
+    if (!planets[planet]) planets[planet] = [];
+    planets[planet].push(mkNode(m.tag, dest + ' Junction', 'Junction',
+      {isJunction:true, masteryExp:1000}, null));
+    manifestTags.add(m.tag);
+  });
+
+  Object.values(planets).forEach(nodes =>
+    nodes.sort((a,b)=>(a.isJunction===b.isJunction)?a.name.localeCompare(b.name):a.isJunction?-1:1)
+  );
+
+  const sorted = Object.entries(planets).sort(([a],[b])=>{
+    const ai=PLANET_ORDER.indexOf(a),bi=PLANET_ORDER.indexOf(b);
+    if(ai===-1&&bi===-1)return a.localeCompare(b);
+    return(ai===-1)?1:(bi===-1)?-1:ai-bi;
+  });
+
+  return {
+    planets: sorted.map(([name,nodes])=>({name,nodes})),
+    railjack: railjack.sort((a,b)=>a.name.localeCompare(b.name))
+  };
+}
+
+
+function renderStarChart() {
+  const el = document.getElementById('scgrid');
+  if (!el) return;
+  el.innerHTML = '';
+
+  if (!ST.nodeDb || Object.keys(ST.nodeDb).length === 0) {
+    el.innerHTML = '<div style="color:var(--tx3);font-size:.86rem;padding:2rem 0">Loading star chart data…</div>';
+    return;
+  }
+
+  const { planets, railjack } = processStarChart(ST.missions, ST.nodeDb, ST.missionDb);
+
+  let totalNodes=0,doneNodes=0,spTotal=0,spDoneCount=0,junctionTotal=0,junctionDone=0,mxpAvailable=0;
+  planets.forEach(p=>p.nodes.forEach(n=>{
+    totalNodes++; if(n.done)doneNodes++;
+    if(n.isJunction){junctionTotal++;if(n.done)junctionDone++;}
+    if(n.done){spTotal++;if(n.spDone)spDoneCount++;}
+    if(!n.spDone&&n.masteryExp>0)mxpAvailable+=n.masteryExp;
+  }));
+  const overallPct = totalNodes ? Math.round(doneNodes/totalNodes*100) : 0;
+
+  const summary = document.createElement('div'); summary.className='sc-summary';
+  summary.innerHTML=`
+    <div class="sc-sum-stat"><div class="sc-sum-num">${doneNodes}/${totalNodes}</div><div class="sc-sum-lbl">Base nodes</div></div>
+    <div style="width:1px;height:28px;background:var(--bd2);flex-shrink:0"></div>
+    <div class="sc-sum-stat"><div class="sc-sum-num">${spDoneCount}/${spTotal}</div><div class="sc-sum-lbl">Steel Path</div></div>
+    <div style="width:1px;height:28px;background:var(--bd2);flex-shrink:0"></div>
+    <div class="sc-sum-stat"><div class="sc-sum-num">${junctionDone}/${junctionTotal}</div><div class="sc-sum-lbl">Junctions</div></div>
+    ${mxpAvailable>0?`<div style="width:1px;height:28px;background:var(--bd2);flex-shrink:0"></div><div class="sc-sum-stat"><div class="sc-sum-num sc-mxp-available">+${fmtM(mxpAvailable)}</div><div class="sc-sum-lbl">MXP available</div></div>`:''}
+    <div class="scbw" style="flex:1;height:6px"><div class="scb" style="width:${overallPct}%"></div></div>
+    <div class="sc-sum-stat" style="align-items:flex-end"><div class="sc-sum-num">${overallPct}%</div><div class="sc-sum-lbl">Overall</div></div>`;
+  el.appendChild(summary);
+
+  const ph=document.createElement('div');ph.className='sc-section';ph.textContent='Main Star Chart';el.appendChild(ph);
+  const planetList=document.createElement('div');planetList.className='sc-planet-list';
+
+  function buildNodeRow(n) {
+    const row=document.createElement('div');
+    row.className='sc-node'+(n.spDone?' sp-done':n.done?' done':'')+(n.isJunction?' junction':'');
+    const lvl=n.minLevel&&n.maxLevel?`${n.minLevel}–${n.maxLevel}`:'';
+    const typeStr=[n.type,n.enemy,lvl].filter(Boolean).join(' · ');
+    const statusIcon = n.spDone ? '✓' : n.done ? '✓' : '○';
+    row.innerHTML=`
+      <span class="sc-node-status">${statusIcon}</span>
+      <span class="sc-node-icon">${n.isJunction?'◆':'●'}</span>
+      <span class="sc-node-name">${n.name}</span>
+      <span class="sc-node-type">${typeStr}</span>
+      ${n.completes>0?`<span class="sc-node-runs">${n.completes}×</span>`:''}
+      ${!n.spDone&&n.masteryExp>0?`<span class="sc-node-mxp" title="SP completion awards ${n.masteryExp} mastery XP">+${n.masteryExp}</span>`:''}
+      ${n.isJunction?`<span class="sc-node-mastery">${n.done?'MASTERY ✓':'MASTERY'}</span>`:''}
+      <button class="sc-node-star">★</button>
+      <input class="sc-node-note" type="text" placeholder="note…">`;
+    const sb=row.querySelector('.sc-node-star');
+    if(isEntityStarred(n.tag))sb.classList.add('on');
+    sb.addEventListener('click',e=>{e.stopPropagation();toggleEntityStar(n.tag,'node',sb);});
+    const ni=row.querySelector('.sc-node-note');
+    ni.value=ST.userData.entities[n.tag]?.note||'';
+    ni.addEventListener('blur',()=>saveEntityNote(n.tag,'node',ni.value));
+    ni.addEventListener('click',e=>e.stopPropagation());
+    ni.addEventListener('keydown',e=>e.stopPropagation());
+    return row;
+  }
+
+  planets.forEach(p=>{
+    const done=p.nodes.filter(n=>n.done).length;
+    const spD=p.nodes.filter(n=>n.spDone).length;
+    const total=p.nodes.length;
+    const pct=total?Math.round(done/total*100):0;
+    const planet=document.createElement('div');
+    planet.className='sc-planet'+(pct===100?' complete':'');
+    const hdr=document.createElement('div');hdr.className='sc-planet-hdr';
+    hdr.innerHTML=`
+      <span class="sc-chevron">▶</span>
+      <span class="sc-planet-name">${p.name}</span>
+      <span class="sc-planet-stats">${done}/${total}</span>
+      <span class="sc-planet-sp"><span class="sp-done">${spD}</span>/${done} SP</span>
+      <div class="scbw" style="width:55px;margin:0 .35rem"><div class="sc-planet-bar-fill" style="height:3px;background:${pct===100?'#4aad9e':'var(--acc)'};width:${pct}%;border-radius:2px"></div></div>
+      <span class="sc-planet-pct">${pct}%</span>`;
+    planet.appendChild(hdr);
+    const body=document.createElement('div');body.className='sc-body';
+    p.nodes.forEach(n=>body.appendChild(buildNodeRow(n)));
+    planet.appendChild(body);
+    hdr.addEventListener('click',()=>planet.classList.toggle('open'));
+    planetList.appendChild(planet);
+  });
+  el.appendChild(planetList);
+
+  if(railjack.length){
+    const rh=document.createElement('div');rh.className='sc-section';rh.style.marginTop='.75rem';rh.textContent='Railjack';el.appendChild(rh);
+    const rjDone=railjack.filter(n=>n.done).length;
+    const rjPct=Math.round(rjDone/railjack.length*100);
+    const rp=document.createElement('div');rp.className='sc-planet'+(rjPct===100?' complete':'');
+    const rhdr=document.createElement('div');rhdr.className='sc-planet-hdr';
+    rhdr.innerHTML=`
+      <span class="sc-chevron">▶</span>
+      <span class="sc-planet-name">Railjack Nodes</span>
+      <span class="sc-planet-stats">${rjDone}/${railjack.length}</span>
+      <div class="scbw" style="width:55px;margin:0 .35rem"><div style="height:3px;background:var(--acc);width:${rjPct}%;border-radius:2px"></div></div>
+      <span class="sc-planet-pct">${rjPct}%</span>`;
+    rp.appendChild(rhdr);
+    const rb=document.createElement('div');rb.className='sc-body';
+    railjack.forEach(n=>rb.appendChild(buildNodeRow(n)));
+    rp.appendChild(rb);
+    rhdr.addEventListener('click',()=>rp.classList.toggle('open'));
+    const rl=document.createElement('div');rl.className='sc-planet-list';rl.appendChild(rp);el.appendChild(rl);
+  }
+}
+/* ── FILTERING ──────────────────────────────── */
+function filteredItems() {
+  const showFounders = document.getElementById('tog-founders')?.checked;
+  const unmaxed      = document.getElementById('tog-unmaxed')?.checked;
+  const onlyStar     = document.getElementById('tog-starred')?.checked;
+  const unowned      = document.getElementById('tog-unowned')?.checked;
+  const needsForma   = document.getElementById('tog-forma')?.checked;
+  const upd          = document.getElementById('upd-sel')?.value || '';
+
+  return ST.items.filter(it => {
+    if (!showFounders && it.isFounder && !it.isOwned) return false;
+    if (!unowned && !it.isOwned) return false;
+    if (!ST.cats[it.cat]) return false;
+    if (!ST.acqs[it.acq]) return false;
+    // Filter by major update version
+    if (upd && it.majorUpdate !== upd) return false;
+    if (unmaxed && it.rank >= it.maxRank && it.maxRank > 0) return false;
+    if (onlyStar && !ST.starred.has(it.path)) return false;
+    if (needsForma && !(it.maxRank===40 && it.rank<40)) return false;
+    if (ST.search && !it.name.toLowerCase().includes(ST.search.toLowerCase())) return false;
+    return true;
+  });
+}
+
+/* ── RENDER: CHIPS ──────────────────────────── */
+function buildChips() {
+  const cc = {}, ac = {};
+  for (const it of ST.items) {
+    cc[it.cat] = (cc[it.cat]||0) + 1;
+    ac[it.acq] = (ac[it.acq]||0) + 1;
+  }
+
+  const ce = document.getElementById('cat-chips');
+  if (ce) {
+    ce.innerHTML = '';
+    CAT_GROUPS.forEach((grp, gi) => {
+      if (gi > 0) {
+        const sep = document.createElement('span');
+        sep.className = 'chip-sep';
+        ce.appendChild(sep);
+      }
+      // Group label (toggles whole group)
+      const lbl = document.createElement('button');
+      lbl.className = 'chip-grp-lbl';
+      lbl.textContent = grp.label;
+      lbl.title = `Toggle all ${grp.label}`;
+      lbl.onclick = () => {
+        const anyOn = grp.keys.some(k => ST.cats[k]);
+        grp.keys.forEach(k => { if (CAT[k]) ST.cats[k] = !anyOn; });
+        buildChips(); render(); saveSettings();
+      };
+      ce.appendChild(lbl);
+
+      const cg = document.createElement('div');
+      cg.className = 'chip-group';
+      grp.keys.forEach(k => {
+        const cfg = CAT[k];
+        if (!cfg) return;
+        const b = document.createElement('button');
+        b.className = 'chip' + (ST.cats[k] ? ' on' : '');
+        b.style.setProperty('--cc', cfg.c);
+        b.innerHTML = `${cfg.l} <span class="cn">${cc[k]||0}</span>`;
+        b.onclick = () => { ST.cats[k] = !ST.cats[k]; b.classList.toggle('on'); render(); saveSettings(); };
+        cg.appendChild(b);
+      });
+      ce.appendChild(cg);
+    });
+  }
+
+  const ae = document.getElementById('acq-chips');
+  if (ae) {
+    ae.innerHTML = '';
+    for (const [k, cfg] of Object.entries(ACQ)) {
+      if (!ac[k]) continue;
+      const b = document.createElement('button');
+      b.className = 'chip' + (ST.acqs[k] ? ' on' : '');
+      b.style.setProperty('--cc', cfg.c);
+      b.innerHTML = `${cfg.l} <span class="cn">${ac[k]}</span>`;
+      b.onclick = () => { ST.acqs[k] = !ST.acqs[k]; b.classList.toggle('on'); render(); saveSettings(); };
+      ae.appendChild(b);
+    }
+  }
+}
+
+/* ── RENDER: UPDATE DROPDOWN ────────────────── */
+function buildUpdateSel() {
+  const sel = document.getElementById('upd-sel');
+  if (!sel) return;
+  const versions = [...new Set(ST.items.map(i => i.majorUpdate).filter(v => v && v !== '0' && v !== 'Unknown'))]
+    .sort((a, b) => parseInt(b) - parseInt(a));
+  sel.innerHTML = '<option value="">All updates</option>';
+  versions.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v;
+    const title = ST.updateNames[v];
+    o.textContent = title ? `${v} — ${title}` : `Update ${v}`;
+    sel.appendChild(o);
+  });
+}
+
+/* ── RENDER: MASTERY BAR ────────────────────── */
+function renderMbar() {
+  const totalM = ST.items.reduce((s,i) => s+(i.mastery||0), 0);
+  const maxed  = ST.items.filter(i => i.rank>=i.maxRank && i.maxRank>0).length;
+  const bycat  = {};
+  for (const it of ST.items) { if (!bycat[it.cat]) bycat[it.cat]=0; bycat[it.cat]+=(it.mastery||0); }
+  const top5 = Object.entries(bycat).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const mbar = document.getElementById('mbar');
+  if (mbar) mbar.innerHTML = `
+    <div class="mbi"><div class="mbl">MASTERY XP</div><div class="mbv">${fmtM(totalM)}</div></div>
+    <div class="mbsep"></div>
+    <div class="mbi"><div class="mbl">MAXED / TOTAL</div><div class="mbv">${maxed} / ${ST.items.length}</div></div>
+    <div class="catbd">${top5.map(([k,v])=>`<span class="cmini" style="background:${CAT[k]?.c||'#607080'}18;color:${CAT[k]?.c||'#607080'};border:1px solid ${CAT[k]?.c||'#607080'}30">${CAT[k]?.l||k} ${fmtM(v)}</span>`).join('')}</div>`;
+}
+
+/* ── RENDER: CARD ────────────────────────────── */
+const fmtXP = x => x>=1e6?(x/1e6).toFixed(2)+'M':x>=1e3?Math.round(x/1e3)+'K':''+x;
+const fmtM  = x => x>=1e6?(x/1e6).toFixed(1)+'M':x>=1e3?Math.round(x/1e3)+'K':''+x;
+
+function makeCard(it, catMax) {
+  const cfg   = CAT[it.cat] || CAT.other;
+  const acfg  = ACQ[it.acq] || ACQ.standard;
+  const maxed = it.rank >= it.maxRank && it.maxRank > 0;
+  const starred = isEntityStarred(it.path);
+  const pct = it.maxRank > 0 ? Math.round((it.rank / it.maxRank) * 100) : 0;
+
+  const rankDisplay = it.maxRank === 40
+    ? `<input class="rank-input" type="number" value="${it.rank}" min="0" max="40" title="Set actual rank (XP cannot determine this for Forma'd weapons)">`
+    : `<span class="rank-cur">${it.rank}</span>`;
+
+  const d = document.createElement('div');
+  d.className = 'card' + (it.isOwned ? '' : ' unowned');
+  d.style.setProperty('--cc', cfg.c);
+
+  d.innerHTML = `
+    <button class="sbtn${starred?' on':''}">★</button>
+    <div class="ctop">
+      <span class="cbadge" style="color:${cfg.c};border-color:${cfg.c}40;background:${cfg.c}14">${cfg.l}</span>
+      <span class="cname">${it.name}</span>
+    </div>
+    <div class="ccore">
+      <span class="rank-info">${rankDisplay}<span class="rank-max">/${it.maxRank}</span></span>
+      ${it.update && it.update !== 'Unknown' ? `<span class="utag" title="${ST.updateNames[it.majorUpdate] ? ST.updateNames[it.majorUpdate] + ' · ' + it.update : 'Update ' + it.update}">${it.update}</span>` : ''}
+    </div>
+    <div class="card-extra">
+      <div class="cmeta">
+        <span class="abadge" style="color:${acfg.c};border-color:${acfg.c}40;background:${acfg.c}10">${acfg.l}</span>
+        ${maxed ? `<span style="color:#a08020;font-size:.58rem;font-family:'Rajdhani',sans-serif;font-weight:600;">MAXED</span>` : ''}
+      </div>
+      <div class="xbw"><div class="xbf" style="width:${pct}%;background:${cfg.c}"></div></div>
+      <div class="cbot">
+        ${it.mastery>0 ? `<span class="mval">+${fmtM(it.mastery)}</span>` : ''}
+        <span class="xval" style="color:var(--acc)">${fmtXP(it.xp)}</span>
+      </div>
+      <textarea class="card-note" placeholder="Add a note…" rows="2"></textarea>
+    </div>`;
+
+  d.dataset.path = it.path;
+  d.addEventListener('click', e => handleCardClick(e, it));
+
+  // Attach listeners post-render (avoids HTML injection issues with note content)
+  const starBtn = d.querySelector('.sbtn');
+  starBtn.addEventListener('click', e => { e.stopPropagation(); toggleEntityStar(it.path, it.cat, starBtn); });
+
+  const rankInput = d.querySelector('.rank-input');
+  if (rankInput) {
+    rankInput.addEventListener('change', () => saveOverride(it.path, rankInput.value));
+    rankInput.addEventListener('click', e => e.stopPropagation());
+  }
+
+  const noteEl = d.querySelector('.card-note');
+  noteEl.value = ST.userData.entities[it.path]?.note || '';
+  noteEl.addEventListener('blur', () => saveEntityNote(it.path, it.cat, noteEl.value));
+  noteEl.addEventListener('click', e => e.stopPropagation());
+  noteEl.addEventListener('keydown', e => e.stopPropagation());
+
+  return d;
+}
+
+/* ── RENDER: MAIN ────────────────────────────── */
+function render() {
+  const items = filteredItems();
+  items.sort((a,b) => {
+    if (ST.sort==='mastery-desc') return b.mastery-a.mastery;
+    if (ST.sort==='xp-desc')     return b.xp-a.xp;
+    if (ST.sort==='xp-asc')      return a.xp-b.xp;
+    if (ST.sort==='name-asc')    return a.name.localeCompare(b.name);
+    if (ST.sort==='rank-asc')    return a.rank-b.rank;
+    if (ST.sort==='cat')         return a.cat.localeCompare(b.cat);
+    return 0;
+  });
+
+  ST._visibleItems = items; // used by shift-click range and Ctrl+A
+
+  const wrap = document.getElementById('items-wrap');
+  if (!wrap) return;
+
+  document.getElementById('s-mxp').textContent   = fmtM(ST.items.reduce((s,i)=>s+(i.mastery||0),0));
+  document.getElementById('s-maxed').textContent = ST.items.filter(i=>i.rank>=i.maxRank&&i.maxRank>0).length;
+  document.getElementById('s-vis').textContent   = items.length;
+
+  const catMax = {};
+  for (const it of ST.items) if (!catMax[it.cat]||it.xp>catMax[it.cat]) catMax[it.cat]=it.xp;
+
+  const frag = document.createDocumentFragment();
+  const grp  = ST.group;
+
+  if (!grp) {
+    const sec = document.createElement('div'); sec.className='isect';
+    const g   = document.createElement('div'); g.className='igrid';
+    if (!items.length) g.innerHTML='<div class="empty">No items match current filters</div>';
+    else items.forEach(it=>g.appendChild(makeCard(it,catMax)));
+    sec.appendChild(g); frag.appendChild(sec);
+  } else {
+    if (grp === 'cat') {
+      // Horizontal kanban — one column per active category, in logical order
+      const colWrap = document.createElement('div');
+      colWrap.className = 'col-wrap';
+      const catOrder = CAT_GROUPS.flatMap(g => g.keys);
+      let colCount = 0;
+      for (const catKey of catOrder) {
+        const catItems = items.filter(i => i.cat === catKey);
+        if (!catItems.length) continue;
+        const cfg = CAT[catKey]; if (!cfg) continue;
+        colCount++;
+        const col = document.createElement('div');
+        col.className = 'cat-col'; col.style.setProperty('--cc', cfg.c);
+        const tm = catItems.reduce((s,i)=>s+(i.mastery||0),0);
+        const hdr = document.createElement('div'); hdr.className='cat-col-hdr';
+        hdr.innerHTML=`<span class="col-cat-name">${cfg.l}</span><div class="col-cat-meta"><span class="col-cat-mxp">${fmtM(tm)}</span><span class="col-cat-cnt">${catItems.length}</span></div>`;
+        col.appendChild(hdr);
+        catItems.forEach(it=>col.appendChild(makeCard(it,catMax)));
+        colWrap.appendChild(col);
+      }
+      if (!colCount) colWrap.innerHTML='<div style="padding:4rem 2rem;color:var(--tx3);font-size:.86rem">No items match current filters</div>';
+      frag.appendChild(colWrap);
+    } else {
+      const map = new Map();
+      for (const it of items) {
+        const key = grp==='update' ? `Update ${it.majorUpdate}`
+                  : grp==='acq'   ? (ACQ[it.acq]?.l||it.acq)
+                  : 'All';
+        if (!map.has(key)) map.set(key,[]);
+        map.get(key).push(it);
+      }
+      let entries = [...map.entries()];
+      if (grp==='update') entries.sort((a,b)=>{
+        const av = parseInt(a[0].replace('Update ',''))||0;
+        const bv = parseInt(b[0].replace('Update ',''))||0;
+        return bv-av;
+      });
+      for (const [key,gitems] of entries) {
+        const tm = gitems.reduce((s,i)=>s+(i.mastery||0),0);
+        const h = document.createElement('div'); h.className='ghdr';
+        const vNum = grp==='update' ? key.replace('Update ','') : null;
+        const uTitle = vNum && ST.updateNames[vNum] ? ST.updateNames[vNum] : null;
+        h.innerHTML=`<span class="gtitle">${uTitle||key}</span>${uTitle?`<span class="gdate">Update ${vNum}</span>`:''}<span class="gm">+${fmtM(tm)}</span><span class="gcnt">${gitems.length} items</span>`;
+        frag.appendChild(h);
+        const sec = document.createElement('div'); sec.className='isect';
+        const g   = document.createElement('div'); g.className='igrid';
+        gitems.forEach(it=>g.appendChild(makeCard(it,catMax)));
+        sec.appendChild(g); frag.appendChild(sec);
+      }
+    }
+  }
+  wrap.innerHTML=''; wrap.appendChild(frag);
+}
+
+/* ── HANDLERS ───────────────────────────────── */
+let _st;
+function onSearch(v) { clearTimeout(_st); _st=setTimeout(()=>{ ST.search=v; document.getElementById('cx').style.display=v?'block':'none'; render(); },150); }
+function clearSearch() { ST.search=''; document.getElementById('search-input').value=''; document.getElementById('cx').style.display='none'; render(); }
+function onSort(v)   { ST.sort=v; render(); saveSettings(); }
+function onGroup(v)  { ST.group=v; render(); saveSettings(); }
+function onUpdateFilter() { render(); }
+function toggleDetails(on) { document.body.classList.toggle('details-open', on); }
+function toggleField(field, el) {
+  const isOn = el.classList.toggle('off');
+  document.body.classList.toggle(`hide-${field}`, isOn);
+}
+
+function toggleStar(path, btn) { toggleEntityStar(path, 'item', btn); if (ST.starred.has(path)) toast('★ Added to watchlist'); }
+
+/* ── SELECTION ───────────────────────────────── */
+function handleCardClick(e, it) {
+  if (e.shiftKey) {
+    window.getSelection().removeAllRanges(); // Clears the blue text highlight
+  }
+  if (e.target.closest('button,input,textarea,select')) return;
+  const idx = ST._visibleItems.findIndex(i => i.path === it.path);
+  if (e.shiftKey && ST._lastSelIdx !== null && idx !== -1) {
+    const lo = Math.min(ST._lastSelIdx, idx);
+    const hi = Math.max(ST._lastSelIdx, idx);
+    ST._visibleItems.slice(lo, hi + 1).forEach(i => ST.selection.add(i.path));
+  } else if (e.ctrlKey || e.metaKey) {
+    if (ST.selection.has(it.path)) ST.selection.delete(it.path);
+    else ST.selection.add(it.path);
+    ST._lastSelIdx = idx;
+  } else {
+    ST.selection.clear();
+    ST.selection.add(it.path);
+    ST._lastSelIdx = idx;
+  }
+  updateSelectionDisplay();
+}
+
+function updateSelectionDisplay() {
+  const count = ST.selection.size;
+  const bar = document.getElementById('action-bar');
+  if (bar) bar.classList.toggle('visible', count > 0);
+  const cnt = document.getElementById('ab-count');
+  if (cnt) cnt.textContent = `${count} selected`;
+  document.querySelectorAll('.card[data-path]').forEach(card => {
+    card.classList.toggle('selected', ST.selection.has(card.dataset.path));
+  });
+}
+
+function clearSelection() {
+  ST.selection.clear(); ST._lastSelIdx = null;
+  updateSelectionDisplay();
+}
+
+function selectAll() {
+  ST._visibleItems.forEach(it => ST.selection.add(it.path));
+  updateSelectionDisplay();
+}
+
+function starSelected() {
+  if (!ST.selection.size) return;
+  const allStarred = [...ST.selection].every(p => isEntityStarred(p));
+  ST.selection.forEach(path => {
+    const item = ST.items.find(i => i.path === path);
+    const type = item?.cat || 'item';
+    const currently = isEntityStarred(path);
+    if (allStarred && currently) toggleEntityStar(path, type, null);
+    else if (!allStarred && !currently) toggleEntityStar(path, type, null);
+  });
+  updateSelectionDisplay();
+  toast(allStarred ? `☆ Unstarred ${ST.selection.size}` : `★ Starred ${ST.selection.size}`);
+}
+
+function unstarSelected() {
+  ST.selection.forEach(path => {
+    const item = ST.items.find(i => i.path === path);
+    if (isEntityStarred(path)) toggleEntityStar(path, item?.cat || 'item', null);
+  });
+  updateSelectionDisplay();
+  toast(`☆ Unstarred ${ST.selection.size}`);
+}
+
+function copySelectedNames() {
+  const names = [...ST.selection]
+    .map(path => ST.items.find(i => i.path === path)?.name)
+    .filter(Boolean);
+  if (!names.length) return;
+  navigator.clipboard.writeText(names.join('\n')).then(() => toast(`Copied ${names.length} names ✓`));
+}
+
+function switchTab(t) {
+  clearSelection();
+  document.getElementById('view-items').style.display = t==='items'?'block':'none';
+  document.getElementById('view-sc').style.display    = t==='sc'?'block':'none';
+  document.getElementById('fnote').style.display      = t==='items'?'flex':'none';
+  document.getElementById('tab-items').className = 'tab'+(t==='items'?' active':'');
+  document.getElementById('tab-sc').className    = 'tab'+(t==='sc'?' active':'');
+  if (t==='sc') {
+    renderStarChart(); // show loading state immediately
+    loadStarChartData().then(() => renderStarChart());
+  }
+}
+
+function toast(msg,dur=2200) {
+  const el=document.getElementById('toast');
+  if(!el) return;
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),dur);
+}
+
+/* ── PERSISTENCE ────────────────────────────── */
+function saveSettings() {
+  ST.userData.settings = { cats:ST.cats, acqs:ST.acqs, sort:ST.sort, group:ST.group };
+  saveUserData();
+}
+function loadSettings() {
+  // loadUserData handles this — this is a no-op kept for call-site compatibility
+}
+
+function copyFilteredNames() {
+  const items = filteredItems();
+  if (!items.length) { toast('Nothing to copy! (Adjust filters)'); return; }
+  navigator.clipboard.writeText(items.map(it=>it.name).join('\n')).then(()=>{
+    toast(`Copied ${items.length} names ✓`);
+  }).catch(()=>toast('Copy failed. Check browser permissions.'));
+}
+
+function exportData() {
+  const out = { ...ST.userData, meta: { ...ST.userData.meta, exportedAt: new Date().toISOString() } };
+  const blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'wf-mastery-userdata.json'; a.click(); URL.revokeObjectURL(a.href);
+  toast('Data exported ✓');
+}
+
+function importData(inp) {
+  const f = inp.files?.[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = async ev => {
+    try {
+      const d = JSON.parse(ev.target.result);
+      if (d.version === 3) {
+        ST.userData = d;
+        await saveUserData();
+        // Re-derive runtime mirrors
+        ST.starred = new Set(Object.entries(ST.userData.entities).filter(([,e])=>e.starred&&e.type!=='node').map(([k])=>k));
+        ST.overrides = Object.fromEntries(Object.entries(ST.userData.entities).filter(([,e])=>e.rank!==undefined).map(([k,e])=>[k,e.rank]));
+        toast('Imported ✓ — reloading…');
+        setTimeout(() => location.reload(), 800);
+      } else {
+        toast('Unrecognised file format');
+      }
+    } catch(e) { toast('Import failed'); }
+  };
+  r.readAsText(f); inp.value = '';
+}
+
+/* ── IMPORT FLOW ────────────────────────────── */
+async function handleImport() {
+  const text=document.getElementById('json-input').value.trim();
+  const errEl=document.getElementById('import-err');
+  if(errEl) errEl.style.display='none';
+  if (!text) { showE('Paste your JSON first.'); return; }
+  let profile;
+  try { profile=parseProfile(text); }
+  catch(e) { showE(e instanceof SyntaxError?'Invalid JSON — try "Load from file" instead.':'Parse error: '+e.message); return; }
+  if (!profile.xpData.length) { showE('No XP data found in this JSON.'); return; }
+  localStorage.setItem('wft3_profile',text);
+  await loadAndShow(profile);
+  function showE(m){ if(errEl){ errEl.textContent=m; errEl.className='err-box'; errEl.style.display='block'; } }
+}
+
+async function loadAndShow(profile) {
+  document.getElementById('import-screen').style.display='none';
+  document.getElementById('loading-screen').style.display='flex';
+  setProgress(15,'Downloading item database…');
+  const [itemDb, updateNames] = await Promise.all([fetchItemDb(), fetchUpdateNames()]);
+  ST.updateNames = updateNames;
+  setProgress(80,'Syncing your progress…');
+  ST.items    = enrichAll(profile.xpData, itemDb);
+  ST.missions = profile.missions;
+  ST.userData.meta.playerName  = profile.playerName;
+  ST.userData.meta.playerLevel = profile.playerLevel;
+  ST.userData.meta.lastSynced  = Date.now();
+  document.getElementById('loading-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  document.getElementById('player-info').textContent=`${profile.playerName} · MR ${profile.playerLevel}`;
+  buildChips();
+  buildUpdateSel();
+  renderMbar();
+  render();
+  saveUserData();
+  toast(`Sync complete: ${ST.items.length} items tracked.`);
+}
+
+function resetApp() {
+  document.getElementById('app').style.display='none';
+  document.getElementById('import-screen').style.display='flex';
+  document.getElementById('json-input').value='';
+  ST.items=[]; ST.missions=[];
+}
+
+/* ── AUDIT ──────────────────────────────────── */
+async function auditDatabase() {
+  const db = await dbGet('cache','item_db');
+  if (!db) return console.error('Database not found. Refresh first.');
+  const currentDb = db.v || db;
+  const counts = {};
+  const TARGETS = {
+    'Warframes':115,'Primary':192,'Secondary':146,'Melee':221,'Zaws':11,'Kitguns':6,
+    'Amps':10,'MOAs':4,'Hounds':3,'Sentinels':17,'Sentinel Weapons':24,'Archwing':5,
+    'Arch-Gun':20,'Arch-Melee':8,'Necramechs':2,'Kubrow':6,'Kavat':5,'Vulpaphyla':3,
+    'Predasite':3,'K-Drive':5
+  };
+  Object.values(currentDb).forEach(item => { const cat=item.apiCat; counts[cat]=(counts[cat]||0)+1; });
+  console.log('%c--- MASTERY AUDIT REPORT ---','font-weight:bold;font-size:14px;color:#4aad9e;');
+  Object.entries(TARGETS).forEach(([cat,target])=>{
+    const current=counts[cat]||0, diff=current-target;
+    let status='%c[OK]', color='color:#4CAF50';
+    if (diff>0) { status=`%c[TOO HIGH: +${diff}]`; color='color:#FF9800'; }
+    else if (diff<0) { status=`%c[MISSING: ${diff}]`; color='color:#F44336'; }
+    console.log(`%s | %c${cat.padEnd(18)} %c| Current: ${current} / Target: ${target}`,color,status,'color:inherit','color:#888');
+    if (diff!==0) {
+      const items=Object.values(currentDb).filter(i=>i.apiCat===cat).map(i=>i.name).join(', ');
+      console.log(`   %cItems found: %c${items||'None'}`,'color:#aaa;font-style:italic','color:#777;font-style:italic');
+    }
+  });
+  Object.keys(counts).forEach(cat=>{
+    if (!TARGETS[cat]) console.log(`%c[UNKNOWN CATEGORY: ${cat}] | Items: ${counts[cat]}`,'color:#E91E63;font-weight:bold;');
+  });
+}
+
+/* ── INIT ───────────────────────────────────── */
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input,textarea,select')) return;
+  if (document.getElementById('app')?.style.display === 'none') return;
+  if (e.key === 'Escape' || e.key === 'Delete') { clearSelection(); return; }
+  if ((e.key === 'a' || e.key === 'A') && (e.ctrlKey || e.metaKey)) { e.preventDefault(); selectAll(); return; }
+  if (e.key === 's' || e.key === 'S') { if (ST.selection.size) { starSelected(); } return; }
+});
+
+document.getElementById('file-in')?.addEventListener('change',e=>{
+  const f=e.target.files?.[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>document.getElementById('json-input').value=ev.target.result;
+  r.readAsText(f); e.target.value='';
+});
+
+(async function init() {
+  await loadUserData();
+  // Restore group selector UI from settings
+  const gs = document.getElementById('grp-sel');
+  if (gs && ST.group) gs.value = ST.group;
+  const saved = localStorage.getItem('wft3_profile');
+  if (saved) {
+    try {
+      const p = parseProfile(saved);
+      if (p.xpData.length) { await loadAndShow(p); return; }
+    } catch(e){ console.error(e); }
+  }
+})();
+</script>
+</body>
+</html>
