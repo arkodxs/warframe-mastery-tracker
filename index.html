@@ -4,19 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Warframe Mastery Tracker</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='82' x='50' text-anchor='middle' font-size='90' fill='%234aad9e'>⬡</text></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23060d18'/><text y='82' x='50' text-anchor='middle' font-size='90' fill='%234aad9e'>⬡</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='82' x='50' text-anchor='middle' font-size='90' fill='%2352b8ad'>⬡</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23161922'/><text y='82' x='50' text-anchor='middle' font-size='90' fill='%2352b8ad'>⬡</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#030810;--s1:#060d18;--s2:#091422;--s3:#0c1928;
-  --bd:#112030;--bd2:#1c3048;
-  --acc:#4aad9e;
-  --tx:#9ab8ce;--tx2:#4e7088;--tx3:#2c4860;
-  --err:#b84060;
+  --bg:#0f1117;--s1:#161922;--s2:#1c2030;--s3:#222638;
+  --bd:#2a3048;--bd2:#384060;
+  --acc:#52b8ad;
+  --tx:#ccd8e6;--tx2:#6e8098;--tx3:#404e62;
+  --err:#a84860;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--bg);color:var(--tx);font-family:'Exo 2',sans-serif;font-size:14px;min-height:100vh}
+
+/* ── LEGIBILITY OVERHAUL ── */
+html,body{background:var(--bg);color:var(--tx);font-family:'Exo 2',sans-serif;font-size:16px;min-height:100vh;line-height:1.5}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--s1)}
 ::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
 code{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);background:rgba(74,173,158,.1);padding:1px 5px;border-radius:3px}
@@ -57,29 +59,29 @@ code{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);b
 #app{display:none;min-height:100vh;flex-direction:column}
 
 /* Header */
-.app-hdr{background:var(--s1);border-bottom:1px solid var(--bd);padding:.6rem 1.4rem;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:20;flex-wrap:wrap}
+.app-hdr{background:var(--s1);border-bottom:1px solid var(--bd);padding:.75rem 1.4rem;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:20;flex-wrap:wrap}
 .hbrand{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
-.hhex{color:var(--acc);font-size:1.05rem}
-.htitle{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.9rem;letter-spacing:.15em;color:#d0e8f8}
-.hplayer{font-size:.68rem;color:var(--tx2);letter-spacing:.06em;margin-top:1px}
+.hhex{color:var(--acc);font-size:1.2rem}
+.htitle{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;letter-spacing:.15em;color:#d0e8f8}
+.hplayer{font-size:.75rem;color:var(--tx2);letter-spacing:.06em;margin-top:1px}
 .hdivider{width:1px;height:28px;background:var(--bd2);flex-shrink:0}
 .hstats{display:flex;gap:.35rem;align-items:center}
 .sp{display:flex;flex-direction:column;align-items:center;padding:.15rem .6rem;background:var(--s2);border:1px solid var(--bd);border-radius:4px}
-.spv{font-family:'Share Tech Mono',monospace;font-size:.82rem;color:var(--acc)}
-.spl{font-size:.55rem;letter-spacing:.1em;color:var(--tx3)}
+.spv{font-family:'Share Tech Mono',monospace;font-size:.95rem;color:var(--acc)}
+.spl{font-size:.62rem;letter-spacing:.08em;color:var(--tx3)}
 .hact{display:flex;gap:.35rem;flex-shrink:0;margin-left:auto}
-.hbtn{padding:.28rem .65rem;background:transparent;border:1px solid var(--bd2);border-radius:4px;color:var(--tx2);font-size:.7rem;cursor:pointer;font-family:'Exo 2',sans-serif;transition:all .15s;white-space:nowrap}
+.hbtn{padding:.32rem .72rem;background:transparent;border:1px solid var(--bd2);border-radius:4px;color:var(--tx2);font-size:.78rem;cursor:pointer;font-family:'Exo 2',sans-serif;transition:all .15s;white-space:nowrap}
 .hbtn:hover{border-color:var(--acc);color:var(--acc)}
 .hbtn-warn{border-color:rgba(200,112,24,.4);color:#b87020}
 .hbtn-warn:hover{border-color:#c87018;color:#c87018}
 
 /* Tabs */
 .tabs{display:flex;background:var(--s1);border-bottom:1px solid var(--bd)}
-.tab{padding:.48rem 1.2rem;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.83rem;letter-spacing:.08em;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab{padding:.55rem 1.4rem;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.92rem;letter-spacing:.08em;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
 .tab:hover{color:var(--tx2)}.tab.active{color:var(--acc);border-bottom-color:var(--acc)}
 
 /* Mastery bar */
-.mbar{background:var(--s2);border-bottom:1px solid var(--bd);padding:.6rem 1.4rem;display:flex;flex-direction:column;gap:.45rem}
+.mbar{background:var(--s2);border-bottom:1px solid var(--bd);padding:.5rem 1.4rem;display:flex;flex-direction:column;gap:.5rem}
 .mbar-row{display:flex;gap:1.1rem;align-items:center;flex-wrap:wrap}
 .mbi{display:flex;flex-direction:column;gap:1px}
 .mbl{font-size:.58rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase}
@@ -90,42 +92,53 @@ code{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);b
 .cmini-val{font-family:'Share Tech Mono',monospace;font-size:.67rem;opacity:.8}
 
 /* Filter rows */
-.frow{background:var(--s1);border-bottom:1px solid var(--bd);padding:.75rem 1.4rem;display:flex;flex-direction:column;align-items:flex-start;gap:.5rem}
-.flbl{font-size:.58rem;letter-spacing:.18em;color:var(--tx3);flex-shrink:0;text-transform:uppercase}
+.frow{background:var(--s1);border-bottom:1px solid var(--bd);padding:.85rem 1.4rem;display:flex;flex-direction:column;align-items:flex-start;gap:.6rem}
+.flbl{font-size:.72rem;letter-spacing:.12em;color:var(--tx2);flex-shrink:0;text-transform:uppercase;font-family:'Rajdhani',sans-serif;font-weight:700}
 
 /* Chip groups */
-.chips{display:flex;gap:.28rem;flex-wrap:wrap;align-items:center}
-.chip-group{display:flex;gap:.28rem;flex-wrap:wrap;align-items:center}
-.chip-grp-lbl{background:none;border:none;color:var(--tx3);font-size:.58rem;letter-spacing:.12em;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600;padding:.15rem .3rem;transition:color .15s;text-transform:uppercase;flex-shrink:0}
-.chip-grp-lbl:hover{color:var(--tx2)}
-.chip-sep{width:1px;height:18px;background:var(--bd2);margin:0 .2rem;flex-shrink:0;align-self:center}
+.chips{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center}
+.chip-group{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center}
+.chip-grp-lbl{background:none;border:none;color:var(--tx2);font-size:.72rem;letter-spacing:.1em;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:700;padding:.2rem .4rem;transition:color .15s;text-transform:uppercase;flex-shrink:0}
+.chip-grp-lbl:hover{color:var(--tx)}
+.chip-sep{width:1px;height:20px;background:var(--bd2);margin:0 .25rem;flex-shrink:0;align-self:center}
 
-.chip{display:flex;align-items:center;gap:.22rem;padding:.15rem .5rem;border-radius:3px;border:1px solid transparent;font-size:.7rem;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.03em;cursor:pointer;transition:all .12s;background:var(--s2);color:var(--tx3);user-select:none}
-.chip:hover{opacity:.85}
-.chip.on{color:var(--cc);border-color:color-mix(in srgb,var(--cc) 50%,transparent);background:color-mix(in srgb,var(--cc) 10%,transparent)}
-.cn{font-family:'Share Tech Mono',monospace;font-size:.62rem;opacity:.65}
+.chip{display:flex;align-items:center;gap:.28rem;padding:.28rem .7rem;border-radius:4px;border:1px solid var(--bd);font-size:.82rem;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.03em;cursor:pointer;transition:all .12s;background:var(--s2);color:var(--tx2);user-select:none}
+.chip:hover{color:var(--tx);border-color:var(--bd2)}
+.chip.on{color:var(--cc);border-color:color-mix(in srgb,var(--cc) 55%,transparent);background:color-mix(in srgb,var(--cc) 12%,transparent)}
+.cn{font-family:'Share Tech Mono',monospace;font-size:.7rem;opacity:.7}
 
-/* MR Calculator panel */
-.mbar-calc{border-top:1px solid var(--bd);padding-top:.4rem;display:none;flex-direction:column;gap:.45rem}
+/* MR Calculator */
+.mbar-calc{border-top:1px solid var(--bd);padding-top:.5rem;display:none;flex-direction:column;gap:.5rem;margin-top:.4rem}
 .mbar-calc.open{display:flex}
-.mbar-calc-toggle{background:none;border:none;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.6rem;letter-spacing:.14em;color:var(--tx3);cursor:pointer;text-transform:uppercase;padding:0;transition:color .12s}
-.mbar-calc-toggle:hover{color:var(--tx2)}
 .calc-row{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
 .calc-stat{display:flex;flex-direction:column;gap:1px}
-.calc-lbl{font-size:.56rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase}
+.calc-lbl{font-size:.58rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase}
 .calc-val{font-family:'Share Tech Mono',monospace;font-size:.82rem;color:var(--tx)}
 .calc-val.accent{color:var(--acc)}
 .calc-bar-wrap{flex:1;min-width:100px;height:6px;background:var(--bg);border-radius:3px;overflow:hidden;position:relative}
 .calc-bar-fill{position:absolute;left:0;top:0;height:100%;background:var(--acc);border-radius:3px;transition:width .3s}
-.calc-bar-proj{position:absolute;top:0;height:100%;background:rgba(74,173,158,.28);transition:left .3s,width .3s;border-left:1px solid rgba(74,173,158,.45)}
+.calc-bar-proj{position:absolute;top:0;height:100%;background:rgba(82,184,173,.25);transition:left .3s,width .3s;border-left:1px solid rgba(82,184,173,.5)}
 .calc-bar-rankup{font-size:.58rem;color:var(--tx3);font-family:'Share Tech Mono',monospace;margin-top:2px;letter-spacing:.04em}
 .calc-bar-overflow{display:none;flex-direction:column;gap:2px;margin-top:2px}
 .calc-bar-overflow.show{display:flex}
 .calc-inputs{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
-.calc-input-grp{display:flex;align-items:center;gap:.3rem;font-size:.7rem;color:var(--tx2)}
+.calc-input-grp{display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--tx2)}
 .calc-input-grp input{width:52px;background:var(--bg);border:1px solid var(--bd2);border-radius:4px;padding:.22rem .4rem;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.75rem;text-align:center;outline:none}
 .calc-input-grp input:focus{border-color:var(--acc)}
-.calc-result{font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--acc);padding:.15rem .5rem;background:rgba(74,173,158,.1);border-radius:4px;border:1px solid rgba(74,173,158,.2)}
+.calc-result{font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--acc);padding:.15rem .5rem;background:rgba(82,184,173,.1);border-radius:4px;border:1px solid rgba(82,184,173,.2)}
+
+/* Category MXP hover tooltip */
+.mbi-wrap{position:relative;display:flex;flex-direction:column;gap:1px;cursor:default}
+.mbi-tip{position:absolute;top:100%;left:0;margin-top:6px;background:var(--s1);border:1px solid var(--bd2);border-radius:7px;padding:.5rem .65rem;display:none;flex-direction:column;gap:.28rem;z-index:30;min-width:180px;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.mbi-wrap:hover .mbi-tip{display:flex}
+.mbi-tip-row{display:flex;align-items:center;justify-content:space-between;gap:.75rem;font-size:.72rem}
+.mbi-tip-cat{color:var(--tx2)}
+.mbi-tip-val{font-family:'Share Tech Mono',monospace;color:var(--acc);font-size:.68rem}
+
+/* Star chart legend */
+.sc-legend{display:flex;gap:.9rem;align-items:center;padding:.35rem .1rem;flex-wrap:wrap}
+.sc-legend-item{display:flex;align-items:center;gap:.3rem;font-size:.65rem;color:var(--tx2)}
+.sc-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
 /* Entity status badges */
 .status-prio{font-size:.54rem;font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--acc);border:1px solid rgba(74,173,158,.4);padding:1px 4px;border-radius:3px;letter-spacing:.04em;cursor:pointer;user-select:none;transition:all .12s}
@@ -140,17 +153,17 @@ code{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);b
 
 /* List chip progress */
 .list-chip-prog{font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--tx3);margin-left:.2rem}
-.ctrls{display:flex;gap:.5rem;padding:.55rem 1.4rem;align-items:center;background:var(--s2);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.ctrls{display:flex;gap:.55rem;padding:.65rem 1.4rem;align-items:center;background:var(--s2);border-bottom:1px solid var(--bd);flex-wrap:wrap}
 .sw{position:relative;flex:1;min-width:140px;max-width:260px}
 .si{position:absolute;left:.5rem;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:.9rem;pointer-events:none}
-#search-input{width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:5px;padding:.36rem 1.7rem;color:var(--tx);font-family:'Exo 2',sans-serif;font-size:.82rem;outline:none;transition:border-color .15s}
+#search-input{width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:5px;padding:.42rem 1.8rem;color:var(--tx);font-family:'Exo 2',sans-serif;font-size:.88rem;outline:none;transition:border-color .15s}
 #search-input:focus{border-color:var(--acc)}
 #search-input::placeholder{color:var(--tx3)}
 .cx{position:absolute;right:.38rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--tx3);cursor:pointer;font-size:.9rem;padding:2px 4px;line-height:1}
 .cx:hover{color:var(--tx)}
-.csel{background:var(--bg);border:1px solid var(--bd2);border-radius:5px;padding:.36rem .55rem;color:var(--tx);font-family:'Exo 2',sans-serif;font-size:.82rem;outline:none;cursor:pointer}
+.csel{background:var(--bg);border:1px solid var(--bd2);border-radius:5px;padding:.42rem .6rem;color:var(--tx);font-family:'Exo 2',sans-serif;font-size:.88rem;outline:none;cursor:pointer}
 .csel:focus{border-color:var(--acc)}
-.ctog{display:flex;align-items:center;gap:.3rem;font-size:.73rem;color:var(--tx2);cursor:pointer;user-select:none;white-space:nowrap}
+.ctog{display:flex;align-items:center;gap:.32rem;font-size:.82rem;color:var(--tx2);cursor:pointer;user-select:none;white-space:nowrap}
 .ctog input{cursor:pointer;accent-color:var(--acc)}
 .rc{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--tx3);white-space:nowrap}
 
@@ -161,61 +174,49 @@ code{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);b
 .gm{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--acc)}
 .gcnt{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--tx3);margin-left:auto}
 
-/* Display group — field toggles + Details, right-aligned in controls */
+/* Display group */
 .display-group{display:flex;align-items:center;gap:.28rem;margin-left:auto;flex-shrink:0;padding-left:.5rem;border-left:1px solid var(--bd2)}
 .dg-sep{width:1px;height:14px;background:var(--bd2);margin:0 .1rem;flex-shrink:0}
-.ftog{padding:.16rem .46rem;border-radius:3px;border:1px solid var(--bd2);background:var(--s3);font-size:.68rem;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.04em;cursor:pointer;transition:all .12s;user-select:none;color:var(--tx2)}
+.ftog{padding:.22rem .5rem;border-radius:3px;border:1px solid var(--bd2);background:var(--s3);font-size:.75rem;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.04em;cursor:pointer;transition:all .12s;user-select:none;color:var(--tx2)}
 .ftog:hover{border-color:var(--acc);color:var(--acc)}
 .ftog.off{color:var(--tx3);opacity:.45;border-color:transparent;text-decoration:line-through}
 
-/* Body-level field visibility toggles */
+/* Toggles */
 body.hide-badge .cbadge{display:none}
 body.hide-rank .rank-info{display:none}
 body.hide-update .utag{display:none}
+body.hide-source .abadge{display:none !important}
+body.hide-maxed .maxed-tag{display:none}
+body.hide-xpbar .xbw,
+body.hide-xpbar .cbot{display:none}
+body.hide-notes .card-note{display:none}
+body.hide-rank.hide-update .ccore:not(:has(.status-prio,.status-build)){display:none}
 
-/* Grid */
-.isect{padding:.8rem 1.4rem}
-.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem}
+/* ── GRID & SPACING ── */
+.isect{padding:.9rem 1.4rem}
+.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:.8rem}
 
-/* Card */
-.card{background:var(--s2);border:1px solid var(--bd);border-radius:7px;padding:.65rem;display:flex;flex-direction:column;gap:.28rem;transition:border-color .12s,background .12s;position:relative;overflow:hidden}
+/* ── CARDS (Level 1 Info) ── */
+.card{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:1rem;display:flex;flex-direction:column;gap:.6rem;transition:border-color .12s,background .12s;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none;}
 .card:hover{border-color:color-mix(in srgb,var(--cc) 55%,transparent);background:var(--s3)}
 .card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cc);border-radius:7px 0 0 7px;opacity:.8}
 
-/* Card: always-visible */
 .ctop{display:flex;align-items:flex-start;gap:.4rem;padding-right:1.2rem}
-.cbadge{font-family:'Share Tech Mono',monospace;font-size:.6rem;padding:2px 5px;border-radius:3px;border:1px solid;flex-shrink:0;margin-top:1px;line-height:1.2;letter-spacing:.03em;white-space:nowrap}
-.cname{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.9rem;line-height:1.2;word-break:break-word;flex:1;color:#c8dce8}
+.cbadge{font-family:'Share Tech Mono',monospace;font-size:.65rem;padding:2px 6px;border-radius:3px;border:1px solid;flex-shrink:0;margin-top:2px;line-height:1.2;letter-spacing:.03em;white-space:nowrap}
+.cname{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.1rem !important;line-height:1.25;word-break:break-word;flex:1;color:#fff}
 .ccore{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
-.rank-info{font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--tx);display:flex;align-items:center;gap:.15rem}
+
+.rank-info{font-family:'Share Tech Mono',monospace;font-size:0.9rem;color:var(--tx);display:flex;align-items:center;gap:.15rem;background:var(--bg);padding:2px 8px;border-radius:4px;border:1px solid var(--bd)}
 .rank-cur{color:var(--acc)}
 .rank-max{color:var(--tx3)}
 .utag{font-size:.58rem;color:var(--tx3);font-family:'Share Tech Mono',monospace;margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px}
 
-/* Card: star button */
 .sbtn{position:absolute;top:.4rem;right:.4rem;background:none;border:none;cursor:pointer;font-size:.7rem;color:var(--tx3);padding:2px;line-height:1;transition:color .12s}
 .sbtn:hover,.sbtn.on{color:#c0a030}
 
-/* Card: extra — always shown; individual sub-elements controlled by body classes */
-.card-extra{display:flex;padding-top:.3rem;border-top:1px solid var(--bd);margin-top:.15rem;flex-direction:column;gap:.28rem}
-body.hide-xpbar .xbw,
-body.hide-xpbar .cbot{display:none}
-body.hide-notes .card-note{display:none}
-
-/* Column layout — used when grouping by category */
-.col-wrap{display:flex;gap:.6rem;overflow-x:auto;padding:.9rem 1.4rem;align-items:flex-start}
-.col-wrap::-webkit-scrollbar{height:5px}
-.col-wrap::-webkit-scrollbar-track{background:var(--s1)}
-.col-wrap::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
-.cat-col{flex-shrink:0;width:230px;display:flex;flex-direction:column;gap:.38rem}
-.cat-col .card{width:100%}
-.cat-col-hdr{border-radius:6px;padding:.38rem .65rem;display:flex;justify-content:space-between;align-items:center;background:var(--s1);border:1px solid var(--bd);border-left:3px solid var(--cc);margin-bottom:.06rem}
-.col-cat-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.82rem;letter-spacing:.06em;color:var(--cc)}
-.col-cat-meta{display:flex;gap:.4rem;align-items:baseline}
-.col-cat-mxp{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--acc)}
-.col-cat-cnt{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--tx3)}
+.card-extra{display:flex;padding-top:.35rem;border-top:1px solid var(--bd);flex-direction:column;gap:.3rem}
 .cmeta{display:flex;gap:.28rem;flex-wrap:wrap;align-items:center}
-.abadge{font-size:.58rem;padding:1px 5px;border-radius:3px;border:1px solid;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.03em}
+.abadge{font-size:.65rem;padding:2px 6px;border-radius:3px;border:1px solid;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.03em}
 .xbw{background:var(--bg);border-radius:2px;height:3px;overflow:hidden}
 .xbf{height:100%;border-radius:2px;transition:width .35s ease}
 .cbot{display:flex;align-items:center;gap:.35rem}
@@ -223,14 +224,39 @@ body.hide-notes .card-note{display:none}
 .xval{font-family:'Share Tech Mono',monospace;font-size:.75rem;margin-left:auto}
 .mval{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--tx2)}
 
-/* Rank input (for rank-40 items) */
 .rank-input{width:36px;background:var(--s3);border:1px solid var(--bd2);color:var(--acc);font-family:'Share Tech Mono',monospace;font-size:.75rem;text-align:center;border-radius:3px;padding:1px}
 
-/* Unowned */
 .card.unowned{opacity:.55;filter:grayscale(.3);border-style:dashed}
 .card.unowned:hover{opacity:.85;filter:grayscale(0)}
+.card.selected{border-color:color-mix(in srgb,var(--cc) 70%,transparent);background:color-mix(in srgb,var(--cc) 7%,var(--s3));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--cc) 25%,transparent)}
+.card.selected::after{content:'✓';position:absolute;bottom:.38rem;right:.42rem;font-size:.55rem;color:var(--cc);font-family:'Share Tech Mono',monospace;opacity:.8;pointer-events:none}
+.card-note{width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:4px;padding:.28rem .42rem;color:var(--tx);font-family:'Exo 2',sans-serif;font-size:.72rem;resize:none;outline:none;min-height:40px;line-height:1.45;transition:border-color .15s;display:block}
+.card-note:focus{border-color:var(--acc)}
+.card-note::placeholder{color:var(--tx3)}
 
-/* Empty state */
+/* Action bar */
+.action-bar{display:none;align-items:center;gap:.5rem;padding:.45rem 1.4rem;background:var(--s1);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.action-bar.visible{display:flex}
+.ab-count{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--acc);flex-shrink:0}
+.ab-btn{padding:.22rem .6rem;border-radius:4px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-size:.72rem;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;transition:all .12s;white-space:nowrap}
+.ab-btn:hover{border-color:var(--acc);color:var(--acc)}
+.ab-btn-clear{margin-left:auto;color:var(--tx3)}
+.ab-btn-clear:hover{border-color:var(--err);color:var(--err)}
+.ab-kb-hint{font-size:.65rem;color:var(--tx3);display:flex;gap:.8rem;align-items:center;margin-right:1rem}
+.ab-kb-hint code{color:var(--tx);background:var(--s3);border:1px solid var(--bd2);padding:1px 4px;border-radius:3px;font-family:'Share Tech Mono',monospace;text-transform:uppercase;font-size:.62rem}
+
+/* Column layout */
+.col-wrap{display:flex;gap:.6rem;overflow-x:auto;padding:.9rem 1.4rem;align-items:flex-start}
+.col-wrap::-webkit-scrollbar{height:5px}
+.col-wrap::-webkit-scrollbar-track{background:var(--s1)}
+.col-wrap::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+.cat-col{flex-shrink:0;width:248px;display:flex;flex-direction:column;gap:.4rem}
+.cat-col .card{width:100%}
+.cat-col-hdr{border-radius:6px;padding:.38rem .65rem;display:flex;justify-content:space-between;align-items:center;background:var(--s1);border:1px solid var(--bd);border-left:3px solid var(--cc);margin-bottom:.06rem}
+.col-cat-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.82rem;letter-spacing:.06em;color:var(--cc)}
+.col-cat-meta{display:flex;gap:.4rem;align-items:baseline}
+.col-cat-mxp{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--acc)}
+.col-cat-cnt{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--tx3)}
 .empty{grid-column:1/-1;text-align:center;padding:4rem 2rem;color:var(--tx3);font-size:.86rem}
 
 /* Star Chart */
@@ -244,45 +270,42 @@ body.hide-notes .card-note{display:none}
 .sc-sum-lbl{font-size:.56rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase}
 .sc-section{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:.16em;color:var(--tx3);text-transform:uppercase;padding-bottom:.3rem;border-bottom:1px solid var(--bd);margin-top:.25rem}
 
-/* Planet accordion list */
-.sc-planet-list{display:flex;flex-direction:column;gap:.3rem}
-.sc-planet{border:1px solid var(--bd);border-radius:7px;overflow:hidden;background:var(--s2)}
-.sc-planet-hdr{display:flex;align-items:center;gap:.5rem;padding:.48rem .75rem;cursor:pointer;user-select:none;transition:background .12s}
-.sc-planet-hdr:hover{background:var(--s3)}
-.sc-chevron{color:var(--tx3);font-size:.58rem;transition:transform .15s;flex-shrink:0}
-.sc-planet.open .sc-chevron{transform:rotate(90deg)}
-.sc-planet-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.88rem;letter-spacing:.05em;color:var(--tx);flex:1}
-.sc-planet-stats{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--tx3);white-space:nowrap}
-.sc-planet-pct{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--acc);min-width:28px;text-align:right}
-.sc-planet.complete .sc-planet-pct{color:#4aad9e}
-.sc-planet-bar{height:2px;background:var(--bg)}
-.sc-planet-bar-fill{height:100%;background:var(--acc)}
-.sc-planet.complete .sc-planet-bar-fill{background:#4aad9e}
-.sc-body{display:none;border-top:1px solid var(--bd)}
-.sc-planet.open .sc-body{display:block}
+/* Planet grid */
+.sc-planet-grid{display:grid;grid-template-columns:repeat(var(--cols,3),1fr);gap:0.75rem;margin-top:.35rem}
+.sc-planet-tile{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:.7rem .85rem;cursor:pointer;transition:border-color .12s,background .12s;position:relative}
+.sc-planet-tile:hover{border-color:var(--bd2);background:var(--s3)}
+.sc-planet-tile.complete{border-color:color-mix(in srgb,var(--acc) 40%,var(--bd))}
+.sc-planet-tile.priority{border-left:3px solid var(--acc)}
+.sc-planet-tile.open{grid-column:1/-1;cursor:default;border-color:var(--acc);background:var(--s2)}
+.sc-tile-hdr{display:flex;align-items:center;gap:.45rem;margin-bottom:.35rem}
+.sc-tile-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.1rem !important;letter-spacing:.02em;color:var(--tx);flex:1}
+.sc-tile-pct{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);flex-shrink:0}
+.sc-tile-pct.sp-focus{color:#6888c8;font-weight:700}
+.sc-planet-tile.complete .sc-tile-pct:not(.sp-focus){color:#4aad9e}
+.sc-tile-star{background:none;border:none;cursor:pointer;font-size:.7rem;color:var(--tx3);padding:1px 2px;line-height:1;transition:color .12s;flex-shrink:0}
+.sc-tile-star:hover,.sc-tile-star.on{color:#c0a030}
+.sc-dual-bar{position:relative;height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:.35rem}
+.sc-dual-base{position:absolute;left:0;top:0;height:100%;background:color-mix(in srgb,var(--acc) 55%,var(--bg));border-radius:3px;transition:width .3s}
+.sc-dual-sp{position:absolute;left:0;top:0;height:100%;background:#6888c8;border-radius:3px;transition:width .3s}
+.sc-tile-stats{font-size:.72rem;color:var(--tx3);font-family:'Share Tech Mono',monospace}
+.sc-tile-stats .sp-done{color:#7898d8}
+.sc-tile-body{display:none;border-top:1px solid var(--bd);margin-top:.45rem;padding-top:.35rem}
+.sc-planet-tile.open .sc-tile-body{display:block}
+.sc-controls{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.3rem;flex-wrap:wrap}
+.sc-col-ctrl{display:flex;align-items:center;gap:.35rem;font-size:.68rem;color:var(--tx3);flex-shrink:0}
+.sc-col-ctrl span{font-family:'Share Tech Mono',monospace}
+.sc-col-btn{background:var(--s2);border:1px solid var(--bd2);border-radius:4px;color:var(--tx2);cursor:pointer;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.8rem;line-height:1;transition:all .12s;font-family:'Share Tech Mono',monospace}
+.sc-col-btn:hover{border-color:var(--acc);color:var(--acc)}
 
-/* Individual node rows */
-.sc-node{display:flex;align-items:center;gap:.48rem;padding:.26rem .75rem;border-bottom:1px solid var(--bd);font-size:.78rem}
+.sc-node{display:flex;align-items:center;gap:.5rem;padding:.32rem .85rem;border-bottom:1px solid var(--bd);font-size:.84rem}
 .sc-node:last-child{border-bottom:none}
 .sc-node.junction{background:rgba(192,160,48,.04)}
 .sc-node-icon{font-size:.52rem;flex-shrink:0;color:var(--tx3)}
 .sc-node.junction .sc-node-icon{color:#b89830}
-.sc-node-name{flex:1;font-family:'Rajdhani',sans-serif;font-weight:500;font-size:.82rem;color:var(--tx2)}
-.sc-node-type{font-size:.58rem;color:var(--tx3);font-family:'Share Tech Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.sc-node-name{flex:1;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.92rem;color:var(--tx2)}
+.sc-node-type{font-size:.65rem;color:var(--tx3);font-family:'Share Tech Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
 .sc-node-mastery{font-size:.54rem;font-family:'Rajdhani',sans-serif;font-weight:700;color:#b89830;border:1px solid rgba(184,152,48,.35);padding:1px 4px;border-radius:3px;letter-spacing:.05em;flex-shrink:0}
 .sc-node-status{font-size:.66rem;flex-shrink:0;width:14px;text-align:center;color:var(--tx3)}
-
-/* Steel Path planet toggle */
-.sc-sp-btn{background:none;border:1px solid var(--bd2);border-radius:3px;color:var(--tx3);font-size:.58rem;font-family:'Rajdhani',sans-serif;font-weight:600;padding:1px 5px;cursor:pointer;transition:all .12s;white-space:nowrap;flex-shrink:0;letter-spacing:.03em}
-.sc-sp-btn:hover{border-color:rgba(184,152,48,.5);color:#b89830}
-.sc-sp-btn.on{border-color:rgba(184,152,48,.45);color:#b89830;background:rgba(184,152,48,.08)}
-
-/* Card note */
-.card-note{width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:4px;padding:.28rem .42rem;color:var(--tx);font-family:'Exo 2',sans-serif;font-size:.72rem;resize:none;outline:none;min-height:40px;line-height:1.45;transition:border-color .15s;display:block}
-.card-note:focus{border-color:var(--acc)}
-.card-note::placeholder{color:var(--tx3)}
-
-/* Node row extras */
 .sc-node-star{background:none;border:none;cursor:pointer;font-size:.65rem;color:var(--tx3);padding:0 2px;line-height:1;transition:color .12s;flex-shrink:0}
 .sc-node-star:hover,.sc-node-star.on{color:#c0a030}
 .sc-node-runs{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--tx3);flex-shrink:0}
@@ -290,28 +313,7 @@ body.hide-notes .card-note{display:none}
 .sc-node-note{background:none;border:none;border-bottom:1px solid transparent;color:var(--tx2);font-size:.68rem;font-family:'Exo 2',sans-serif;outline:none;width:90px;padding:0 2px;transition:border-color .12s;min-width:0;flex-shrink:1}
 .sc-node-note:focus{border-bottom-color:var(--acc)}
 .sc-node-note::placeholder{color:var(--tx3)}
-.sc-planet-sp{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--tx3);white-space:nowrap}
-.sc-planet-sp .sp-done{color:#6888c8}
-.sc-mxp-available{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:#b89830}
 
-/* Card selection */
-.card.selected{border-color:color-mix(in srgb,var(--cc) 70%,transparent);background:color-mix(in srgb,var(--cc) 7%,var(--s3));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--cc) 25%,transparent)}
-.card.selected::after{content:'✓';position:absolute;bottom:.38rem;right:.42rem;font-size:.55rem;color:var(--cc);font-family:'Share Tech Mono',monospace;opacity:.8;pointer-events:none}
-
-/* Action bar */
-.action-bar{display:none;align-items:center;gap:.5rem;padding:.45rem 1.4rem;background:var(--s1);border-bottom:1px solid var(--bd);flex-wrap:wrap}
-.action-bar.visible{display:flex}
-.ab-count{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--acc);flex-shrink:0}
-.ab-btn{padding:.22rem .6rem;border-radius:4px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-size:.72rem;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;transition:all .12s;white-space:nowrap}
-.ab-btn:hover{border-color:var(--acc);color:var(--acc)}
-.ab-btn-clear{margin-left:auto;color:var(--tx3)}
-.ab-btn-clear:hover{border-color:var(--err);color:var(--err)}
-.ab-hints{display:flex;gap:.28rem;flex-wrap:wrap;align-items:center}
-.ab-hint{display:inline-flex;align-items:center;gap:.22rem;font-size:.62rem;color:var(--tx3);white-space:nowrap}
-.ab-hint kbd{display:inline-flex;align-items:center;height:15px;padding:0 4px;border-radius:3px;border:1px solid var(--bd2);background:var(--s2);color:var(--tx2);font-family:'Share Tech Mono',monospace;font-size:.58rem;line-height:1;letter-spacing:0}
-.ab-sep{color:var(--bd2);font-size:.7rem;user-select:none}
-
-/* Node row — 3-state colour coding */
 .sc-node.done .sc-node-status{color:var(--acc)}
 .sc-node.done .sc-node-name{color:var(--tx)}
 .sc-node.sp-done{background:rgba(68,104,168,.06)}
@@ -319,10 +321,8 @@ body.hide-notes .card-note{display:none}
 .sc-node.sp-done .sc-node-name{color:#8aaae0}
 .sc-node.sp-done .sc-node-icon{color:#6888c8}
 .sc-node:not(.done) .sc-node-status{color:var(--tx3)}
-#toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--s3);border:1px solid var(--acc);border-radius:6px;padding:.45rem .85rem;font-size:.78rem;color:var(--acc);z-index:100;opacity:0;transition:opacity .25s;pointer-events:none}
-#toast.show{opacity:1}
 
-/* Refresh panel (shown when player ID is known) */
+/* Refresh panel & Lists */
 .refresh-panel{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:.75rem 1rem;margin-bottom:.9rem;display:none}
 .refresh-panel.visible{display:block}
 .rp-top{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem}
@@ -332,7 +332,6 @@ body.hide-notes .card-note{display:none}
 .rp-url{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--tx2);background:var(--bg);border:1px solid var(--bd2);border-radius:5px;padding:.3rem .6rem;word-break:break-all;line-height:1.4;margin-bottom:.5rem}
 .rp-note{font-size:.65rem;color:var(--tx3);line-height:1.5}
 
-/* List styles */
 .list-bar{background:var(--s1);border-bottom:1px solid var(--bd);padding:.45rem 1.4rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
 .list-chip{display:flex;align-items:center;gap:.22rem;padding:.16rem .55rem;border-radius:3px;border:1px solid var(--bd2);font-size:.7rem;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;transition:all .12s;background:var(--s2);color:var(--tx2);user-select:none}
 .list-chip:hover{border-color:var(--acc);color:var(--acc)}
@@ -342,13 +341,28 @@ body.hide-notes .card-note{display:none}
 .list-new-btn{padding:.16rem .55rem;border-radius:3px;border:1px dashed var(--bd2);font-size:.7rem;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;background:transparent;color:var(--tx3);transition:all .12s}
 .list-new-btn:hover{border-color:var(--acc);color:var(--acc)}
 
-/* Add to list popover in action bar */
 .ab-list-wrap{position:relative}
 .ab-list-pop{position:absolute;top:100%;left:0;margin-top:4px;background:var(--s1);border:1px solid var(--bd2);border-radius:6px;padding:.3rem;min-width:160px;z-index:30;display:none;flex-direction:column;gap:2px;box-shadow:0 4px 12px rgba(0,0,0,.4)}
 .ab-list-pop.open{display:flex}
 .ab-list-opt{padding:.25rem .6rem;border-radius:4px;font-size:.75rem;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;color:var(--tx2);transition:background .1s;border:none;background:none;text-align:left;width:100%}
 .ab-list-opt:hover{background:var(--s2);color:var(--tx)}
 .ab-list-opt.new{color:var(--acc);border-top:1px solid var(--bd);margin-top:2px;padding-top:.3rem}
+
+.hstat-wrap{position:relative;display:flex;flex-direction:column;align-items:center;padding:.15rem .6rem;background:var(--s2);border:1px solid var(--bd);border-radius:4px;cursor:default}
+.hstat-tip{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:6px;background:var(--s1);border:1px solid var(--bd2);border-radius:7px;padding:.5rem .65rem;display:none;flex-direction:column;gap:.25rem;z-index:40;min-width:190px;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+.hstat-wrap:hover .hstat-tip{display:flex}
+.hstat-tip-row{display:flex;align-items:center;justify-content:space-between;gap:.75rem;font-size:.72rem}
+.hstat-tip-cat{color:var(--tx2)}
+.hstat-tip-val{font-family:'Share Tech Mono',monospace;color:var(--acc);font-size:.68rem}
+.hstat-tip-lbl{font-size:.56rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase;margin-bottom:.1rem}
+
+.mbar-calc-toggle{width:100%;background:var(--s3);border:1px solid var(--bd2);border-radius:6px;padding:.45rem .8rem;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.08em;color:var(--tx2);cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all .15s;text-transform:uppercase}
+.mbar-calc-toggle:hover{border-color:var(--acc);color:var(--acc)}
+.frow-inline{flex-direction:row;align-items:center;gap:.6rem;padding:.55rem 1.4rem}
+.frow-inline .flbl{min-width:52px;flex-shrink:0}
+
+#toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--s3);border:1px solid var(--acc);border-radius:6px;padding:.45rem .85rem;font-size:.78rem;color:var(--acc);z-index:100;opacity:0;transition:opacity .25s;pointer-events:none}
+#toast.show{opacity:1}
 .fnote{padding:.4rem 1.4rem;font-size:.66rem;color:var(--tx3);background:var(--s2);border-top:1px solid var(--bd);display:flex;gap:1rem;flex-wrap:wrap;line-height:1.6}
 .fnote span{color:var(--tx2)}
 </style>
@@ -419,9 +433,13 @@ body.hide-notes .card-note{display:none}
     </div>
     <div class="hdivider"></div>
     <div class="hstats">
-      <div class="sp"><div class="spv" id="s-mxp">0</div><div class="spl">MXP</div></div>
-      <div class="sp"><div class="spv" id="s-maxed">0</div><div class="spl">MAXED</div></div>
-      <div class="sp"><div class="spv" id="s-vis">0</div><div class="spl">SHOWN</div></div>
+      <div class="hstat-wrap">
+        <div class="spv" id="s-mxp">0</div><div class="spl">Item MXP</div>
+        <div class="hstat-tip" id="hstat-cat-tip"><div class="hstat-tip-lbl">By category</div></div>
+      </div>
+      <div class="sp"><div class="spv" id="s-sc-mxp">—</div><div class="spl">SC MXP</div></div>
+      <div class="sp"><div class="spv" id="s-maxed">0</div><div class="spl">Maxed</div></div>
+      <div class="sp"><div class="spv" id="s-vis">0</div><div class="spl">Shown</div></div>
     </div>
     <div class="hact">
       <button class="hbtn" onclick="copyFilteredNames()">Copy Names</button>
@@ -440,9 +458,7 @@ body.hide-notes .card-note{display:none}
   </div>
 
   <div id="view-items">
-    <div class="mbar" id="mbar">
-      <button class="mbar-calc-toggle" onclick="toggleCalc(this)">Calculator ▾</button>
-    </div>
+    <div class="mbar" id="mbar"></div>
 
     <!-- Active list filter bar (hidden until lists exist) -->
     <div class="list-bar" id="list-bar" style="display:none">
@@ -451,14 +467,13 @@ body.hide-notes .card-note{display:none}
       <button class="list-new-btn" onclick="promptNewList()">+ New list</button>
     </div>
 
-    <!-- Category filter — grouped -->
-    <div class="frow">
-      <span class="flbl">Category</span>
+    <!-- Category filter — grouped, no label to save space -->
+    <div class="frow" style="padding-top:.6rem;padding-bottom:.6rem">
       <div class="chips" id="cat-chips"></div>
     </div>
 
-    <!-- Source filter -->
-    <div class="frow">
+    <!-- Source filter — inline -->
+    <div class="frow frow-inline">
       <span class="flbl">Source</span>
       <div class="chips" id="acq-chips"></div>
     </div>
@@ -479,10 +494,15 @@ body.hide-notes .card-note{display:none}
         <option value="cat">By category</option>
       </select>
       <select class="csel" id="grp-sel" onchange="onGroup(this.value)">
+        <option value="cat">By category</option>
         <option value="">No grouping</option>
         <option value="update">By update</option>
         <option value="acq">By source</option>
-        <option value="cat">By category</option>
+      </select>
+      <select class="csel" id="prime-sel" onchange="render()">
+        <option value="">All items</option>
+        <option value="prime">Prime only</option>
+        <option value="nonprime">Non-Prime only</option>
       </select>
       <select class="csel" id="upd-sel" onchange="onUpdateFilter(this.value)">
         <option value="">All updates</option>
@@ -496,7 +516,9 @@ body.hide-notes .card-note{display:none}
         <span class="ftog" id="ftog-badge" onclick="toggleField('badge',this)">Badge</span>
         <span class="ftog" id="ftog-rank" onclick="toggleField('rank',this)">Rank</span>
         <span class="ftog" id="ftog-update" onclick="toggleField('update',this)">Update</span>
+        <span class="ftog off" id="ftog-source" onclick="toggleField('source',this)">Source</span>
         <div class="dg-sep"></div>
+        <span class="ftog" id="ftog-maxed" onclick="toggleField('maxed',this)">Maxed</span>
         <span class="ftog off" id="ftog-xpbar" onclick="toggleField('xpbar',this)">XP Bar</span>
         <span class="ftog off" id="ftog-notes" onclick="toggleField('notes',this)">Notes</span>
       </div>
@@ -505,24 +527,8 @@ body.hide-notes .card-note{display:none}
     <div id="action-bar" class="action-bar">
       <span class="ab-count" id="ab-count">0 selected</span>
       <div class="hdivider" style="height:14px;opacity:.25;margin:0 .1rem"></div>
-      <div class="ab-hints">
-        <span class="ab-hint"><kbd>click</kbd> select</span>
-        <span class="ab-sep">·</span>
-        <span class="ab-hint"><kbd>ctrl</kbd><kbd>click</kbd> toggle</span>
-        <span class="ab-sep">·</span>
-        <span class="ab-hint"><kbd>shift</kbd><kbd>click</kbd> range</span>
-        <span class="ab-sep">·</span>
-        <span class="ab-hint"><kbd>S</kbd> star</span>
-        <span class="ab-sep">·</span>
-        <span class="ab-hint"><kbd>W</kbd> wiki</span>
-        <span class="ab-sep">·</span>
-        <span class="ab-hint"><kbd>P</kbd> priority</span>
-        <span class="ab-sep">·</span>
-        <span class="ab-hint"><kbd>B</kbd> building</span>
-        <span class="ab-sep">·</span>
-        <span class="ab-hint"><kbd>ctrl+A</kbd> all</span>
-        <span class="ab-sep">·</span>
-        <span class="ab-hint"><kbd>esc</kbd> clear</span>
+      <div class="ab-kb-hint">
+        <code>Esc</code> Clear · <code>S</code> Star · <code>W</code> Wiki · <code>Del</code> Unselect
       </div>
       <button class="ab-btn" onclick="selectAll()">Select all visible</button>
       <button class="ab-btn" onclick="starSelected()">★ Star</button>
@@ -585,7 +591,6 @@ const CAT = {
   other:           {l:'Other',          c:'#506070', g:'??'},
 };
 
-// Visual groupings for category chip filter
 const CAT_GROUPS = [
   { label: 'Warframes',   keys: ['warframe'] },
   { label: 'Weapons',     keys: ['primary','secondary','melee','zaw','kitgun'] },
@@ -623,9 +628,9 @@ const ST = {
   items:[], missions:[],
   cats: Object.fromEntries(Object.keys(CAT).map(k=>[k,true])),
   acqs: Object.fromEntries(Object.keys(ACQ).map(k=>[k,true])),
-  search:'', sort:'mastery-desc', group:'', update:'',
-  starred: new Set(),   // runtime mirror of userData.entities starred flags
-  overrides: {},        // runtime mirror of userData.entities rank overrides
+  search:'', sort:'mastery-desc', group:'cat', update:'',
+  starred: new Set(),
+  overrides: {},
   updateNames: {},
   nodeDb: null,
   missionDb: null,
@@ -633,7 +638,7 @@ const ST = {
   _lastSelIdx: null,
   _visibleItems: [],
   _hoveredItem: null,
-  activeList: null,   // list ID currently being filtered by
+  activeList: null,
   userData: {
     version: 3,
     meta: {},
@@ -662,7 +667,10 @@ function saveOverride(path, rank) {
 
 function xpToRank(xp, multiplier, maxRank) {
   if (!xp || xp <= 0) return 0;
-  return Math.min(Math.round((-1 + Math.sqrt(1 + (8 * xp) / multiplier)) / 2), maxRank);
+  // Warframe Affinity Formula: Total XP = Constant * Rank^2
+  // Constant is 500 for Weapons (multiplier 100), 1000 for Frames (multiplier 200)
+  const constant = multiplier * 5; 
+  return Math.min(Math.floor(Math.sqrt(xp / constant)), maxRank);
 }
 
 function getMajorVersion(rawIntro) {
@@ -671,15 +679,14 @@ function getMajorVersion(rawIntro) {
   return match ? match[1] : '0';
 }
 
-// ── MR Threshold ──
 function mrThreshold(rank) {
   if (rank <= 0) return 0;
   if (rank <= 30) return 2500 * rank * rank;
   return 2250000 + 147500 * (rank - 30);
 }
+
 function rankFromMastery(xp) {
   if (xp <= 0) return 0;
-  // Binary search across ranks 1-40
   let lo = 0, hi = 40;
   while (lo < hi) {
     const mid = (lo + hi + 1) >> 1;
@@ -687,19 +694,41 @@ function rankFromMastery(xp) {
   }
   return lo;
 }
+
 function calcTotalMastery() {
   const itemMxp = ST.items.reduce((s,i) => s+(i.mastery||0), 0);
   const scMxp   = calcStarChartMxp(ST.missions);
-  return itemMxp + scMxp;
+  
+  const rjMxp = (ST.userData.meta.rjInt || 0) * 1500;
+  const drMxp = (ST.userData.meta.drInt || 0) * 1500;
+  const plexusMxp = ST.userData.meta.plexusDone ? 6000 : 0;
+
+  return itemMxp + scMxp + rjMxp + drMxp + plexusMxp;
 }
 
-// ── Wiki ──
+function getAdjustedTotalMxp() {
+  const calc = calcTotalMastery();
+  const playerMR = ST.userData.meta.playerLevel || 0;
+  const floor = mrThreshold(playerMR);
+  return Math.max(calc, floor);
+}
+
+// Global handler to save the manual inputs
+function updateManualMxp(key, val) {
+  if (key === 'plexusDone') {
+    ST.userData.meta[key] = val;
+  } else {
+    ST.userData.meta[key] = Math.max(0, parseInt(val) || 0);
+  }
+  saveUserData();
+  renderMbar(); 
+}
+
 function openWikiPage(name) {
   if (!name) return;
   window.open('https://wiki.warframe.com/w/' + name.replace(/ /g, '_'), '_blank');
 }
 
-// ── Entity status ──
 function toggleEntityStatus(path, status, btn) {
   const item = ST.items.find(i => i.path === path);
   const e = getOrCreateEntity(path, item?.cat || 'item');
@@ -708,21 +737,26 @@ function toggleEntityStatus(path, status, btn) {
   pruneEntity(path);
   saveUserData();
 }
+
 function getOrCreateEntity(id, type) {
   if (!ST.userData.entities[id]) ST.userData.entities[id] = { type };
   return ST.userData.entities[id];
 }
+
 function pruneEntity(id) {
   const e = ST.userData.entities[id]; if (!e) return;
   if (!Object.keys(e).some(k => k !== 'type')) delete ST.userData.entities[id];
 }
+
 function saveEntityNote(id, type, text) {
   const e = getOrCreateEntity(id, type);
   const t = text.trim();
   if (t) e.note = t; else delete e.note;
   pruneEntity(id); saveUserData();
 }
+
 function isEntityStarred(id) { return !!ST.userData.entities[id]?.starred; }
+
 function toggleEntityStar(id, type, btn) {
   const e = getOrCreateEntity(id, type);
   e.starred = !e.starred;
@@ -735,7 +769,6 @@ function toggleEntityStar(id, type, btn) {
   return on;
 }
 
-// ── Player ID helpers ──
 function getPlayerId()  { return localStorage.getItem('wft3_playerid') || ''; }
 function savePlayerId(id) { if (id) localStorage.setItem('wft3_playerid', id.trim()); }
 function clearSavedId() {
@@ -762,14 +795,12 @@ function onPlayerIdInput(val) {
   }
 }
 function refreshProfile() {
-  // Show import screen in refresh mode (ID already known)
   document.getElementById('app').style.display = 'none';
   document.getElementById('import-screen').style.display = 'flex';
   document.getElementById('json-input').value = '';
   initImportScreen();
 }
 
-// ── List management ──
 function listById(id) { return ST.userData.lists.find(l => l.id === id); }
 
 function promptNewList(initialPaths) {
@@ -819,7 +850,6 @@ function toggleListPop(btn) {
   if (!pop) return;
   const isOpen = pop.classList.toggle('open');
   if (!isOpen) return;
-  // Build pop contents
   pop.innerHTML = '';
   ST.userData.lists.forEach(l => {
     const opt = document.createElement('button');
@@ -833,7 +863,6 @@ function toggleListPop(btn) {
   newOpt.textContent = '+ New list';
   newOpt.onclick = () => { promptNewList(ST.selection); closeListPop(); };
   pop.appendChild(newOpt);
-  // Close on outside click
   setTimeout(() => {
     const close = e => { if (!pop.contains(e.target) && e.target !== btn) { closeListPop(); document.removeEventListener('click', close); } };
     document.addEventListener('click', close);
@@ -856,7 +885,6 @@ function buildListBar() {
     nameSpan.textContent = l.name;
     chip.appendChild(nameSpan);
 
-    // Progress pill: X/Y maxed
     const listItems = ST.items.filter(it => ST.userData.entities[it.path]?.lists?.includes(l.id));
     if (listItems.length > 0) {
       const maxedCount = listItems.filter(i => i.rank >= i.maxRank && i.maxRank > 0).length;
@@ -871,7 +899,6 @@ function buildListBar() {
     delBtn.textContent = '✕';
     delBtn.addEventListener('click', e => {
       e.stopPropagation();
-      // Inline confirm: replace del button with yes/no
       delBtn.style.display = 'none';
       const confirmSpan = document.createElement('span');
       confirmSpan.style.cssText = 'display:inline-flex;gap:3px;align-items:center;margin-left:3px';
@@ -895,7 +922,6 @@ function buildListBar() {
 }
 
 /* ── INDEXEDDB ──────────────────────────────── */
-// Two separate databases so clearing cache never touches user data
 let _cacheDb = null;
 let _userDb  = null;
 
@@ -925,7 +951,6 @@ function openUserDB() {
   });
 }
 
-// Cache DB — API responses (item DB, node DB, update names etc.)
 async function dbGet(store, key) {
   try {
     const db = await openCacheDB();
@@ -947,7 +972,6 @@ async function dbSet(store, key, val) {
   } catch(e) {}
 }
 
-// User DB — personal data (notes, stars, lists, settings)
 async function userDbGet(key) {
   try {
     const db = await openUserDB();
@@ -974,22 +998,12 @@ const LS_USER_KEY = 'wft3_userdata';
 
 async function saveUserData() {
   ST.userData.meta.lastSynced = Date.now();
-  // Primary: user IndexedDB
   await userDbSet('userData', ST.userData);
-  // Fallback: localStorage (survives IndexedDB being cleared)
-  try {
-    localStorage.setItem(LS_USER_KEY, JSON.stringify(ST.userData));
-  } catch(e) {
-    // localStorage full — not critical, IndexedDB is primary
-    console.warn('localStorage backup failed (may be full):', e);
-  }
+  try { localStorage.setItem(LS_USER_KEY, JSON.stringify(ST.userData)); } catch(e) {}
 }
 
 async function loadUserData() {
-  // Try primary source first (user IndexedDB)
   let stored = await userDbGet('userData');
-
-  // Fallback to localStorage if IndexedDB was cleared or empty
   if (!stored?.v?.version) {
     try {
       const ls = localStorage.getItem(LS_USER_KEY);
@@ -997,9 +1011,7 @@ async function loadUserData() {
         const parsed = JSON.parse(ls);
         if (parsed?.version === 3) {
           stored = { v: parsed };
-          // Restore to IndexedDB since we recovered from localStorage
           await userDbSet('userData', parsed);
-          console.info('User data restored from localStorage fallback.');
         }
       }
     } catch(e) {}
@@ -1011,7 +1023,6 @@ async function loadUserData() {
     migrateOldData();
   }
 
-  // Populate runtime mirrors from userData
   ST.starred = new Set(
     Object.entries(ST.userData.entities)
       .filter(([,e]) => e.starred && e.type !== 'node')
@@ -1022,7 +1033,6 @@ async function loadUserData() {
       .filter(([,e]) => e.rank !== undefined)
       .map(([k,e]) => [k, e.rank])
   );
-  // Restore settings
   const s = ST.userData.settings;
   if (s.cats)  Object.assign(ST.cats, s.cats);
   if (s.acqs)  Object.assign(ST.acqs, s.acqs);
@@ -1031,7 +1041,6 @@ async function loadUserData() {
 }
 
 function migrateOldData() {
-  // Migrate wft3 (settings + starred items)
   try {
     const old = JSON.parse(localStorage.getItem('wft3') || '{}');
     if (old.cats)    ST.userData.settings.cats  = old.cats;
@@ -1043,7 +1052,6 @@ function migrateOldData() {
     });
     localStorage.removeItem('wft3');
   } catch(e) {}
-  // Migrate wft3_overrides
   try {
     const ov = JSON.parse(localStorage.getItem('wft3_overrides') || '{}');
     Object.entries(ov).forEach(([path, rank]) => {
@@ -1051,11 +1059,9 @@ function migrateOldData() {
     });
     localStorage.removeItem('wft3_overrides');
   } catch(e) {}
-  // Migrate wft3_sp (planet-level SP toggles — convert to entity flags)
   try { localStorage.removeItem('wft3_sp'); } catch(e) {}
 }
 
-/* ── PROGRESS ────────────────────────────────── */
 function setProgress(pct,msg) {
   const bar = document.getElementById('load-bar');
   const txt = document.getElementById('load-msg');
@@ -1160,7 +1166,6 @@ async function fetchItemDb() {
       const nameKey = item.name.toLowerCase();
       if (dbByName[nameKey] && score <= dbByName[nameKey].score) return;
 
-      // Fix: store introduced as a plain string
       const rawIntro = item.introduced
         ? (typeof item.introduced === 'object' ? (item.introduced.name || '') : String(item.introduced))
         : 'Unknown';
@@ -1184,7 +1189,6 @@ async function fetchItemDb() {
   } catch(err) { return {}; }
 }
 
-/* ── UPDATE NAMES ───────────────────────────── */
 async function fetchUpdateNames() {
   try {
     const cached = await dbGet('cache', 'update_names');
@@ -1196,7 +1200,6 @@ async function fetchUpdateNames() {
     const map = {};
 
     logs.filter(l => l.type === 'Update').forEach(l => {
-      // Handles both "Update 35: Title" and "Title: Update 35" orderings
       const m = l.name.match(/Update\s+(\d+)[.\d]*\s*[:\-–]?\s*(.+)|(.+?)\s*[:\-–]\s*Update\s+(\d+)/i);
       if (m) {
         const ver = m[1] || m[4];
@@ -1205,7 +1208,6 @@ async function fetchUpdateNames() {
       }
     });
 
-    // Fill well-known older ones the regex may miss
     const fallbacks = {
       '18':'The Second Dream',
       '19':'The War Within',
@@ -1237,7 +1239,6 @@ async function fetchUpdateNames() {
   }
 }
 
-/* ── MISSION DB (wiki mastery data) ─────────── */
 async function fetchMissionDb() {
   if (ST.missionDb) return;
   try {
@@ -1250,7 +1251,6 @@ async function fetchMissionDb() {
     const text = data.parse?.wikitext?.['*'] || '';
 
     const db = {};
-    // Split on top-level node blocks — each starts with { and contains InternalName
     const blocks = text.split(/(?=\s*\{[^{}]*InternalName)/);
     blocks.forEach(block => {
       const internalName = block.match(/InternalName\s*=\s*"([^"]+)"/)?.[1];
@@ -1281,7 +1281,6 @@ async function fetchMissionDb() {
   }
 }
 
-/* ── PROFILE PARSING ────────────────────────── */
 function parseProfile(text) {
   const data = JSON.parse(text);
   const r = data.Results?.[0] || data;
@@ -1306,7 +1305,6 @@ function parseProfile(text) {
   };
 }
 
-/* ── ITEM ENRICHMENT ────────────────────────── */
 function detectAcq(path, name) {
   const p = (path||'').toLowerCase();
   const n = (name||'').toLowerCase();
@@ -1329,10 +1327,8 @@ function enrichAll(xpData, itemDb) {
     const userXP = userXPMap[dbPath] || 0;
     const { finalCat } = classifyItem({ name:api.name, uniqueName:dbPath, category:api.apiCat });
     const catKey = API_CAT_MAP[finalCat] || 'other';
-    const multiplier = (catKey==='warframe'||catKey==='necramech'||catKey==='archwing'||catKey==='sentinel') ? 200 : 100;
+    const multiplier = ['warframe','necramech','archwing','sentinel','kubrow','kavat','vulpaphyla','predasite','companion','moa','hound','kdrive'].includes(catKey) ? 200 : 100;
     const maxR = api.maxRank || 30;
-    // For rank-40 items, XP is cumulative across Forma cycles so xpToRank can mislead.
-    // Cap the XP-derived rank at 30; user sets the real rank via the input.
     const xpCap = maxR === 40 ? 30 : maxR;
     const rank = ST.overrides[dbPath] !== undefined
       ? ST.overrides[dbPath]
@@ -1349,7 +1345,6 @@ function enrichAll(xpData, itemDb) {
       mastery: rank * multiplier,
       isOwned: userXP > 0,
       isFounder: api.isFounder,
-      // Fix: api.introduced is now a plain string, not an object
       update: api.introduced || 'Unknown',
       majorUpdate: api.majorUpdate || '0',
     };
@@ -1357,7 +1352,6 @@ function enrichAll(xpData, itemDb) {
 }
 
 /* ── STAR CHART ─────────────────────────────── */
-
 async function loadStarChartData() {
   await Promise.all([loadNodeDb(), fetchMissionDb()]);
 }
@@ -1370,7 +1364,6 @@ async function loadNodeDb() {
     const resp = await fetch('https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/solNodes.json');
     if (!resp.ok) throw new Error('Nodes fetch failed');
     const raw = await resp.json();
-    // Normalise: static data is already an object keyed by node ID
     const db = Array.isArray(raw)
       ? Object.fromEntries(raw.map(n => [n.id || n.tag, n]))
       : raw;
@@ -1383,7 +1376,6 @@ async function loadNodeDb() {
 }
 
 function processStarChart(missions, nodeDb, missionDb) {
-  const seenNodes = new Set();
   const PLANET_ORDER = [
     'Mercury','Venus','Earth','Mars','Phobos','Ceres','Jupiter','Europa',
     'Saturn','Uranus','Neptune','Pluto','Sedna','Eris','Lua',
@@ -1404,8 +1396,10 @@ function processStarChart(missions, nodeDb, missionDb) {
     {tag:'PlutoToErisJunction',     planet:'Pluto',   dest:'Eris'     },
     {tag:'ErisToSednaJunction',     planet:'Eris',    dest:'Sedna'    },
   ];
-  const manifestTags = new Set(JUNCTION_MANIFEST.map(j => j.tag));
-  const JUNK_TYPES   = new Set(['ancient retribution','conclave','pvp']);
+  const manifestTags  = new Set(JUNCTION_MANIFEST.map(j => j.tag));
+  const JUNK_TYPES    = new Set(['ancient retribution','conclave','pvp']);
+  const EXCLUDE_TAGS  = new Set(['SolNode234']); // Dormizone
+  const EXCLUDE_NAMES = ['index endurance']; 
 
   const baseDone     = new Set(missions.map(m => m.tag).filter(Boolean));
   const spDone       = new Set(missions.filter(m => m.tier >= 1).map(m => m.tag));
@@ -1414,41 +1408,47 @@ function processStarChart(missions, nodeDb, missionDb) {
 
   const mkNode = (tag, name, type, extra, md) => ({
     tag, name, type,
-    enemy:     md?.enemy     || '',
-    minLevel:  md?.minLevel  || 0,
-    maxLevel:  md?.maxLevel  || 0,
-    done:      baseDone.has(tag),
-    spDone:    spDone.has(tag),
-    completes: completesMap[tag] || 0,
-    masteryExp:md?.masteryExp || 0,
-    isJunction:false,
+    enemy:      md?.enemy     || '',
+    minLevel:   md?.minLevel  || 0,
+    maxLevel:   md?.maxLevel  || 0,
+    done:       baseDone.has(tag),
+    spDone:     spDone.has(tag),
+    completes:  completesMap[tag] || 0,
+    masteryExp: md?.masteryExp || 0,
+    isJunction: false,
     ...extra,
   });
+
+  const seenNodes = new Set();
 
   for (const [tag, node] of Object.entries(nodeDb)) {
     if (!node) continue;
     if (/hub/i.test(tag)) continue;
+    if (EXCLUDE_TAGS.has(tag)) continue;
+
     const mdata    = missionDb?.[tag] || {};
     const rawType  = node.type || node.missionType || '';
     const effType  = (mdata.type || rawType).toLowerCase();
+
     if (JUNK_TYPES.has(effType)) continue;
     if (effType === 'relay' && !mdata.type) continue;
     if (!rawType && !mdata.type && !baseDone.has(tag)) continue;
-    const rawValue = node.value || '';
-    const planet   = node.planet
-      || (rawValue.match(/\(([^)]+)\)$/)?.[1] || '')
-      || mdata.planet || node.systemName || '';
-    const name     = rawValue.replace(/\s*\([^)]+\)$/,'').trim() || mdata.name || tag;
-    const isRJ     = tag.startsWith('CrewBattle') || effType.includes('proxima')
-                  || planet.toLowerCase().includes('proxima');
 
-    // Ghost node filter: skip unvisited nodes not validated by missionDb
+    const rawValue = node.value || '';
+    const planet   = node.planet || (rawValue.match(/\(([^)]+)\)$/)?.[1] || '') || mdata.planet || node.systemName || '';
+    const name     = rawValue.replace(/\s*\([^)]+\)$/, '').trim() || mdata.name || tag;
+
+    if (EXCLUDE_NAMES.some(n => name.toLowerCase().includes(n))) continue;
+
     if (!baseDone.has(tag) && !missionDb?.[tag]) continue;
 
-    // Name+planet dedup: keep the completed version if dupes exist
-    const dedupKey = `${name}||${planet}`;
+    // Deduplicate by name+planet — keep completed version if dupes exist
+    const dedupKey = name + '||' + planet;
     if (seenNodes.has(dedupKey) && !baseDone.has(tag)) continue;
     seenNodes.add(dedupKey);
+
+    const isRJ = tag.startsWith('CrewBattle') || effType.includes('proxima') || planet.toLowerCase().includes('proxima');
+
     const nd = mkNode(tag, name, mdata.type || rawType, {}, mdata);
     if (isRJ) railjack.push(nd);
     else if (planet) { if (!planets[planet]) planets[planet]=[]; planets[planet].push(nd); }
@@ -1482,13 +1482,15 @@ function processStarChart(missions, nodeDb, missionDb) {
   });
   return {planets:sorted.map(([name,nodes])=>({name,nodes})),railjack:railjack.sort((a,b)=>a.name.localeCompare(b.name))};
 }
+
+
 function renderStarChart() {
   const el = document.getElementById('scgrid');
   if (!el) return;
   el.innerHTML = '';
 
-  if (!ST.nodeDb || Object.keys(ST.nodeDb).length === 0) {
-    el.innerHTML = '<div style="color:var(--tx3);font-size:.86rem;padding:2rem 0">Loading star chart data…</div>';
+  if (!ST.nodeDb || !Object.keys(ST.nodeDb).length) {
+    el.innerHTML = '<div style="color:var(--tx3);font-size:.88rem;padding:2rem 0">Loading star chart data…</div>';
     return;
   }
 
@@ -1499,9 +1501,17 @@ function renderStarChart() {
     totalNodes++; if(n.done)doneNodes++;
     if(n.isJunction){junctionTotal++;if(n.done)junctionDone++;}
     if(n.done){spTotal++;if(n.spDone)spDoneCount++;}
-    if(!n.spDone&&n.masteryExp>0)mxpAvailable+=n.masteryExp;
+    if(n.masteryExp>0&&(n.isJunction?!n.done:!n.spDone))mxpAvailable+=n.masteryExp;
   }));
-  const overallPct = totalNodes ? Math.round(doneNodes/totalNodes*100) : 0;
+
+  const basePct = totalNodes ? Math.round(doneNodes/totalNodes*100) : 0;
+  const spOverallPct = spTotal ? Math.round(spDoneCount/spTotal*100) : 0;
+  
+  // If base nodes are 100% done, switch the main bar to Steel Path progress
+  const isOverallBaseDone = basePct === 100;
+  const displayOverallPct = isOverallBaseDone ? spOverallPct : basePct;
+  const overallLabel = isOverallBaseDone ? `${displayOverallPct}% SP` : `${displayOverallPct}%`;
+  const barColor = isOverallBaseDone ? '#6888c8' : 'var(--acc)';
 
   const summary = document.createElement('div'); summary.className='sc-summary';
   summary.innerHTML=`
@@ -1511,28 +1521,42 @@ function renderStarChart() {
     <div style="width:1px;height:28px;background:var(--bd2);flex-shrink:0"></div>
     <div class="sc-sum-stat"><div class="sc-sum-num">${junctionDone}/${junctionTotal}</div><div class="sc-sum-lbl">Junctions</div></div>
     ${mxpAvailable>0?`<div style="width:1px;height:28px;background:var(--bd2);flex-shrink:0"></div><div class="sc-sum-stat"><div class="sc-sum-num sc-mxp-available">+${fmtM(mxpAvailable)}</div><div class="sc-sum-lbl">MXP available</div></div>`:''}
-    <div class="scbw" style="flex:1;height:6px"><div class="scb" style="width:${overallPct}%"></div></div>
-    <div class="sc-sum-stat" style="align-items:flex-end"><div class="sc-sum-num">${overallPct}%</div><div class="sc-sum-lbl">Overall</div></div>`;
+    <div class="scbw" style="flex:1;height:6px"><div class="scb" style="width:${displayOverallPct}%; background:${barColor}"></div></div>
+    <div class="sc-sum-stat" style="align-items:flex-end"><div class="sc-sum-num" style="color:${barColor}; font-weight:${isOverallBaseDone?'700':'400'}">${overallLabel}</div><div class="sc-sum-lbl">Overall</div></div>`;
   el.appendChild(summary);
 
+  const cols = ST.userData.settings?.scCols ?? 3;
+  const controls = document.createElement('div'); controls.className = 'sc-controls';
+  controls.innerHTML = `
+    <div class="sc-legend">
+      <span class="sc-legend-item"><span class="sc-legend-dot" style="background:var(--tx3);opacity:.4"></span>Not visited</span>
+      <span class="sc-legend-item"><span class="sc-legend-dot" style="background:color-mix(in srgb,var(--acc) 55%,var(--bg))"></span>Base done</span>
+      <span class="sc-legend-item"><span class="sc-legend-dot" style="background:#6888c8"></span>Steel Path done</span>
+      <span class="sc-legend-item"><span class="sc-legend-dot" style="background:#b89830"></span>◆ Junction (mastery XP)</span>
+    </div>
+    <div class="sc-col-ctrl">
+      <span>Columns</span>
+      <button class="sc-col-btn" onclick="setSCCols(${Math.max(1,cols-1)})">−</button>
+      <span>${cols}</span>
+      <button class="sc-col-btn" onclick="setSCCols(${Math.min(5,cols+1)})">+</button>
+    </div>`;
+  el.appendChild(controls);
+
   const ph=document.createElement('div');ph.className='sc-section';ph.textContent='Main Star Chart';el.appendChild(ph);
-  const planetList=document.createElement('div');planetList.className='sc-planet-list';
 
   function buildNodeRow(n) {
     const row=document.createElement('div');
     row.className='sc-node'+(n.spDone?' sp-done':n.done?' done':'')+(n.isJunction?' junction':'');
     const lvl=n.minLevel&&n.maxLevel?`${n.minLevel}–${n.maxLevel}`:'';
     const typeStr=[n.type,n.enemy,lvl].filter(Boolean).join(' · ');
-    const statusIcon = n.spDone ? '✓' : n.done ? '✓' : '○';
     row.innerHTML=`
-      <span class="sc-node-status">${statusIcon}</span>
+      <span class="sc-node-status">${n.done?'✓':'○'}</span>
       <span class="sc-node-icon">${n.isJunction?'◆':'●'}</span>
       <span class="sc-node-name">${n.name}</span>
       <span class="sc-node-type">${typeStr}</span>
       ${n.completes>0?`<span class="sc-node-runs">${n.completes}×</span>`:''}
-      ${!n.spDone&&n.masteryExp>0?`<span class="sc-node-mxp" title="SP completion awards ${n.masteryExp} mastery XP">+${n.masteryExp}</span>`:''}
-      ${n.isJunction?`<span class="sc-node-mastery">${n.done?'MASTERY ✓':'MASTERY'}</span>`:''}
-      <a class="sc-node-wiki" href="https://wiki.warframe.com/w/${n.name.replace(/ /g,'_')}" target="_blank" title="Open wiki" onclick="event.stopPropagation()">wiki ↗</a>
+      ${n.masteryExp>0&&(n.isJunction?!n.done:!n.spDone)?`<span class="sc-node-mxp" title="${n.isJunction?'Junction':'SP'} completion awards ${n.masteryExp} mastery XP">+${n.masteryExp}</span>`:''}
+      <a class="sc-node-wiki" href="https://wiki.warframe.com/w/${n.name.replace(/ /g,'_')}" target="_blank" onclick="event.stopPropagation()">wiki ↗</a>
       <button class="sc-node-star">★</button>
       <input class="sc-node-note" type="text" placeholder="note…">`;
     const sb=row.querySelector('.sc-node-star');
@@ -1546,50 +1570,108 @@ function renderStarChart() {
     return row;
   }
 
-  planets.forEach(p=>{
-    const done=p.nodes.filter(n=>n.done).length;
-    const spD=p.nodes.filter(n=>n.spDone).length;
-    const total=p.nodes.length;
-    const pct=total?Math.round(done/total*100):0;
-    const planet=document.createElement('div');
-    planet.className='sc-planet'+(pct===100?' complete':'');
-    const hdr=document.createElement('div');hdr.className='sc-planet-hdr';
-    hdr.innerHTML=`
-      <span class="sc-chevron">▶</span>
-      <span class="sc-planet-name">${p.name}</span>
-      <span class="sc-planet-stats">${done}/${total}</span>
-      <span class="sc-planet-sp"><span class="sp-done">${spD}</span>/${done} SP</span>
-      <div class="scbw" style="width:55px;margin:0 .35rem"><div class="sc-planet-bar-fill" style="height:3px;background:${pct===100?'#4aad9e':'var(--acc)'};width:${pct}%;border-radius:2px"></div></div>
-      <span class="sc-planet-pct">${pct}%</span>`;
-    planet.appendChild(hdr);
-    const body=document.createElement('div');body.className='sc-body';
-    p.nodes.forEach(n=>body.appendChild(buildNodeRow(n)));
-    planet.appendChild(body);
-    hdr.addEventListener('click',()=>planet.classList.toggle('open'));
-    planetList.appendChild(planet);
+  const sortedPlanets = [...planets].sort((a,b) => {
+    const aS = isEntityStarred('planet:'+a.name) ? 0 : 1;
+    const bS = isEntityStarred('planet:'+b.name) ? 0 : 1;
+    return aS - bS;
   });
-  el.appendChild(planetList);
 
-  if(railjack.length){
+  const grid = document.createElement('div');
+  grid.className = 'sc-planet-grid';
+  grid.style.setProperty('--cols', cols);
+
+  sortedPlanets.forEach(p => {
+    const done  = p.nodes.filter(n=>n.done).length;
+    const spD   = p.nodes.filter(n=>n.spDone).length;
+    const total = p.nodes.length;
+    
+    const basePct = total ? Math.round(done/total*100) : 0;
+    const spPct   = total ? Math.round(spD/total*100) : 0;
+    
+    const isBaseDone = basePct === 100;
+    const displayPct = isBaseDone ? spPct : basePct;
+    const pctClass = isBaseDone ? 'sc-tile-pct sp-focus' : 'sc-tile-pct';
+    const pctLabel = isBaseDone ? `${displayPct}% SP` : `${displayPct}%`;
+    const starred = isEntityStarred('planet:'+p.name);
+
+    const tile = document.createElement('div');
+    tile.className = 'sc-planet-tile' + (isBaseDone?' complete':'') + (starred?' priority':'');
+
+    tile.innerHTML = `
+      <div class="sc-tile-hdr">
+        <span class="sc-tile-name">${p.name}</span>
+        <button class="sc-tile-star${starred?' on':''}">⭑</button>
+        <span class="${pctClass}">${pctLabel}</span>
+      </div>
+      <div class="sc-dual-bar">
+        <div class="sc-dual-base" style="width:${basePct}%"></div>
+        <div class="sc-dual-sp" style="width:${spPct}%"></div>
+      </div>
+      <div class="sc-tile-stats">${done}/${total} base · <span class="sp-done">${spD}</span> SP</div>
+      <div class="sc-tile-body"></div>`;
+
+    const starBtn = tile.querySelector('.sc-tile-star');
+    starBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      const on = toggleEntityStar('planet:'+p.name, 'planet', starBtn);
+      tile.classList.toggle('priority', on);
+    });
+
+    const hdr  = tile.querySelector('.sc-tile-hdr');
+    const body = tile.querySelector('.sc-tile-body');
+    hdr.addEventListener('click', () => {
+      const isOpen = tile.classList.toggle('open');
+      if (isOpen) {
+        if (!body.children.length) p.nodes.forEach(n=>body.appendChild(buildNodeRow(n)));
+        grid.querySelectorAll('.sc-planet-tile.open').forEach(t => {
+          if (t !== tile) t.classList.remove('open');
+        });
+      }
+    });
+
+    grid.appendChild(tile);
+  });
+  el.appendChild(grid);
+
+  if (railjack.length) {
     const rh=document.createElement('div');rh.className='sc-section';rh.style.marginTop='.75rem';rh.textContent='Railjack';el.appendChild(rh);
     const rjDone=railjack.filter(n=>n.done).length;
+    const rjSp=railjack.filter(n=>n.spDone).length;
     const rjPct=Math.round(rjDone/railjack.length*100);
-    const rp=document.createElement('div');rp.className='sc-planet'+(rjPct===100?' complete':'');
-    const rhdr=document.createElement('div');rhdr.className='sc-planet-hdr';
-    rhdr.innerHTML=`
-      <span class="sc-chevron">▶</span>
-      <span class="sc-planet-name">Railjack Nodes</span>
-      <span class="sc-planet-stats">${rjDone}/${railjack.length}</span>
-      <div class="scbw" style="width:55px;margin:0 .35rem"><div style="height:3px;background:var(--acc);width:${rjPct}%;border-radius:2px"></div></div>
-      <span class="sc-planet-pct">${rjPct}%</span>`;
-    rp.appendChild(rhdr);
-    const rb=document.createElement('div');rb.className='sc-body';
-    railjack.forEach(n=>rb.appendChild(buildNodeRow(n)));
-    rp.appendChild(rb);
-    rhdr.addEventListener('click',()=>rp.classList.toggle('open'));
-    const rl=document.createElement('div');rl.className='sc-planet-list';rl.appendChild(rp);el.appendChild(rl);
+    const rjSpPct=Math.round(rjSp/railjack.length*100);
+    const rgrid=document.createElement('div');rgrid.className='sc-planet-grid';rgrid.style.setProperty('--cols',cols);
+    const rtile=document.createElement('div');rtile.className='sc-planet-tile'+(rjPct===100?' complete':'');
+    
+    const isBaseDone = rjPct === 100;
+    const displayPct = isBaseDone ? rjSpPct : rjPct;
+    const pctClass = isBaseDone ? 'sc-tile-pct sp-focus' : 'sc-tile-pct';
+    const pctLabel = isBaseDone ? `${displayPct}% SP` : `${displayPct}%`;
+
+    rtile.innerHTML=`
+      <div class="sc-tile-hdr"><span class="sc-tile-name">Railjack</span><span class="${pctClass}">${pctLabel}</span></div>
+      <div class="sc-dual-bar"><div class="sc-dual-base" style="width:${rjPct}%"></div><div class="sc-dual-sp" style="width:${rjSpPct}%"></div></div>
+      <div class="sc-tile-stats">${rjDone}/${railjack.length} base · <span class="sp-done">${rjSp}</span> SP</div>
+      <div class="sc-tile-body"></div>`;
+    const rb=rtile.querySelector('.sc-tile-body');
+    rtile.querySelector('.sc-tile-hdr').addEventListener('click',()=>{
+      const open=rtile.classList.toggle('open');
+      if(open&&!rb.children.length)railjack.forEach(n=>rb.appendChild(buildNodeRow(n)));
+    });
+    rgrid.appendChild(rtile);el.appendChild(rgrid);
   }
 }
+
+function setSCCols(n) {
+  if (!ST.userData.settings) ST.userData.settings = {};
+  ST.userData.settings.scCols = n;
+  saveUserData();
+  renderStarChart();
+}
+
+function togglePlanetStar(name, btn) {
+  toggleEntityStar('planet:'+name, 'planet', btn);
+}
+
 /* ── FILTERING ──────────────────────────────── */
 function filteredItems() {
   const showFounders = document.getElementById('tog-founders')?.checked;
@@ -1598,17 +1680,19 @@ function filteredItems() {
   const unowned      = document.getElementById('tog-unowned')?.checked;
   const needsForma   = document.getElementById('tog-forma')?.checked;
   const upd          = document.getElementById('upd-sel')?.value || '';
+  const primeFilter = document.getElementById('prime-sel')?.value || '';
 
   return ST.items.filter(it => {
     if (!showFounders && it.isFounder && !it.isOwned) return false;
     if (!unowned && !it.isOwned) return false;
     if (!ST.cats[it.cat]) return false;
     if (!ST.acqs[it.acq]) return false;
-    // Filter by major update version
     if (upd && it.majorUpdate !== upd) return false;
     if (unmaxed && it.rank >= it.maxRank && it.maxRank > 0) return false;
     if (onlyStar && !ST.starred.has(it.path)) return false;
     if (needsForma && !(it.maxRank===40 && it.rank<40)) return false;
+    if (primeFilter === 'prime' && !it.name.toLowerCase().includes(' prime')) return false;
+    if (primeFilter === 'nonprime' && it.name.toLowerCase().includes(' prime')) return false;
     if (ST.activeList) {
       const entityLists = ST.userData.entities[it.path]?.lists || [];
       if (!entityLists.includes(ST.activeList)) return false;
@@ -1635,7 +1719,6 @@ function buildChips() {
         sep.className = 'chip-sep';
         ce.appendChild(sep);
       }
-      // Group label (toggles whole group)
       const lbl = document.createElement('button');
       lbl.className = 'chip-grp-lbl';
       lbl.textContent = grp.label;
@@ -1652,7 +1735,7 @@ function buildChips() {
       grp.keys.forEach(k => {
         const cfg = CAT[k];
         if (!cfg) return;
-        if (!(cc[k]||0)) return; // hide empty categories
+        if (!(cc[k]||0)) return;
         const b = document.createElement('button');
         b.className = 'chip' + (ST.cats[k] ? ' on' : '');
         b.style.setProperty('--cc', cfg.c);
@@ -1679,7 +1762,6 @@ function buildChips() {
   }
 }
 
-/* ── RENDER: UPDATE DROPDOWN ────────────────── */
 function buildUpdateSel() {
   const sel = document.getElementById('upd-sel');
   if (!sel) return;
@@ -1708,94 +1790,74 @@ function calcStarChartMxp(missions) {
   let total = 0;
   missions.forEach(m => {
     if (JUNCTION_TAGS.has(m.tag)) total += 1000;
-    if (m.tier >= 1 && ST.missionDb?.[m.tag]?.masteryExp) total += ST.missionDb[m.tag].masteryExp;
+    
+    if (ST.missionDb?.[m.tag]?.masteryExp) {
+      // Add mastery for the normal base node completion
+      total += ST.missionDb[m.tag].masteryExp;
+      
+      // Add mastery a 2nd time if completed on Steel Path (tier >= 1)
+      if (m.tier >= 1) {
+        total += ST.missionDb[m.tag].masteryExp;
+      }
+    }
   });
   return total;
 }
+
 function renderMbar() {
-  const totalM  = ST.items.reduce((s,i) => s+(i.mastery||0), 0);
-  const maxed   = ST.items.filter(i => i.rank>=i.maxRank&&i.maxRank>0).length;
-  const scMxp   = calcStarChartMxp(ST.missions);
-  const bycat   = {};
-  for (const it of ST.items) { if (!bycat[it.cat]) bycat[it.cat]=0; bycat[it.cat]+=(it.mastery||0); }
-  const cats = Object.entries(bycat).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
-
-  // List mastery potential (when list is active)
-  let listPotential = null;
-  if (ST.activeList) {
-    const listItems = filteredItems(); // already filtered by list
-    const unmaxedInList = listItems.filter(i => i.rank < i.maxRank);
-    const potential = unmaxedInList.reduce((s,i) => {
-      const mult = (i.cat==='warframe'||i.cat==='necramech'||i.cat==='archwing'||i.cat==='sentinel') ? 200 : 100;
-      return s + (i.maxRank - i.rank) * mult;
-    }, 0);
-    listPotential = { potential, count: unmaxedInList.length };
-  }
-
   const mbar = document.getElementById('mbar');
   if (!mbar) return;
+  const wasOpen = localStorage.getItem('wft3_calc_open') === '1';
+  let calc = mbar.querySelector('.mbar-calc');
+  let togBtn = mbar.querySelector('.mbar-calc-toggle');
+  if (!togBtn) {
+    togBtn = document.createElement('button');
+    togBtn.className = 'mbar-calc-toggle';
+    togBtn.onclick = () => toggleCalc(togBtn);
+    mbar.appendChild(togBtn);
+  }
+  togBtn.innerHTML = `MR Calculator <span>${wasOpen ? '▴' : '▾'}</span>`;
+  if (!calc) {
+    calc = document.createElement('div');
+    calc.className = 'mbar-calc' + (wasOpen ? ' open' : '');
+    mbar.appendChild(calc);
+  }
 
-  // Preserve calc toggle state
-  const calcOpen = mbar.querySelector('.mbar-calc')?.classList.contains('open');
-
-  mbar.innerHTML = '';
-
-  // Toggle button
-  const tog = document.createElement('button');
-  tog.className = 'mbar-calc-toggle';
-  tog.textContent = 'Calculator ▾';
-  tog.onclick = () => toggleCalc(tog);
-  mbar.appendChild(tog);
-
-  // Stats row
-  const row = document.createElement('div'); row.className = 'mbar-row';
-  row.innerHTML = `
-    <div class="mbi"><div class="mbl">Item MXP</div><div class="mbv">${fmtM(totalM)}</div></div>
-    <div class="mbsep"></div>
-    <div class="mbi"><div class="mbl">Maxed</div><div class="mbv">${maxed} / ${ST.items.length}</div></div>
-    ${scMxp>0 ? `<div class="mbsep"></div><div class="mbi"><div class="mbl">Star Chart MXP</div><div class="mbv">${fmtM(scMxp)}</div></div>` : ''}
-    ${listPotential ? `<div class="mbsep"></div><div class="mbi"><div class="mbl">List potential</div><div class="mbv" style="color:#b89030">+${fmtM(listPotential.potential)}</div></div>` : ''}`;
-  mbar.appendChild(row);
-
-  // Category row
-  const catRow = document.createElement('div'); catRow.className = 'mbar-cats';
-  catRow.innerHTML = cats.map(([k,v]) => `<span class="cmini" style="background:${CAT[k]?.c||'#607080'}14;color:${CAT[k]?.c||'#607080'};border:1px solid ${CAT[k]?.c||'#607080'}32">${CAT[k]?.l||k}<span class="cmini-val">${fmtM(v)}</span></span>`).join('');
-  mbar.appendChild(catRow);
-
-  // Calculator panel (hidden by default)
-  const calc = document.createElement('div'); calc.className = 'mbar-calc' + (calcOpen ? ' open' : '');
-  renderCalcPanel(calc, totalM + scMxp);
-  mbar.appendChild(calc);
+  renderCalcPanel(calc, calcTotalMastery());
 }
 
 function renderCalcPanel(el, currentMxp) {
-  const playerMR  = ST.userData.meta.playerLevel || 0;
-  const nextMR    = playerMR + 1;
-  const threshold = mrThreshold(nextMR);
-  const gap       = Math.max(0, threshold - currentMxp);
-  const pct       = threshold > 0 ? Math.min(100, Math.round(currentMxp / threshold * 100)) : 100;
+  // Derive the rank directly from the math to prevent visual gaps
+  const calcMR    = rankFromMastery(currentMxp);
+  const nextMR    = calcMR + 1;
+  const th0       = mrThreshold(calcMR);
+  const th1       = mrThreshold(nextMR);
+  const gap       = Math.max(0, th1 - currentMxp);
+  
+  const rankRange = th1 - th0;
+  const progress  = Math.max(0, currentMxp - th0);
+  const pct       = rankRange > 0 ? Math.min(100, (progress / rankRange) * 100) : 100;
+  
   const wepsNeeded = gap > 0 ? Math.ceil(gap / 3000) : 0;
   const frmsNeeded = gap > 0 ? Math.ceil(gap / 6000) : 0;
 
-  // Potential from all unleveled items
   const potential = ST.items.reduce((s,i) => {
-    const mult = (i.cat==='warframe'||i.cat==='necramech'||i.cat==='archwing'||i.cat==='sentinel') ? 200 : 100;
+    const mult = ['warframe','necramech','archwing','sentinel','kubrow','kavat','vulpaphyla','predasite','companion','moa','hound','kdrive'].includes(i.cat) ? 200 : 100;
     return s + (i.maxRank - i.rank) * mult;
   }, 0);
   const ceilMR = rankFromMastery(currentMxp + potential);
 
-  // List projection (when list filter is active)
   let listHtml = '';
   if (ST.activeList) {
     const list = listById(ST.activeList);
     const listItems = ST.items.filter(it => ST.userData.entities[it.path]?.lists?.includes(ST.activeList));
     const listGain = listItems.reduce((s,i) => {
-      const mult = (i.cat==='warframe'||i.cat==='necramech'||i.cat==='archwing'||i.cat==='sentinel') ? 200 : 100;
+      const mult = ['warframe','necramech','archwing','sentinel','kubrow','kavat','vulpaphyla','predasite','companion','moa','hound','kdrive'].includes(i.cat) ? 200 : 100;
       return s + (i.maxRank - i.rank) * mult;
     }, 0);
     const listNewTotal = currentMxp + listGain;
     const listNewMR    = rankFromMastery(listNewTotal);
-    const mrGain       = listNewMR - playerMR;
+    const mrGain       = listNewMR - calcMR;
     listHtml = `
       <div class="calc-row" style="background:rgba(74,173,158,.06);border-radius:5px;padding:.35rem .5rem;border:1px solid rgba(74,173,158,.15)">
         <div class="calc-stat">
@@ -1805,16 +1867,21 @@ function renderCalcPanel(el, currentMxp) {
       </div>`;
   }
 
+  const rjInt = ST.userData.meta.rjInt || 0;
+  const drInt = ST.userData.meta.drInt || 0;
+  const plexusDone = ST.userData.meta.plexusDone || false;
+  const manualMxp = (rjInt + drInt) * 1500 + (plexusDone ? 6000 : 0);
+
   el.innerHTML = `
     <div class="calc-row">
-      <div class="calc-stat"><div class="calc-lbl">Progress to MR ${nextMR}</div><div class="calc-val accent">${fmtM(currentMxp)} / ${fmtM(threshold)}</div></div>
+      <div class="calc-stat"><div class="calc-lbl">Progress to MR ${nextMR}</div><div class="calc-val accent">${fmtM(currentMxp)} / ${fmtM(th1)}</div></div>
       <div style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:100px">
         <div style="display:flex;align-items:center;gap:6px">
           <div class="calc-bar-wrap" style="flex:1">
             <div class="calc-bar-fill" id="cbar-cur" style="width:${pct}%"></div>
             <div class="calc-bar-proj" id="cbar-proj" style="left:${pct}%;width:0%"></div>
           </div>
-          <span class="calc-bar-rankup" id="cbar-rank-lbl">MR ${playerMR}→${nextMR}</span>
+          <span class="calc-bar-rankup" id="cbar-rank-lbl">MR ${calcMR}→${nextMR}</span>
         </div>
         <div class="calc-bar-overflow" id="cbar-overflow">
           <div style="display:flex;align-items:center;gap:6px">
@@ -1831,7 +1898,28 @@ function renderCalcPanel(el, currentMxp) {
       To reach MR ${nextMR}: <span style="color:var(--tx)">~${wepsNeeded} weapons</span> or <span style="color:var(--tx)">~${frmsNeeded} frames</span> at max rank
     </div>` : `<div style="font-size:.68rem;color:var(--acc)">Ready to rank up!</div>`}
     ${listHtml}
-    <div class="calc-row">
+    
+    <div class="calc-row" style="padding-top:.5rem; border-top:1px solid var(--bd); margin-top:.3rem">
+      <div class="calc-stat">
+        <div class="calc-lbl">Intrinsics & Plexus</div>
+        <div class="calc-val accent" style="font-size:.7rem">+${fmtM(manualMxp)}</div>
+      </div>
+      <div class="calc-inputs" style="margin-left:auto; gap:.8rem">
+        <div class="calc-input-grp">
+          <span title="Railjack Intrinsics (Max 50)">RJ Int.</span>
+          <input type="number" min="0" max="50" value="${rjInt}" onchange="updateManualMxp('rjInt', this.value)" style="width:44px">
+        </div>
+        <div class="calc-input-grp">
+          <span title="Drifter Intrinsics (Max 40)">Drifter Int.</span>
+          <input type="number" min="0" max="40" value="${drInt}" onchange="updateManualMxp('drInt', this.value)" style="width:44px">
+        </div>
+        <label class="ctog" title="Plexus (6,000 MXP)">
+          <input type="checkbox" onchange="updateManualMxp('plexusDone', this.checked)" ${plexusDone ? 'checked' : ''}> Plexus
+        </label>
+      </div>
+    </div>
+    
+    <div class="calc-row" style="padding-top:.5rem; border-top:1px solid var(--bd); margin-top:.3rem">
       <div class="calc-stat"><div class="calc-lbl">Mastery ceiling</div><div class="calc-val">+${fmtM(potential)} available → MR ${ceilMR} max</div></div>
     </div>
     <div class="calc-inputs">
@@ -1844,7 +1932,6 @@ function renderCalcPanel(el, currentMxp) {
       <div class="calc-result" id="wi-result">Enter items to see projection</div>
     </div>`;
 
-  // Seed bars with list projection if a list is active
   if (ST.activeList) {
     const listGain = ST.items
       .filter(it => ST.userData.entities[it.path]?.lists?.includes(ST.activeList))
@@ -1852,7 +1939,6 @@ function renderCalcPanel(el, currentMxp) {
         const mult = (i.cat==='warframe'||i.cat==='necramech'||i.cat==='archwing'||i.cat==='sentinel') ? 200 : 100;
         return s + (i.maxRank - i.rank) * mult;
       }, 0);
-    // Use setTimeout to let the DOM settle first
     setTimeout(() => updateCalcBars(listGain), 0);
   }
 }
@@ -1861,26 +1947,29 @@ function toggleCalc(btn) {
   const calc = document.querySelector('.mbar-calc');
   if (!calc) return;
   const open = calc.classList.toggle('open');
-  btn.textContent = `Calculator ${open ? '▴' : '▾'}`;
+  localStorage.setItem('wft3_calc_open', open ? '1' : '0');
+  if (btn) btn.innerHTML = `MR Calculator <span>${open ? '▴' : '▾'}</span>`;
 }
 
 function updateCalcBars(projMxp) {
   const current  = calcTotalMastery();
-  const playerMR = ST.userData.meta.playerLevel || 0;
-  const nextMR   = playerMR + 1;
+  const calcMR   = rankFromMastery(current);
+  const nextMR   = calcMR + 1;
+  const th0 = mrThreshold(calcMR);
   const th1 = mrThreshold(nextMR);
   const th2 = mrThreshold(nextMR + 1);
 
-  const currentPct = Math.min(100, Math.round(current / th1 * 100));
-  const remaining  = Math.max(0, th1 - Math.min(current, th1));
+  const rankRange1 = th1 - th0;
+  const progress   = Math.max(0, current - th0);
+  const currentPct = rankRange1 > 0 ? Math.min(100, (progress / rankRange1) * 100) : 100;
 
-  // Capped projection on first bar
+  const remaining  = Math.max(0, th1 - Math.max(current, th0));
   const projOnBar1 = Math.min(projMxp, remaining);
-  const projPct1   = Math.round(projOnBar1 / th1 * 100);
+  const projPct1   = rankRange1 > 0 ? (projOnBar1 / rankRange1 * 100) : 0;
 
-  // Overflow into next rank
   const overflow    = Math.max(0, projMxp - remaining);
-  const overflowPct = th2 > th1 ? Math.min(100, Math.round(overflow / (th2 - th1) * 100)) : 0;
+  const rankRange2  = th2 - th1;
+  const overflowPct = rankRange2 > 0 ? Math.min(100, (overflow / rankRange2) * 100) : 0;
 
   const barP  = document.getElementById('cbar-proj');
   const barO  = document.getElementById('cbar-over');
@@ -1897,7 +1986,7 @@ function updateCalcBars(projMxp) {
     gapEl.textContent = remaining2 > 0 ? `+${fmtM(remaining2)} left` : '✓ Rank up!';
     gapEl.style.color = remaining2 <= 0 ? 'var(--acc)' : '';
   }
-  if (rankLbl) rankLbl.textContent = `MR ${playerMR}→${nextMR}`;
+  if (rankLbl) rankLbl.textContent = `MR ${calcMR}→${nextMR}`;
   if (overLbl) overLbl.textContent = `MR ${nextMR}→${nextMR+1} (+${fmtM(overflow)})`;
 }
 
@@ -1906,12 +1995,11 @@ function updateWhatIf() {
   const f = parseInt(document.getElementById('wi-frames')?.value)  || 0;
   const extra = w * 3000 + f * 6000;
 
-  // If user hasn't entered anything, show list projection on bar instead
   const listGain = (() => {
     if (!ST.activeList) return 0;
     return ST.items.filter(it => ST.userData.entities[it.path]?.lists?.includes(ST.activeList))
       .reduce((s,i) => {
-        const mult = (i.cat==='warframe'||i.cat==='necramech'||i.cat==='archwing'||i.cat==='sentinel') ? 200 : 100;
+        const mult = ['warframe','necramech','archwing','sentinel','kubrow','kavat','vulpaphyla','predasite','companion','moa','hound','kdrive'].includes(i.cat) ? 200 : 100;
         return s + (i.maxRank - i.rank) * mult;
       }, 0);
   })();
@@ -1923,8 +2011,8 @@ function updateWhatIf() {
     if (extra === 0) { res.textContent = 'Enter items to see projection'; return; }
     const newTotal = calcTotalMastery() + extra;
     const newRank  = rankFromMastery(newTotal);
-    const mr = ST.userData.meta.playerLevel || 0;
-    res.textContent = `+${fmtM(extra)} → MR ${newRank}${newRank > mr ? ` (+${newRank - mr} rank${newRank-mr!==1?'s':''})` : ' (no change)'}`;
+    const calcMR = rankFromMastery(calcTotalMastery());
+    res.textContent = `+${fmtM(extra)} → MR ${newRank}${newRank > calcMR ? ` (+${newRank - calcMR} rank${newRank-calcMR!==1?'s':''})` : ' (no change)'}`;
   }
 }
 
@@ -1940,7 +2028,7 @@ function makeCard(it, catMax) {
   const pct = it.maxRank > 0 ? Math.round((it.rank / it.maxRank) * 100) : 0;
 
   const rankDisplay = it.maxRank === 40
-    ? `<input class="rank-input" type="number" value="${it.rank}" min="0" max="40" title="Set actual rank (XP cannot determine this for Forma'd weapons)">`
+    ? `<input class="rank-input" type="number" value="${it.rank}" min="0" max="40" title="Set actual rank">`
     : `<span class="rank-cur">${it.rank}</span>`;
 
   const d = document.createElement('div');
@@ -1965,7 +2053,7 @@ function makeCard(it, catMax) {
     <div class="card-extra">
       <div class="cmeta">
         <span class="abadge" style="color:${acfg.c};border-color:${acfg.c}40;background:${acfg.c}10">${acfg.l}</span>
-        ${maxed ? `<span style="color:#a08020;font-size:.58rem;font-family:'Rajdhani',sans-serif;font-weight:600;">MAXED</span>` : ''}
+        ${maxed ? `<span class="maxed-tag" style="color:#a08020;font-size:.7rem;font-family:'Rajdhani',sans-serif;font-weight:700;">MAXED</span>` : ''}
       </div>
       <div class="xbw"><div class="xbf" style="width:${pct}%;background:${cfg.c}"></div></div>
       <div class="cbot">
@@ -1979,7 +2067,6 @@ function makeCard(it, catMax) {
   d.addEventListener('mouseenter', () => { ST._hoveredItem = it; });
   d.addEventListener('click', e => handleCardClick(e, it));
 
-  // Attach listeners post-render (avoids HTML injection issues with note content)
   const starBtn = d.querySelector('.sbtn');
   starBtn.addEventListener('click', e => { e.stopPropagation(); toggleEntityStar(it.path, it.cat, starBtn); });
 
@@ -2011,14 +2098,28 @@ function render() {
     return 0;
   });
 
-  ST._visibleItems = items; // used by shift-click range and Ctrl+A
+  ST._visibleItems = items; 
 
   const wrap = document.getElementById('items-wrap');
   if (!wrap) return;
 
-  document.getElementById('s-mxp').textContent   = fmtM(ST.items.reduce((s,i)=>s+(i.mastery||0),0));
-  document.getElementById('s-maxed').textContent = ST.items.filter(i=>i.rank>=i.maxRank&&i.maxRank>0).length;
-  document.getElementById('s-vis').textContent   = items.length;
+  const totalMxp = ST.items.reduce((s,i)=>s+(i.mastery||0),0);
+  const scMxp    = calcStarChartMxp(ST.missions);
+  document.getElementById('s-mxp').textContent    = fmtM(totalMxp);
+  document.getElementById('s-maxed').textContent  = ST.items.filter(i=>i.rank>=i.maxRank&&i.maxRank>0).length;
+  document.getElementById('s-vis').textContent    = items.length;
+  const scEl = document.getElementById('s-sc-mxp');
+  if (scEl) scEl.textContent = scMxp > 0 ? fmtM(scMxp) : '—';
+
+  const tipEl = document.getElementById('hstat-cat-tip');
+  if (tipEl) {
+    const bycat = {};
+    for (const it of ST.items) { if (!bycat[it.cat]) bycat[it.cat]=0; bycat[it.cat]+=(it.mastery||0); }
+    const rows = Object.entries(bycat).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])
+      .map(([k,v]) => `<div class="hstat-tip-row"><span class="hstat-tip-cat" style="color:${CAT[k]?.c||'var(--tx2)'}">${CAT[k]?.l||k}</span><span class="hstat-tip-val">${fmtM(v)}</span></div>`)
+      .join('');
+    tipEl.innerHTML = '<div class="hstat-tip-lbl">By category</div>' + rows;
+  }
 
   const catMax = {};
   for (const it of ST.items) if (!catMax[it.cat]||it.xp>catMax[it.cat]) catMax[it.cat]=it.xp;
@@ -2034,7 +2135,6 @@ function render() {
     sec.appendChild(g); frag.appendChild(sec);
   } else {
     if (grp === 'cat') {
-      // Horizontal kanban — one column per active category, in logical order
       const colWrap = document.createElement('div');
       colWrap.className = 'col-wrap';
       const catOrder = CAT_GROUPS.flatMap(g => g.keys);
@@ -2182,7 +2282,7 @@ function switchTab(t) {
   document.getElementById('tab-items').className = 'tab'+(t==='items'?' active':'');
   document.getElementById('tab-sc').className    = 'tab'+(t==='sc'?' active':'');
   if (t==='sc') {
-    renderStarChart(); // show loading state immediately
+    renderStarChart(); 
     loadStarChartData().then(() => renderStarChart());
   }
 }
@@ -2199,9 +2299,7 @@ function saveSettings() {
   ST.userData.settings = { cats:ST.cats, acqs:ST.acqs, sort:ST.sort, group:ST.group };
   saveUserData();
 }
-function loadSettings() {
-  // loadUserData handles this — this is a no-op kept for call-site compatibility
-}
+function loadSettings() {}
 
 function setStatusSelected(status) {
   if (!ST.selection.size) return;
@@ -2243,7 +2341,6 @@ function importData(inp) {
         ST.userData = d;
         await userDbSet('userData', ST.userData);
         try { localStorage.setItem(LS_USER_KEY, JSON.stringify(ST.userData)); } catch(e) {}
-        // Re-derive runtime mirrors
         ST.starred = new Set(Object.entries(ST.userData.entities).filter(([,e])=>e.starred&&e.type!=='node').map(([k])=>k));
         ST.overrides = Object.fromEntries(Object.entries(ST.userData.entities).filter(([,e])=>e.rank!==undefined).map(([k,e])=>[k,e.rank]));
         toast('Imported ✓ — reloading…');
@@ -2266,13 +2363,11 @@ async function handleImport() {
   try { profile = parseProfile(text); }
   catch(e) { showE(e instanceof SyntaxError ? 'Invalid JSON — try "Load from file" instead.' : 'Parse error: ' + e.message); return; }
   if (!profile.xpData.length) { showE('No XP data found in this JSON.'); return; }
-  // Extract and persist player ID from the raw JSON if present
   try {
     const raw = JSON.parse(text);
     const r = raw.Results?.[0] || raw;
     const id = r.PlayerId || r.playerId || r.AccountId || r.accountId || '';
     if (id) savePlayerId(id);
-    // Also try to find ID in the URL query if injected somehow (fallback to manual input)
     const manualId = document.getElementById('player-id-input')?.value.trim();
     if (!id && manualId) savePlayerId(manualId);
   } catch(e) {}
@@ -2301,7 +2396,6 @@ async function loadAndShow(profile) {
   buildListBar();
   renderMbar();
   render();
-  // Show refresh button if player ID is stored
   const pid = getPlayerId();
   const rbtn = document.getElementById('hbtn-refresh');
   if (rbtn) rbtn.style.display = pid ? 'block' : 'none';
@@ -2314,7 +2408,6 @@ function initImportScreen() {
   const idEntry = document.getElementById('id-entry');
   const refreshPanel = document.getElementById('refresh-panel');
   if (id) {
-    // Known ID — show refresh panel
     if (idEntry) idEntry.style.display = 'none';
     if (refreshPanel) {
       refreshPanel.classList.add('visible');
@@ -2324,7 +2417,6 @@ function initImportScreen() {
       if (url)  url.textContent  = profileUrl(id);
     }
   } else {
-    // No ID — show entry fields
     if (idEntry) idEntry.style.display = 'block';
     if (refreshPanel) refreshPanel.classList.remove('visible');
   }
@@ -2383,7 +2475,13 @@ document.addEventListener('keydown', e => {
     else toast('Hover or select an item to open its wiki page');
     return;
   }
-  if (e.key === 'p' || e.key === 'P') { if (ST.selection.size) setStatusSelected('priority'); return; }
+  if (e.key === 'l' || e.key === 'L') {
+    if (ST.userData.lists.length > 0) {
+      const bar = document.getElementById('list-bar');
+      if (bar) { bar.scrollIntoView({behavior:'smooth',block:'nearest'}); bar.style.outline='1px solid var(--acc)'; setTimeout(()=>bar.style.outline='',800); }
+    } else { promptNewList(); }
+    return;
+  }
   if (e.key === 'b' || e.key === 'B') { if (ST.selection.size) setStatusSelected('building'); return; }
 });
 
@@ -2396,11 +2494,10 @@ document.getElementById('file-in')?.addEventListener('change',e=>{
 
 (async function init() {
   await loadUserData();
-  // XP Bar and Notes pills start as off — sync body classes
-  document.body.classList.add('hide-xpbar', 'hide-notes');
+  document.body.classList.add('hide-xpbar', 'hide-notes', 'hide-source');
   initImportScreen();
   const gs = document.getElementById('grp-sel');
-  if (gs && ST.group) gs.value = ST.group;
+  if (gs) gs.value = ST.group || 'cat';
   const saved = localStorage.getItem('wft3_profile');
   if (saved) {
     try {
