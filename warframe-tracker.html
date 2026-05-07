@@ -393,7 +393,7 @@ body.hide-notes .card-note{display:none}
     <div class="ir">
       <button class="btn btn-g" onclick="document.getElementById('file-in').click()">Load from file</button>
       <input type="file" id="file-in" accept=".json,.txt" style="display:none">
-      <button class="btn btn-p" onclick="handleImport()">Import →</button>
+      <button class="btn btn-p" onclick="handleImport()">Import profile →</button>
       <span class="inote">Data stays local — never sent anywhere</span>
     </div>
   </div>
@@ -424,8 +424,8 @@ body.hide-notes .card-note{display:none}
     <div class="hact">
       <button class="hbtn" onclick="copyFilteredNames()">Copy Names</button>
       <button class="hbtn" id="hbtn-refresh" onclick="refreshProfile()" style="display:none">Refresh Profile</button>
-      <button class="hbtn" onclick="exportData()">Export ↓</button>
-      <button class="hbtn" onclick="document.getElementById('imp-in').click()">Import ↑</button>
+      <button class="hbtn" onclick="exportData()">Save data ↓</button>
+      <button class="hbtn" onclick="document.getElementById('imp-in').click()">Load data ↑</button>
       <input type="file" id="imp-in" accept=".json" style="display:none" onchange="importData(this)">
       <button class="hbtn" onclick="resetApp()">↺ New</button>
       <button class="hbtn hbtn-warn" onclick="auditDatabase()">⚠ Audit</button>
@@ -893,52 +893,122 @@ function buildListBar() {
 }
 
 /* ── INDEXEDDB ──────────────────────────────── */
-let _idb = null;
-function openDB() {
-  if (_idb) return Promise.resolve(_idb);
-  return new Promise((ok,err)=>{
-    const r = indexedDB.open('wft3',1);
+// Two separate databases so clearing cache never touches user data
+let _cacheDb = null;
+let _userDb  = null;
+
+function openCacheDB() {
+  if (_cacheDb) return Promise.resolve(_cacheDb);
+  return new Promise((ok,err) => {
+    const r = indexedDB.open('wft3-cache', 1);
     r.onupgradeneeded = e => {
-      ['cache','user'].forEach(s => {
-        if (!e.target.result.objectStoreNames.contains(s))
-          e.target.result.createObjectStore(s,{keyPath:'k'});
-      });
+      if (!e.target.result.objectStoreNames.contains('cache'))
+        e.target.result.createObjectStore('cache', {keyPath:'k'});
     };
-    r.onsuccess = ()=>{ _idb=r.result; ok(_idb); };
-    r.onerror   = ()=>err(r.error);
+    r.onsuccess = () => { _cacheDb = r.result; ok(_cacheDb); };
+    r.onerror   = () => err(r.error);
   });
 }
-async function dbGet(store, key) {
-  const db = await openDB();
-  return new Promise(ok=>{
-    const req = db.transaction(store,'readonly').objectStore(store).get(key);
-    req.onsuccess = ()=>ok(req.result||null);
-    req.onerror   = ()=>ok(null);
+
+function openUserDB() {
+  if (_userDb) return Promise.resolve(_userDb);
+  return new Promise((ok,err) => {
+    const r = indexedDB.open('wft3-user', 1);
+    r.onupgradeneeded = e => {
+      if (!e.target.result.objectStoreNames.contains('user'))
+        e.target.result.createObjectStore('user', {keyPath:'k'});
+    };
+    r.onsuccess = () => { _userDb = r.result; ok(_userDb); };
+    r.onerror   = () => err(r.error);
   });
+}
+
+// Cache DB — API responses (item DB, node DB, update names etc.)
+async function dbGet(store, key) {
+  try {
+    const db = await openCacheDB();
+    return new Promise(ok => {
+      const req = db.transaction('cache','readonly').objectStore('cache').get(key);
+      req.onsuccess = () => ok(req.result || null);
+      req.onerror   = () => ok(null);
+    });
+  } catch(e) { return null; }
 }
 async function dbSet(store, key, val) {
-  const db = await openDB();
-  return new Promise((ok,err)=>{
-    const tx = db.transaction(store,'readwrite');
-    tx.objectStore(store).put({k:key,v:val,t:Date.now()});
-    tx.oncomplete = ok; tx.onerror = ()=>err(tx.error);
-  });
+  try {
+    const db = await openCacheDB();
+    return new Promise((ok,err) => {
+      const tx = db.transaction('cache','readwrite');
+      tx.objectStore('cache').put({k:key, v:val, t:Date.now()});
+      tx.oncomplete = ok; tx.onerror = () => err(tx.error);
+    });
+  } catch(e) {}
+}
+
+// User DB — personal data (notes, stars, lists, settings)
+async function userDbGet(key) {
+  try {
+    const db = await openUserDB();
+    return new Promise(ok => {
+      const req = db.transaction('user','readonly').objectStore('user').get(key);
+      req.onsuccess = () => ok(req.result || null);
+      req.onerror   = () => ok(null);
+    });
+  } catch(e) { return null; }
+}
+async function userDbSet(key, val) {
+  try {
+    const db = await openUserDB();
+    return new Promise((ok,err) => {
+      const tx = db.transaction('user','readwrite');
+      tx.objectStore('user').put({k:key, v:val, t:Date.now()});
+      tx.oncomplete = ok; tx.onerror = () => err(tx.error);
+    });
+  } catch(e) {}
 }
 
 /* ── USER DATA ───────────────────────────────── */
+const LS_USER_KEY = 'wft3_userdata';
+
 async function saveUserData() {
   ST.userData.meta.lastSynced = Date.now();
-  await dbSet('user', 'userData', ST.userData);
+  // Primary: user IndexedDB
+  await userDbSet('userData', ST.userData);
+  // Fallback: localStorage (survives IndexedDB being cleared)
+  try {
+    localStorage.setItem(LS_USER_KEY, JSON.stringify(ST.userData));
+  } catch(e) {
+    // localStorage full — not critical, IndexedDB is primary
+    console.warn('localStorage backup failed (may be full):', e);
+  }
 }
 
 async function loadUserData() {
-  const stored = await dbGet('user', 'userData');
+  // Try primary source first (user IndexedDB)
+  let stored = await userDbGet('userData');
+
+  // Fallback to localStorage if IndexedDB was cleared or empty
+  if (!stored?.v?.version) {
+    try {
+      const ls = localStorage.getItem(LS_USER_KEY);
+      if (ls) {
+        const parsed = JSON.parse(ls);
+        if (parsed?.version === 3) {
+          stored = { v: parsed };
+          // Restore to IndexedDB since we recovered from localStorage
+          await userDbSet('userData', parsed);
+          console.info('User data restored from localStorage fallback.');
+        }
+      }
+    } catch(e) {}
+  }
+
   if (stored?.v?.version === 3) {
     ST.userData = stored.v;
   } else {
-    // First run — migrate old scattered localStorage keys
     migrateOldData();
   }
+
   // Populate runtime mirrors from userData
   ST.starred = new Set(
     Object.entries(ST.userData.entities)
@@ -2169,7 +2239,8 @@ function importData(inp) {
       const d = JSON.parse(ev.target.result);
       if (d.version === 3) {
         ST.userData = d;
-        await saveUserData();
+        await userDbSet('userData', ST.userData);
+        try { localStorage.setItem(LS_USER_KEY, JSON.stringify(ST.userData)); } catch(e) {}
         // Re-derive runtime mirrors
         ST.starred = new Set(Object.entries(ST.userData.entities).filter(([,e])=>e.starred&&e.type!=='node').map(([k])=>k));
         ST.overrides = Object.fromEntries(Object.entries(ST.userData.entities).filter(([,e])=>e.rank!==undefined).map(([k,e])=>[k,e.rank]));
