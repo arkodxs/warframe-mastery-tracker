@@ -781,7 +781,18 @@ function classifyItem(item) {
 async function fetchItemDb() {
   try {
     const cached = await dbGet('cache','item_db');
-    if (cached && (Date.now()-cached.t)<CACHE_TTL) return cached.v;
+    const normalizeRank40Items = (db) => {
+      if (!db || typeof db !== 'object') return db;
+      for (const [path, item] of Object.entries(db)) {
+        if (!item || typeof item !== 'object') continue;
+        const nameKey = String(item.name || '').toLowerCase();
+        if (nameKey === 'paracesis' || String(path).toLowerCase().includes('paracesis')) {
+          item.maxRank = 40;
+        }
+      }
+      return db;
+    };
+    if (cached && (Date.now()-cached.t)<CACHE_TTL) return normalizeRank40Items(cached.v);
 
     const resp = await fetch('https://raw.githubusercontent.com/wfcd/warframe-items/master/data/json/All.json');
     const items = await resp.json();
@@ -821,12 +832,13 @@ async function fetchItemDb() {
           apiCat: finalCat,
           introduced: rawIntro,
           majorUpdate: majorVer,
-          maxRank: (pathLower.includes('kuva') || pathLower.includes('tenet') || pathLower.includes('lich') || pathLower.includes('coda') || isMech || pathLower.includes('paracesis')) ? 40 : 30
+          maxRank: (pathLower.includes('kuva') || pathLower.includes('tenet') || pathLower.includes('lich') || pathLower.includes('coda') || isMech || pathLower.includes('paracesis') || item.name === 'Paracesis') ? 40 : 30
         }
       };
     });
 
     Object.values(dbByName).forEach(winner => { db[winner.path] = winner.data; });
+    normalizeRank40Items(db);
     await dbSet('cache','item_db',db);
     return db;
   } catch(err) { return {}; }
