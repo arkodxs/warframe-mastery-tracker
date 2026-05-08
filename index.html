@@ -78,6 +78,68 @@ code{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);b
 .tab{padding:.55rem 1.4rem;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.92rem;letter-spacing:.08em;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
 .tab:hover{color:var(--tx2)}.tab.active{color:var(--acc);border-bottom-color:var(--acc)}
 
+/* Planner */
+#view-planner{display:none;padding:1.4rem}
+.planner-head{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.55rem}
+.planner-title{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.planner-title h2{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;letter-spacing:.12em;color:#d0e8f8;text-transform:uppercase}
+.planner-note{font-size:.65rem;color:var(--tx3);line-height:1.4;max-width:980px}
+.planner-legend{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center}
+.planner-legend span{font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--tx2);background:var(--s2);border:1px solid var(--bd);border-radius:999px;padding:.16rem .38rem}
+.planner-controls{display:flex;gap:.42rem;align-items:center;flex-wrap:wrap;margin-bottom:.55rem}
+.planner-controls .csel{min-width:140px;padding:.35rem .52rem;font-size:.8rem}
+.planner-list{display:flex;flex-direction:column;gap:.35rem}
+.planner-keyhint{font-size:.62rem;color:var(--tx3);font-family:'Share Tech Mono',monospace;margin-left:auto;white-space:nowrap}
+.planner-keyhint kbd{display:inline-flex;align-items:center;height:15px;padding:0 4px;border-radius:3px;border:1px solid var(--bd2);background:var(--s2);color:var(--tx2);font-family:'Share Tech Mono',monospace;font-size:.58rem;line-height:1;letter-spacing:0}
+.planner-row{background:var(--s2);border:1px solid var(--bd);border-radius:8px;overflow:hidden}
+.planner-row[open]{border-color:color-mix(in srgb,var(--acc) 55%,var(--bd))}
+.planner-row.selected{border-color:color-mix(in srgb,var(--acc) 65%,var(--bd));background:color-mix(in srgb,var(--acc) 4%,var(--s2))}
+.planner-row summary{list-style:none;display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;cursor:pointer;user-select:none}
+.planner-row summary::-webkit-details-marker{display:none}
+.planner-row summary:hover{background:var(--s3)}
+.planner-main{display:flex;align-items:center;gap:.5rem;flex:1;min-width:0}
+.planner-star{background:none;border:none;cursor:pointer;font-size:.8rem;color:var(--tx3);padding:0 2px;line-height:1;transition:color .12s;flex-shrink:0;margin-top:.15rem}
+.planner-star:hover,.planner-star.on{color:#c0a030}
+.planner-meta{display:flex;align-items:center;gap:.35rem;min-width:0;flex:1;flex-wrap:wrap}
+.planner-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.02rem;color:var(--tx);letter-spacing:.02em;line-height:1.25}
+.planner-stars{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--acc)}
+.planner-cat{font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em}
+.planner-chip{font-family:'Share Tech Mono',monospace;font-size:.56rem;padding:.12rem .36rem;border-radius:999px;border:1px solid var(--bd2);color:var(--tx2);background:var(--bg)}
+.planner-chip.owned{color:#4aad9e;border-color:rgba(74,173,158,.4)}
+.planner-chip.unowned{color:var(--tx3)}
+.planner-row.unowned,.planner-row.unmaxxed{opacity:.55;filter:grayscale(.3);}
+.planner-row.unowned:hover,.planner-row.unmaxxed:hover{opacity:.85;filter:grayscale(0)}
+.planner-chip.farm{color:#b89830;border-color:rgba(184,152,48,.4)}
+.planner-chip.note{color:var(--acc);border-color:rgba(82,184,173,.35)}
+.planner-chip.rank-max{color:#4aad9e;border-color:rgba(74,173,158,.45);background:rgba(74,173,158,.1)}
+.planner-chip.rank-mid{color:#b89830;border-color:rgba(184,152,48,.45);background:rgba(184,152,48,.08)}
+.planner-chip.rank-zero{color:#a85a68;border-color:rgba(168,90,104,.45);background:rgba(168,90,104,.08)}
+.planner-right{display:flex;align-items:center;gap:.3rem;flex-shrink:0}
+.planner-farmsel{background:var(--bg);border:1px solid var(--bd2);border-radius:5px;color:var(--tx);font-family:'Rajdhani',sans-serif;font-size:.66rem;padding:.14rem .3rem;max-width:118px}
+.planner-expand{font-size:.62rem;color:var(--tx3);flex-shrink:0}
+.planner-body{border-top:1px solid var(--bd);padding:1rem 1rem 1.1rem;display:flex;flex-direction:column;gap:.85rem}
+.planner-body-row{display:flex;gap:.85rem;flex-wrap:wrap;align-items:flex-start}
+.planner-textarea{width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:8px;padding:.6rem .65rem;color:var(--tx);font-family:'Exo 2',sans-serif;font-size:.86rem;resize:vertical;min-height:90px;outline:none}
+.planner-textarea:focus{border-color:var(--acc)}
+.planner-section{display:flex;flex-direction:column;gap:.35rem}
+.planner-section h3{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.12em;color:var(--tx3);text-transform:uppercase}
+.planner-checks{display:flex;gap:.35rem;flex-wrap:wrap}
+.planner-check{display:flex;align-items:center;gap:.28rem;padding:.22rem .45rem;border:1px solid var(--bd2);border-radius:999px;background:var(--s1);font-size:.68rem;color:var(--tx2)}
+.planner-check input{accent-color:var(--acc)}
+.planner-breakdown{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:.35rem}
+.planner-break{background:var(--s1);border:1px solid var(--bd);border-radius:6px;padding:.45rem .5rem;display:flex;flex-direction:column;gap:.22rem}
+.planner-break-top{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.planner-break-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.75rem;color:var(--tx)}
+.planner-break-val{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--acc)}
+.planner-break-desc{font-size:.72rem;color:var(--tx3);line-height:1.45}
+.planner-justify{font-size:.78rem;color:var(--tx2);line-height:1.5;background:var(--s1);border:1px solid var(--bd);border-radius:6px;padding:.6rem .65rem}
+.planner-empty{padding:3rem 1rem;text-align:center;color:var(--tx3);font-size:.95rem}
+.planner-col-wrap{display:flex;gap:.7rem;overflow-x:auto;padding-bottom:.5rem}
+.planner-col{flex:0 0 360px;display:flex;flex-direction:column;gap:.45rem}
+.planner-col-hdr{border-radius:8px;padding:.5rem .7rem;display:flex;justify-content:space-between;align-items:center;background:var(--s1);border:1px solid var(--bd);border-left:3px solid var(--acc)}
+.planner-col-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.9rem;letter-spacing:.08em;color:var(--acc);text-transform:uppercase}
+.planner-col-count{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--tx3)}
+
 /* Mastery bar */
 .mbar{background:var(--s2);border-bottom:1px solid var(--bd);padding:.6rem 1.4rem;display:flex;flex-direction:column;gap:.45rem}
 .mbar-row{display:flex;gap:1.1rem;align-items:center;flex-wrap:wrap}
@@ -525,6 +587,7 @@ body.hide-rank.hide-update .ccore:not(:has(.status-prio,.status-build)){display:
   <div class="tabs">
     <div class="tab active" id="tab-items" onclick="switchTab('items')">Items</div>
     <div class="tab" id="tab-sc" onclick="switchTab('sc')">Star Chart</div>
+    <div class="tab" id="tab-planner" onclick="switchTab('planner')">Planner</div>
   </div>
 
   <div id="view-items">
@@ -639,12 +702,51 @@ body.hide-rank.hide-update .ccore:not(:has(.status-prio,.status-build)){display:
   <div class="fnote">Star chart data from warframestat.us — <span>Steel Path completions cannot be separated from Normal in this profile format.</span> Node counts may vary slightly as DE adds missions.</div>
   </div>
 
+  <div id="view-planner">
+    <div class="planner-head">
+      <div class="planner-title">
+        <h2>Planner</h2>
+        <span class="planner-chip farm">Stars: harder first</span>
+        <span class="planner-chip">Base Warframes only</span>
+      </div>
+      <div class="planner-note">This view reuses favorites, notes, ownership, and rank progress from the tracker. The star breakdown is hidden by default: P = progression access, R = runs, M = materials, Q = quest, S = soft lock.</div>
+      <div class="planner-legend">
+        <span>P progression</span><span>R runs</span><span>M materials</span><span>Q quest</span><span>S soft lock</span>
+      </div>
+    </div>
+    <div class="planner-controls">
+      <select class="csel" id="planner-layout" onchange="onPlannerLayout(this.value)">
+        <option value="columns">Columns by stage</option>
+        <option value="list">Freeform list</option>
+      </select>
+      <select class="csel" id="planner-sort" onchange="onPlannerSort(this.value)">
+        <option value="stars-desc">Stars: hardest first</option>
+        <option value="stars-asc">Stars: easiest first</option>
+        <option value="name-asc">Name A–Z</option>
+        <option value="rank-asc">Rank progress</option>
+        <option value="rank-desc">Rank progress reverse</option>
+      </select>
+      <select class="csel" id="planner-filter" onchange="renderPlanner()">
+        <option value="all">All base frames</option>
+        <option value="starred">Starred only</option>
+        <option value="unowned">Unowned first</option>
+      </select>
+      <select class="csel" id="planner-list" onchange="onPlannerList(this.value)">
+        <option value="none">No list filter</option>
+      </select>
+      <span class="planner-keyhint"><kbd>W</kbd> open wiki for selected/hovered row</span>
+    </div>
+    <div class="planner-list" id="planner-wrap"></div>
+  </div>
+
   <div class="fnote" id="fnote">
     <span>Mastery formula:</span> weapons rank 30 = 465K XP · frames rank 30 = 930K XP
   </div>
 </div>
 
 <div id="toast"></div>
+
+<script src="warframe-breakdown-data.js"></script>
 
 <script>
 'use strict';
@@ -718,15 +820,24 @@ const ST = {
   cats: Object.fromEntries(Object.keys(CAT).map(k=>[k,true])),
   acqs: Object.fromEntries(Object.keys(ACQ).map(k=>[k,true])),
   search:'', sort:'mastery-desc', group:'cat', update:'',
+  plannerSort:'stars-desc',
+  plannerLayout:'columns',
   starred: new Set(),   // runtime mirror of userData.entities starred flags
   overrides: {},        // runtime mirror of userData.entities rank overrides
   updateNames: {},
   nodeDb: null,
   missionDb: null,
+  _missionDbPromise: null,
+  plannerData: null,
+  plannerIndex: null,
   selection: new Set(),
   _lastSelIdx: null,
   _visibleItems: [],
   _hoveredItem: null,
+  _plannerVisibleRows: [],
+  _plannerHoveredPath: null,
+  _plannerSelectedPath: null,
+  tab: 'items',
   activeList: null,   // list ID currently being filtered by
   userData: {
     version: 3,
@@ -1014,6 +1125,7 @@ function buildListBar() {
     });
     chips.appendChild(chip);
   });
+  rebuildPlannerFilterOptions();
 }
 
 /* ── INDEXEDDB ──────────────────────────────── */
@@ -1150,6 +1262,9 @@ async function loadUserData() {
   if (s.acqs)  Object.assign(ST.acqs, s.acqs);
   if (s.sort)  ST.sort  = s.sort;
   if (s.group) ST.group = s.group;
+  if (s.plannerSort) ST.plannerSort = s.plannerSort;
+  if (s.plannerLayout) ST.plannerLayout = s.plannerLayout;
+  if (s.plannerActiveList) ST.activeList = s.plannerActiveList;
 }
 
 function migrateOldData() {
@@ -1378,46 +1493,59 @@ async function fetchUpdateNames() {
 
 /* ── MISSION DB (wiki mastery data) ─────────── */
 async function fetchMissionDb() {
-  if (ST.missionDb) return;
-  try {
-    const cached = await dbGet('cache', 'mission_db');
-    if (cached && (Date.now() - cached.t) < MISSION_DB_TTL) { ST.missionDb = cached.v; return; }
+  if (ST.missionDb) return ST.missionDb;
+  if (ST._missionDbPromise) return ST._missionDbPromise;
 
-    const resp = await fetch('https://wiki.warframe.com/api.php?action=parse&page=Module:Missions/data&prop=wikitext&format=json&origin=*');
-    if (!resp.ok) throw new Error('Mission wiki fetch failed');
-    const data = await resp.json();
-    const text = data.parse?.wikitext?.['*'] || '';
+  ST._missionDbPromise = (async () => {
+    try {
+      const cached = await dbGet('cache', 'mission_db');
+      if (cached && (Date.now() - cached.t) < MISSION_DB_TTL) {
+        ST.missionDb = cached.v;
+        return ST.missionDb;
+      }
 
-    const db = {};
-    // Split on top-level node blocks — each starts with { and contains InternalName
-    const blocks = text.split(/(?=\s*\{[^{}]*InternalName)/);
-    blocks.forEach(block => {
-      const internalName = block.match(/InternalName\s*=\s*"([^"]+)"/)?.[1];
-      if (!internalName) return;
-      const masteryExp  = block.match(/MasteryExp\s*=\s*(\d+)/)?.[1];
-      const name        = block.match(/\bName\s*=\s*"([^"]+)"/)?.[1];
-      const planet      = block.match(/Planet\s*=\s*"([^"]+)"/)?.[1];
-      const type        = block.match(/\bType\s*=\s*"([^"]+)"/)?.[1];
-      const enemy       = block.match(/Enemy\s*=\s*"([^"]+)"/)?.[1];
-      const minLevel    = block.match(/MinLevel\s*=\s*(\d+)/)?.[1];
-      const maxLevel    = block.match(/MaxLevel\s*=\s*(\d+)/)?.[1];
-      db[internalName] = {
-        name:      name || internalName,
-        planet:    planet || '',
-        type:      type || '',
-        enemy:     enemy || '',
-        minLevel:  minLevel ? parseInt(minLevel) : 0,
-        maxLevel:  maxLevel ? parseInt(maxLevel) : 0,
-        masteryExp: masteryExp ? parseInt(masteryExp) : 0,
-      };
-    });
+      const resp = await fetch('https://wiki.warframe.com/api.php?action=parse&page=Module:Missions/data&prop=wikitext&format=json&origin=*');
+      if (!resp.ok) throw new Error('Mission wiki fetch failed');
+      const data = await resp.json();
+      const text = data.parse?.wikitext?.['*'] || '';
 
-    ST.missionDb = db;
-    await dbSet('cache', 'mission_db', db);
-  } catch(e) {
-    console.warn('Mission DB fetch failed:', e);
-    ST.missionDb = {};
-  }
+      const db = {};
+      // Split on top-level node blocks — each starts with { and contains InternalName
+      const blocks = text.split(/(?=\s*\{[^{}]*InternalName)/);
+      blocks.forEach(block => {
+        const internalName = block.match(/InternalName\s*=\s*"([^"]+)"/)?.[1];
+        if (!internalName) return;
+        const masteryExp  = block.match(/MasteryExp\s*=\s*(\d+)/)?.[1];
+        const name        = block.match(/\bName\s*=\s*"([^"]+)"/)?.[1];
+        const planet      = block.match(/Planet\s*=\s*"([^"]+)"/)?.[1];
+        const type        = block.match(/\bType\s*=\s*"([^"]+)"/)?.[1];
+        const enemy       = block.match(/Enemy\s*=\s*"([^"]+)"/)?.[1];
+        const minLevel    = block.match(/MinLevel\s*=\s*(\d+)/)?.[1];
+        const maxLevel    = block.match(/MaxLevel\s*=\s*(\d+)/)?.[1];
+        db[internalName] = {
+          name:      name || internalName,
+          planet:    planet || '',
+          type:      type || '',
+          enemy:     enemy || '',
+          minLevel:  minLevel ? parseInt(minLevel) : 0,
+          maxLevel:  maxLevel ? parseInt(maxLevel) : 0,
+          masteryExp: masteryExp ? parseInt(masteryExp) : 0,
+        };
+      });
+
+      ST.missionDb = db;
+      await dbSet('cache', 'mission_db', db);
+      return db;
+    } catch(e) {
+      console.warn('Mission DB fetch failed:', e);
+      ST.missionDb = {};
+      return ST.missionDb;
+    } finally {
+      ST._missionDbPromise = null;
+    }
+  })();
+
+  return ST._missionDbPromise;
 }
 
 /* ── PROFILE PARSING ────────────────────────── */
@@ -1871,6 +1999,309 @@ function togglePlanetStar(name, btn) {
   toggleEntityStar('planet:'+name, 'planet', btn);
 }
 
+const PLANNER_BREAKDOWN = {
+  P: { name: 'Progression', desc: 'Rank and star chart access.' },
+  R: { name: 'Runs', desc: 'Mission runtime to get blueprint drops.' },
+  M: { name: 'Materials', desc: 'Resource gathering to craft parts.' },
+  Q: { name: 'Quest', desc: 'Direct quest time requirements.' },
+  S: { name: 'Soft Lock', desc: 'Wait-gated rotations, events, or spawns.' },
+};
+const PLANNER_STAGE_ORDER = ['Very Early Game', 'Early Game', 'Mid-Game', 'Late Game'];
+
+function escapeHtml(v) {
+  return String(v || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function normalizePlannerName(name) {
+  return String(name || '')
+    .toLowerCase()
+    .replace(/\s+prime$/, '')
+    .trim();
+}
+
+function ensurePlannerData() {
+  if (ST.plannerData && ST.plannerIndex) return;
+  const source = Array.isArray(window.WF_BREAKDOWN) ? window.WF_BREAKDOWN : [];
+  ST.plannerData = source;
+  ST.plannerIndex = {};
+  source.forEach(row => {
+    const key = normalizePlannerName(row.warframe);
+    if (key) ST.plannerIndex[key] = row;
+  });
+}
+
+function rebuildPlannerFilterOptions() {
+  const sel = document.getElementById('planner-filter');
+  const listSel = document.getElementById('planner-list');
+  if (!sel || !listSel) return;
+  const prev = sel.value || 'all';
+  sel.innerHTML = `
+    <option value="all">All base frames</option>
+    <option value="starred">Starred only</option>
+    <option value="unowned">Unowned first</option>`;
+
+  // Populate the separate list dropdown
+  listSel.innerHTML = `<option value="none">No list filter</option>`;
+  ST.userData.lists.forEach(l => {
+    const o = document.createElement('option');
+    o.value = l.id;
+    o.textContent = l.name;
+    listSel.appendChild(o);
+  });
+
+  const exists = [...sel.options].some(o => o.value === prev);
+  sel.value = exists ? prev : 'all';
+  listSel.value = ST.activeList || 'none';
+}
+
+function comparePlannerRows(a, b) {
+  const mode = document.getElementById('planner-filter')?.value || 'all';
+  if (mode === 'unowned') {
+    const aUnowned = a.item.isOwned ? 1 : 0;
+    const bUnowned = b.item.isOwned ? 1 : 0;
+    if (aUnowned !== bUnowned) return aUnowned - bUnowned;
+  }
+  if (ST.plannerSort === 'stars-desc') return b.planner.total_stars - a.planner.total_stars;
+  if (ST.plannerSort === 'stars-asc') return a.planner.total_stars - b.planner.total_stars;
+  if (ST.plannerSort === 'name-asc') return a.item.name.localeCompare(b.item.name);
+  if (ST.plannerSort === 'rank-asc') return a.progressPct - b.progressPct;
+  if (ST.plannerSort === 'rank-desc') return b.progressPct - a.progressPct;
+  return b.planner.total_stars - a.planner.total_stars;
+}
+
+function plannerRows() {
+  ensurePlannerData();
+  const rows = ST.items
+    .filter(it => it.cat === 'warframe' && !/\sprime$/i.test(it.name))
+    .map(it => {
+      const key = normalizePlannerName(it.name);
+      const p = ST.plannerIndex?.[key];
+      if (!p) return null;
+      const e = ST.userData.entities[it.path] || {};
+      return {
+        item: it,
+        planner: p,
+        entity: e,
+        progressPct: it.maxRank > 0 ? Math.round((it.rank / it.maxRank) * 100) : 0,
+        starred: isEntityStarred(it.path),
+        farmStatus: e.farmStatus || 'unset',
+        checks: e.farmChecks || {},
+        inActiveList: ST.activeList ? !!ST.userData.entities[it.path]?.lists?.includes(ST.activeList) : false,
+      };
+    })
+    .filter(Boolean);
+
+  const mode = document.getElementById('planner-filter')?.value || 'all';
+  const listSel = document.getElementById('planner-list')?.value || 'none';
+  let visible = rows;
+  if (listSel !== 'none') {
+    visible = rows.filter(r => ST.userData.entities[r.item.path]?.lists?.includes(listSel));
+    // keep runtime activeList in sync with UI
+    ST.activeList = listSel;
+  } else if (mode === 'starred') visible = rows.filter(r => r.starred);
+  else if (mode === 'unowned') visible = rows.slice();
+
+  visible.sort(comparePlannerRows);
+
+  return visible;
+}
+
+function onPlannerLayout(v) {
+  ST.plannerLayout = v;
+  renderPlanner();
+  saveSettings();
+}
+
+function setPlannerFarmStatus(path, cat, status) {
+  const e = getOrCreateEntity(path, cat);
+  if (!status || status === 'unset') delete e.farmStatus;
+  else e.farmStatus = status;
+  pruneEntity(path);
+  saveUserData();
+}
+
+function setPlannerCheck(path, cat, key, checked) {
+  const e = getOrCreateEntity(path, cat);
+  if (!e.farmChecks) e.farmChecks = {};
+  if (checked) e.farmChecks[key] = true;
+  else delete e.farmChecks[key];
+  if (!Object.keys(e.farmChecks).length) delete e.farmChecks;
+  pruneEntity(path);
+  saveUserData();
+}
+
+function onPlannerSort(v) {
+  ST.plannerSort = v;
+  renderPlanner();
+  saveSettings();
+}
+
+function renderPlanner() {
+  const wrap = document.getElementById('planner-wrap');
+  if (!wrap) return;
+
+  const rows = plannerRows();
+  ST._plannerVisibleRows = rows;
+  if (!rows.length) {
+    wrap.innerHTML = '<div class="planner-empty">No matching base frames for current Planner filters.</div>';
+    ST._plannerSelectedPath = null;
+    ST._plannerHoveredPath = null;
+    return;
+  }
+
+  const farmLabels = {
+    unset: 'No status',
+    can_now: 'Can farm now',
+    blocked: 'Blocked',
+    in_progress: 'In progress',
+    done: 'Done',
+  };
+
+  const makePlannerRow = (r) => {
+    const details = document.createElement('details');
+    details.className = 'planner-row';
+    details.dataset.path = r.item.path;
+    if (ST._plannerSelectedPath === r.item.path) details.classList.add('selected');
+    // Reflect ownership/maxed state visually like the Items tab
+    if (!r.item.isOwned) details.classList.add('unowned');
+    if (r.item.maxRank > 0 && r.item.rank < r.item.maxRank) details.classList.add('unmaxxed');
+
+    const farmLabel = farmLabels[r.farmStatus] || 'No status';
+    const notePresent = !!r.entity.note;
+    const ownedCls = r.item.isOwned ? 'owned' : 'unowned';
+    const rankStateCls = r.item.rank <= 0 ? 'rank-zero' : (r.item.rank >= r.item.maxRank ? 'rank-max' : 'rank-mid');
+    const rankStateLbl = r.item.rank <= 0 ? 'Rank 0' : (r.item.rank >= r.item.maxRank ? 'Rank Max' : 'Rank In Progress');
+    const breakdownHtml = Object.entries(PLANNER_BREAKDOWN).map(([k, cfg]) => {
+      const val = Number(r.planner.breakdown?.[k] || 0).toFixed(1);
+      return `<div class="planner-break"><div class="planner-break-top"><span class="planner-break-name">${cfg.name}</span><span class="planner-break-val">${val}</span></div><div class="planner-break-desc">${cfg.desc}</div></div>`;
+    }).join('');
+
+    const checksHtml = Object.entries(PLANNER_BREAKDOWN).map(([k, cfg]) => {
+      const checked = r.checks[k] ? 'checked' : '';
+      return `<label class="planner-check"><input data-check="${k}" type="checkbox" ${checked}> ${cfg.name}</label>`;
+    }).join('');
+
+    details.innerHTML = `
+      <summary>
+        <div class="planner-main">
+          <button type="button" class="planner-star${r.starred ? ' on' : ''}" title="Toggle favorite">★</button>
+          <div class="planner-meta">
+            <span class="planner-name">${escapeHtml(r.item.name)}</span>
+            <span class="planner-stars">${Number(r.planner.total_stars).toFixed(1)} ★</span>
+            <span class="planner-cat">${escapeHtml(r.planner.category)}</span>
+            <span class="planner-chip ${ownedCls}">${r.item.isOwned ? 'Owned' : 'Unowned'}</span>
+            <span class="planner-chip ${rankStateCls}">${rankStateLbl}</span>
+            <span class="planner-chip farm">${escapeHtml(farmLabel)}</span>
+            ${notePresent ? '<span class="planner-chip note">Note</span>' : ''}
+          </div>
+        </div>
+        <div class="planner-right">
+          <select class="planner-farmsel" title="Farm status">
+            <option value="unset" ${r.farmStatus==='unset'?'selected':''}>No status</option>
+            <option value="can_now" ${r.farmStatus==='can_now'?'selected':''}>Can farm now</option>
+            <option value="blocked" ${r.farmStatus==='blocked'?'selected':''}>Blocked</option>
+            <option value="in_progress" ${r.farmStatus==='in_progress'?'selected':''}>In progress</option>
+            <option value="done" ${r.farmStatus==='done'?'selected':''}>Done</option>
+          </select>
+          <span class="planner-expand">▾</span>
+        </div>
+      </summary>
+      <div class="planner-body">
+        <div class="planner-section"><h3>Why This Rating</h3><div class="planner-justify">${escapeHtml(r.planner.justification || 'No notes provided.')}</div></div>
+        <div class="planner-section"><h3>Difficulty Breakdown</h3><div class="planner-breakdown">${breakdownHtml}</div></div>
+        <div class="planner-body-row"><div class="planner-section" style="flex:1;min-width:260px"><h3>Shared Note</h3><textarea class="planner-textarea" placeholder="Add a planning note…">${escapeHtml(r.entity.note || '')}</textarea></div></div>
+        <div class="planner-section"><h3>Personal Checklist</h3><div class="planner-checks">${checksHtml}</div></div>
+      </div>`;
+
+    const starBtn = details.querySelector('.planner-star');
+    starBtn.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleEntityStar(r.item.path, r.item.cat, starBtn);
+      if ((document.getElementById('planner-filter')?.value || 'all') === 'starred') renderPlanner();
+    });
+
+    details.querySelector('summary')?.addEventListener('click', (e) => {
+      // Toggle selection without forcing a full re-render to avoid
+      // interrupting native details open/close behavior.
+      const prev = ST._plannerSelectedPath;
+      ST._plannerSelectedPath = (prev === r.item.path) ? null : r.item.path;
+      // Update classes in-place
+      if (prev) {
+        const prevEl = document.querySelector(`.planner-row[data-path="${prev}"]`);
+        if (prevEl) prevEl.classList.remove('selected');
+      }
+      if (ST._plannerSelectedPath) details.classList.add('selected'); else details.classList.remove('selected');
+    });
+    details.addEventListener('mouseenter', () => { ST._plannerHoveredPath = r.item.path; });
+
+    const farmSel = details.querySelector('.planner-farmsel');
+    farmSel.addEventListener('click', e => e.stopPropagation());
+    farmSel.addEventListener('change', () => {
+      setPlannerFarmStatus(r.item.path, r.item.cat, farmSel.value);
+      renderPlanner();
+    });
+
+    const noteEl = details.querySelector('.planner-textarea');
+    noteEl.addEventListener('blur', () => saveEntityNote(r.item.path, r.item.cat, noteEl.value));
+    noteEl.addEventListener('click', e => e.stopPropagation());
+    noteEl.addEventListener('keydown', e => e.stopPropagation());
+
+    details.querySelectorAll('input[data-check]').forEach(input => {
+      input.addEventListener('change', () => {
+        setPlannerCheck(r.item.path, r.item.cat, input.dataset.check, input.checked);
+      });
+    });
+
+    return details;
+  };
+
+  wrap.innerHTML = '';
+  if (ST.plannerLayout === 'list') {
+    const frag = document.createDocumentFragment();
+    rows.forEach(r => frag.appendChild(makePlannerRow(r)));
+    wrap.appendChild(frag);
+    return;
+  }
+
+  const stageMap = {};
+  PLANNER_STAGE_ORDER.forEach(s => { stageMap[s] = []; });
+  rows.forEach(r => {
+    const stage = PLANNER_STAGE_ORDER.includes(r.planner.category) ? r.planner.category : 'Late Game';
+    stageMap[stage].push(r);
+  });
+
+  const colWrap = document.createElement('div');
+  colWrap.className = 'planner-col-wrap';
+  PLANNER_STAGE_ORDER.forEach(stage => {
+    const colRows = stageMap[stage] || [];
+    colRows.sort(comparePlannerRows);
+    const col = document.createElement('div');
+    col.className = 'planner-col';
+    const hdr = document.createElement('div');
+    hdr.className = 'planner-col-hdr';
+    hdr.innerHTML = `<span class="planner-col-name">${escapeHtml(stage)}</span><span class="planner-col-count">${colRows.length}</span>`;
+    col.appendChild(hdr);
+    if (!colRows.length) {
+      const empty = document.createElement('div');
+      empty.className = 'planner-empty';
+      empty.style.padding = '1.2rem .6rem';
+      empty.style.fontSize = '.72rem';
+      empty.textContent = 'No frames in this stage for current filters.';
+      col.appendChild(empty);
+    } else {
+      colRows.forEach(r => col.appendChild(makePlannerRow(r)));
+    }
+    colWrap.appendChild(col);
+  });
+  wrap.appendChild(colWrap);
+}
+
 
 /* ── FILTERING ──────────────────────────────── */
 function filteredItems() {
@@ -1992,7 +2423,7 @@ function calcStarChartMxp(missions) {
     if (m.tag.startsWith('CrewBattle')) return;
     const isJunction = m.tag.endsWith('Junction');
     // Use missionDb masteryExp; junctions fall back to 1000 if not in DB
-    const mxp = ST.missionDb?.[m.tag]?.masteryExp ?? (isJunction ? 1000 : 0);
+    const mxp = m.masteryExp ?? ST.missionDb?.[m.tag]?.masteryExp ?? (isJunction ? 1000 : 0);
     if (mxp <= 0) return;
     total += mxp;                  // base completion always gives mastery
     if (m.tier >= 1) total += mxp; // SP gives same amount again (wiki confirmed)
@@ -2035,7 +2466,7 @@ function renderCalcPanel(el, currentMxp) {
   const progress  = currentMxp - th0;
   const range     = threshold - th0;
   const gap       = Math.max(0, threshold - currentMxp);
-  const pct       = range > 0 ? Math.min(100, Math.round(progress / range * 100)) : 100;
+  const pct       = range > 0 ? Math.min(100, (progress / range) * 100) : 100;
   const wepsNeeded = gap > 0 ? Math.ceil(gap / 3000) : 0;
   const frmsNeeded = gap > 0 ? Math.ceil(gap / 6000) : 0;
 
@@ -2141,6 +2572,7 @@ function updateCalcBars(projMxp) {
   const current  = calcTotalMastery();
   const playerMR = rankFromMastery(current);
   const nextMR   = playerMR + 1;
+  const th0 = mrThreshold(playerMR);
   const th1 = mrThreshold(nextMR);
   // Read fill bar's actual rendered width to guarantee zero gap between fill and projection
   const currentPct = parseFloat(document.getElementById('cbar-cur')?.style.width) || 0;
@@ -2150,11 +2582,12 @@ function updateCalcBars(projMxp) {
 
   // Capped projection on first bar
   const projOnBar1 = Math.min(projMxp, remaining);
-  const projPct1   = Math.round(projOnBar1 / th1 * 100);
+  const currentRange = Math.max(1, th1 - th0);
+  const projPct1   = Math.min(100, (projOnBar1 / currentRange) * 100);
 
   // Overflow into next rank
   const overflow    = Math.max(0, projMxp - remaining);
-  const overflowPct = th2 > th1 ? Math.min(100, Math.round(overflow / (th2 - th1) * 100)) : 0;
+  const overflowPct = th2 > th1 ? Math.min(100, (overflow / (th2 - th1)) * 100) : 0;
 
   const barP  = document.getElementById('cbar-proj');
   const barO  = document.getElementById('cbar-over');
@@ -2349,11 +2782,12 @@ function render() {
         if (!catItems.length) continue;
         const cfg = CAT[catKey]; if (!cfg) continue;
         colCount++;
+        const catMaxed = catItems.filter(i => i.rank >= i.maxRank && i.maxRank > 0).length;
         const col = document.createElement('div');
         col.className = 'cat-col'; col.style.setProperty('--cc', cfg.c);
         const tm = catItems.reduce((s,i)=>s+(i.mastery||0),0);
         const hdr = document.createElement('div'); hdr.className='cat-col-hdr';
-        hdr.innerHTML=`<span class="col-cat-name">${cfg.l}</span><div class="col-cat-meta"><span class="col-cat-mxp">${fmtM(tm)}</span><span class="col-cat-cnt">${catItems.length}</span></div>`;
+        hdr.innerHTML=`<span class="col-cat-name">${cfg.l}</span><div class="col-cat-meta"><span class="col-cat-mxp">${fmtM(tm)}</span><span class="col-cat-cnt" title="Maxed / total items">${catMaxed}/${catItems.length}</span></div>`;
         col.appendChild(hdr);
         catItems.forEach(it=>col.appendChild(makeCard(it,catMax)));
         colWrap.appendChild(col);
@@ -2390,6 +2824,8 @@ function render() {
     }
   }
   wrap.innerHTML=''; wrap.appendChild(frag);
+
+  if (ST.tab === 'planner') renderPlanner();
 }
 
 /* ── HANDLERS ───────────────────────────────── */
@@ -2481,15 +2917,19 @@ function copySelectedNames() {
 
 function switchTab(t) {
   clearSelection();
+  ST.tab = t;
   document.getElementById('view-items').style.display = t==='items'?'block':'none';
   document.getElementById('view-sc').style.display    = t==='sc'?'block':'none';
+  document.getElementById('view-planner').style.display = t==='planner'?'block':'none';
   document.getElementById('fnote').style.display      = t==='items'?'flex':'none';
   document.getElementById('tab-items').className = 'tab'+(t==='items'?' active':'');
   document.getElementById('tab-sc').className    = 'tab'+(t==='sc'?' active':'');
+  document.getElementById('tab-planner').className = 'tab'+(t==='planner'?' active':'');
   if (t==='sc') {
     renderStarChart(); // show loading state immediately
     loadStarChartData().then(() => renderStarChart());
   }
+  if (t==='planner') renderPlanner();
 }
 
 function toast(msg,dur=2200) {
@@ -2501,7 +2941,7 @@ function toast(msg,dur=2200) {
 
 /* ── PERSISTENCE ────────────────────────────── */
 function saveSettings() {
-  ST.userData.settings = { cats:ST.cats, acqs:ST.acqs, sort:ST.sort, group:ST.group };
+  ST.userData.settings = { cats:ST.cats, acqs:ST.acqs, sort:ST.sort, group:ST.group, plannerSort:ST.plannerSort, plannerLayout:ST.plannerLayout, plannerActiveList: ST.activeList };
   saveUserData();
 }
 function loadSettings() {
@@ -2606,10 +3046,20 @@ async function loadAndShow(profile) {
   buildListBar();
   renderMbar();
   render();
+  void fetchMissionDb().then(() => {
+    if (document.getElementById('app')?.style.display === 'flex') renderMbar();
+  });
   // Show refresh button if player ID is stored
   const pid = getPlayerId();
   const rbtn = document.getElementById('hbtn-refresh');
   if (rbtn) rbtn.style.display = pid ? 'block' : 'none';
+  rebuildPlannerFilterOptions();
+  const plannerSortSel = document.getElementById('planner-sort');
+  if (plannerSortSel) plannerSortSel.value = ST.plannerSort;
+  const plannerLayoutSel = document.getElementById('planner-layout');
+  if (plannerLayoutSel) plannerLayoutSel.value = ST.plannerLayout;
+  const plannerListSel = document.getElementById('planner-list');
+  if (plannerListSel) plannerListSel.value = ST.activeList || 'none';
   saveUserData();
   toast(`Sync complete: ${ST.items.length} items tracked.`);
 }
@@ -2681,9 +3131,11 @@ document.addEventListener('keydown', e => {
   if ((e.key === 'a' || e.key === 'A') && (e.ctrlKey || e.metaKey)) { e.preventDefault(); selectAll(); return; }
   if (e.key === 's' || e.key === 'S') { if (ST.selection.size) { starSelected(); } return; }
   if (e.key === 'w' || e.key === 'W') {
-    const target = ST.selection.size === 1
-      ? ST.items.find(i => i.path === [...ST.selection][0])
-      : ST._hoveredItem;
+    const target = ST.tab === 'planner'
+      ? (ST.items.find(i => i.path === ST._plannerSelectedPath) || ST.items.find(i => i.path === ST._plannerHoveredPath) || ST._hoveredItem)
+      : (ST.selection.size === 1
+          ? ST.items.find(i => i.path === [...ST.selection][0])
+          : ST._hoveredItem);
     if (target) openWikiPage(target.name);
     else toast('Hover or select an item to open its wiki page');
     return;
