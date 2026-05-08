@@ -16,9 +16,7 @@
   --err:#a84860;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
-/* ── LEGIBILITY OVERHAUL ── */
-html,body{background:var(--bg);color:var(--tx);font-family:'Exo 2',sans-serif;font-size:16px;min-height:100vh;line-height:1.5}
+html,body{background:var(--bg);color:var(--tx);font-family:'Exo 2',sans-serif;font-size:16px;min-height:100vh}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--s1)}
 ::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
 code{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);background:rgba(74,173,158,.1);padding:1px 5px;border-radius:3px}
@@ -81,7 +79,7 @@ code{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);b
 .tab:hover{color:var(--tx2)}.tab.active{color:var(--acc);border-bottom-color:var(--acc)}
 
 /* Mastery bar */
-.mbar{background:var(--s2);border-bottom:1px solid var(--bd);padding:.5rem 1.4rem;display:flex;flex-direction:column;gap:.5rem}
+.mbar{background:var(--s2);border-bottom:1px solid var(--bd);padding:.6rem 1.4rem;display:flex;flex-direction:column;gap:.45rem}
 .mbar-row{display:flex;gap:1.1rem;align-items:center;flex-wrap:wrap}
 .mbi{display:flex;flex-direction:column;gap:1px}
 .mbl{font-size:.58rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase}
@@ -107,9 +105,11 @@ code{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);b
 .chip.on{color:var(--cc);border-color:color-mix(in srgb,var(--cc) 55%,transparent);background:color-mix(in srgb,var(--cc) 12%,transparent)}
 .cn{font-family:'Share Tech Mono',monospace;font-size:.7rem;opacity:.7}
 
-/* MR Calculator */
+/* MR Calculator — collapsible, hidden by default */
 .mbar-calc{border-top:1px solid var(--bd);padding-top:.5rem;display:none;flex-direction:column;gap:.5rem;margin-top:.4rem}
 .mbar-calc.open{display:flex}
+.mbar-calc-toggle{background:none;border:1px solid var(--bd2);border-radius:4px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.65rem;letter-spacing:.08em;color:var(--tx2);cursor:pointer;text-transform:uppercase;padding:.16rem .5rem;transition:all .12s;flex-shrink:0;margin-left:auto}
+.mbar-calc-toggle:hover{border-color:var(--acc);color:var(--acc)}
 .calc-row{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
 .calc-stat{display:flex;flex-direction:column;gap:1px}
 .calc-lbl{font-size:.58rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase}
@@ -139,6 +139,9 @@ code{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);b
 .sc-legend{display:flex;gap:.9rem;align-items:center;padding:.35rem .1rem;flex-wrap:wrap}
 .sc-legend-item{display:flex;align-items:center;gap:.3rem;font-size:.65rem;color:var(--tx2)}
 .sc-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* cname readable against new palette */
+.cname{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:1.05rem;line-height:1.25;word-break:break-word;flex:1;color:var(--tx)}
 
 /* Entity status badges */
 .status-prio{font-size:.54rem;font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--acc);border:1px solid rgba(74,173,158,.4);padding:1px 4px;border-radius:3px;letter-spacing:.04em;cursor:pointer;user-select:none;transition:all .12s}
@@ -174,78 +177,50 @@ code{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);b
 .gm{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--acc)}
 .gcnt{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--tx3);margin-left:auto}
 
-/* Display group */
+/* Display group — field toggles + Details, right-aligned in controls */
 .display-group{display:flex;align-items:center;gap:.28rem;margin-left:auto;flex-shrink:0;padding-left:.5rem;border-left:1px solid var(--bd2)}
 .dg-sep{width:1px;height:14px;background:var(--bd2);margin:0 .1rem;flex-shrink:0}
 .ftog{padding:.22rem .5rem;border-radius:3px;border:1px solid var(--bd2);background:var(--s3);font-size:.75rem;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.04em;cursor:pointer;transition:all .12s;user-select:none;color:var(--tx2)}
 .ftog:hover{border-color:var(--acc);color:var(--acc)}
 .ftog.off{color:var(--tx3);opacity:.45;border-color:transparent;text-decoration:line-through}
 
-/* Toggles */
+/* Body-level field visibility toggles */
 body.hide-badge .cbadge{display:none}
 body.hide-rank .rank-info{display:none}
 body.hide-update .utag{display:none}
-body.hide-source .abadge{display:none !important}
+body.hide-source .card-extra .abadge{display:none}
 body.hide-maxed .maxed-tag{display:none}
-body.hide-xpbar .xbw,
-body.hide-xpbar .cbot{display:none}
-body.hide-notes .card-note{display:none}
-body.hide-rank.hide-update .ccore:not(:has(.status-prio,.status-build)){display:none}
 
-/* ── GRID & SPACING ── */
+/* Grid */
 .isect{padding:.9rem 1.4rem}
-.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:.8rem}
+.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.55rem}
 
-/* ── CARDS (Level 1 Info) ── */
-.card{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:1rem;display:flex;flex-direction:column;gap:.6rem;transition:border-color .12s,background .12s;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none;}
+/* Card */
+.card{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:.75rem;display:flex;flex-direction:column;gap:.32rem;transition:border-color .12s,background .12s;position:relative;overflow:hidden}
 .card:hover{border-color:color-mix(in srgb,var(--cc) 55%,transparent);background:var(--s3)}
 .card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cc);border-radius:7px 0 0 7px;opacity:.8}
 
+/* Card: always-visible */
 .ctop{display:flex;align-items:flex-start;gap:.4rem;padding-right:1.2rem}
 .cbadge{font-family:'Share Tech Mono',monospace;font-size:.65rem;padding:2px 6px;border-radius:3px;border:1px solid;flex-shrink:0;margin-top:2px;line-height:1.2;letter-spacing:.03em;white-space:nowrap}
-.cname{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.1rem !important;line-height:1.25;word-break:break-word;flex:1;color:#fff}
+.cname{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:1.05rem;line-height:1.25;word-break:break-word;flex:1;color:var(--tx)}
 .ccore{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
-
-.rank-info{font-family:'Share Tech Mono',monospace;font-size:0.9rem;color:var(--tx);display:flex;align-items:center;gap:.15rem;background:var(--bg);padding:2px 8px;border-radius:4px;border:1px solid var(--bd)}
+.rank-info{font-family:'Share Tech Mono',monospace;font-size:.82rem;color:var(--tx);display:flex;align-items:center;gap:.15rem}
 .rank-cur{color:var(--acc)}
 .rank-max{color:var(--tx3)}
 .utag{font-size:.58rem;color:var(--tx3);font-family:'Share Tech Mono',monospace;margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px}
 
+/* Card: star button */
 .sbtn{position:absolute;top:.4rem;right:.4rem;background:none;border:none;cursor:pointer;font-size:.7rem;color:var(--tx3);padding:2px;line-height:1;transition:color .12s}
 .sbtn:hover,.sbtn.on{color:#c0a030}
 
-.card-extra{display:flex;padding-top:.35rem;border-top:1px solid var(--bd);flex-direction:column;gap:.3rem}
-.cmeta{display:flex;gap:.28rem;flex-wrap:wrap;align-items:center}
-.abadge{font-size:.65rem;padding:2px 6px;border-radius:3px;border:1px solid;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.03em}
-.xbw{background:var(--bg);border-radius:2px;height:3px;overflow:hidden}
-.xbf{height:100%;border-radius:2px;transition:width .35s ease}
-.cbot{display:flex;align-items:center;gap:.35rem}
-.xlbl{font-size:.58rem;letter-spacing:.09em;color:var(--tx3)}
-.xval{font-family:'Share Tech Mono',monospace;font-size:.75rem;margin-left:auto}
-.mval{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--tx2)}
+/* Card: extra — always shown; individual sub-elements controlled by body classes */
+.card-extra{display:flex;padding-top:.35rem;border-top:1px solid var(--bd);margin-top:.2rem;flex-direction:column;gap:.3rem}
+body.hide-xpbar .xbw,
+body.hide-xpbar .cbot{display:none}
+body.hide-notes .card-note{display:none}
 
-.rank-input{width:36px;background:var(--s3);border:1px solid var(--bd2);color:var(--acc);font-family:'Share Tech Mono',monospace;font-size:.75rem;text-align:center;border-radius:3px;padding:1px}
-
-.card.unowned{opacity:.55;filter:grayscale(.3);border-style:dashed}
-.card.unowned:hover{opacity:.85;filter:grayscale(0)}
-.card.selected{border-color:color-mix(in srgb,var(--cc) 70%,transparent);background:color-mix(in srgb,var(--cc) 7%,var(--s3));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--cc) 25%,transparent)}
-.card.selected::after{content:'✓';position:absolute;bottom:.38rem;right:.42rem;font-size:.55rem;color:var(--cc);font-family:'Share Tech Mono',monospace;opacity:.8;pointer-events:none}
-.card-note{width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:4px;padding:.28rem .42rem;color:var(--tx);font-family:'Exo 2',sans-serif;font-size:.72rem;resize:none;outline:none;min-height:40px;line-height:1.45;transition:border-color .15s;display:block}
-.card-note:focus{border-color:var(--acc)}
-.card-note::placeholder{color:var(--tx3)}
-
-/* Action bar */
-.action-bar{display:none;align-items:center;gap:.5rem;padding:.45rem 1.4rem;background:var(--s1);border-bottom:1px solid var(--bd);flex-wrap:wrap}
-.action-bar.visible{display:flex}
-.ab-count{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--acc);flex-shrink:0}
-.ab-btn{padding:.22rem .6rem;border-radius:4px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-size:.72rem;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;transition:all .12s;white-space:nowrap}
-.ab-btn:hover{border-color:var(--acc);color:var(--acc)}
-.ab-btn-clear{margin-left:auto;color:var(--tx3)}
-.ab-btn-clear:hover{border-color:var(--err);color:var(--err)}
-.ab-kb-hint{font-size:.65rem;color:var(--tx3);display:flex;gap:.8rem;align-items:center;margin-right:1rem}
-.ab-kb-hint code{color:var(--tx);background:var(--s3);border:1px solid var(--bd2);padding:1px 4px;border-radius:3px;font-family:'Share Tech Mono',monospace;text-transform:uppercase;font-size:.62rem}
-
-/* Column layout */
+/* Column layout — used when grouping by category */
 .col-wrap{display:flex;gap:.6rem;overflow-x:auto;padding:.9rem 1.4rem;align-items:flex-start}
 .col-wrap::-webkit-scrollbar{height:5px}
 .col-wrap::-webkit-scrollbar-track{background:var(--s1)}
@@ -257,6 +232,23 @@ body.hide-rank.hide-update .ccore:not(:has(.status-prio,.status-build)){display:
 .col-cat-meta{display:flex;gap:.4rem;align-items:baseline}
 .col-cat-mxp{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--acc)}
 .col-cat-cnt{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--tx3)}
+.cmeta{display:flex;gap:.28rem;flex-wrap:wrap;align-items:center}
+.abadge{font-size:.65rem;padding:2px 6px;border-radius:3px;border:1px solid;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.03em}
+.xbw{background:var(--bg);border-radius:2px;height:3px;overflow:hidden}
+.xbf{height:100%;border-radius:2px;transition:width .35s ease}
+.cbot{display:flex;align-items:center;gap:.35rem}
+.xlbl{font-size:.58rem;letter-spacing:.09em;color:var(--tx3)}
+.xval{font-family:'Share Tech Mono',monospace;font-size:.75rem;margin-left:auto}
+.mval{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--tx2)}
+
+/* Rank input (for rank-40 items) */
+.rank-input{width:36px;background:var(--s3);border:1px solid var(--bd2);color:var(--acc);font-family:'Share Tech Mono',monospace;font-size:.75rem;text-align:center;border-radius:3px;padding:1px}
+
+/* Unowned */
+.card.unowned{opacity:.55;filter:grayscale(.3);border-style:dashed}
+.card.unowned:hover{opacity:.85;filter:grayscale(0)}
+
+/* Empty state */
 .empty{grid-column:1/-1;text-align:center;padding:4rem 2rem;color:var(--tx3);font-size:.86rem}
 
 /* Star Chart */
@@ -270,33 +262,24 @@ body.hide-rank.hide-update .ccore:not(:has(.status-prio,.status-build)){display:
 .sc-sum-lbl{font-size:.56rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase}
 .sc-section{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:.16em;color:var(--tx3);text-transform:uppercase;padding-bottom:.3rem;border-bottom:1px solid var(--bd);margin-top:.25rem}
 
-/* Planet grid */
-.sc-planet-grid{display:grid;grid-template-columns:repeat(var(--cols,3),1fr);gap:0.75rem;margin-top:.35rem}
-.sc-planet-tile{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:.7rem .85rem;cursor:pointer;transition:border-color .12s,background .12s;position:relative}
-.sc-planet-tile:hover{border-color:var(--bd2);background:var(--s3)}
-.sc-planet-tile.complete{border-color:color-mix(in srgb,var(--acc) 40%,var(--bd))}
-.sc-planet-tile.priority{border-left:3px solid var(--acc)}
-.sc-planet-tile.open{grid-column:1/-1;cursor:default;border-color:var(--acc);background:var(--s2)}
-.sc-tile-hdr{display:flex;align-items:center;gap:.45rem;margin-bottom:.35rem}
-.sc-tile-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.1rem !important;letter-spacing:.02em;color:var(--tx);flex:1}
-.sc-tile-pct{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);flex-shrink:0}
-.sc-tile-pct.sp-focus{color:#6888c8;font-weight:700}
-.sc-planet-tile.complete .sc-tile-pct:not(.sp-focus){color:#4aad9e}
-.sc-tile-star{background:none;border:none;cursor:pointer;font-size:.7rem;color:var(--tx3);padding:1px 2px;line-height:1;transition:color .12s;flex-shrink:0}
-.sc-tile-star:hover,.sc-tile-star.on{color:#c0a030}
-.sc-dual-bar{position:relative;height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:.35rem}
-.sc-dual-base{position:absolute;left:0;top:0;height:100%;background:color-mix(in srgb,var(--acc) 55%,var(--bg));border-radius:3px;transition:width .3s}
-.sc-dual-sp{position:absolute;left:0;top:0;height:100%;background:#6888c8;border-radius:3px;transition:width .3s}
-.sc-tile-stats{font-size:.72rem;color:var(--tx3);font-family:'Share Tech Mono',monospace}
-.sc-tile-stats .sp-done{color:#7898d8}
-.sc-tile-body{display:none;border-top:1px solid var(--bd);margin-top:.45rem;padding-top:.35rem}
-.sc-planet-tile.open .sc-tile-body{display:block}
-.sc-controls{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.3rem;flex-wrap:wrap}
-.sc-col-ctrl{display:flex;align-items:center;gap:.35rem;font-size:.68rem;color:var(--tx3);flex-shrink:0}
-.sc-col-ctrl span{font-family:'Share Tech Mono',monospace}
-.sc-col-btn{background:var(--s2);border:1px solid var(--bd2);border-radius:4px;color:var(--tx2);cursor:pointer;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.8rem;line-height:1;transition:all .12s;font-family:'Share Tech Mono',monospace}
-.sc-col-btn:hover{border-color:var(--acc);color:var(--acc)}
+/* Planet accordion list */
+.sc-planet-list{display:flex;flex-direction:column;gap:.3rem}
+.sc-planet{border:1px solid var(--bd);border-radius:7px;overflow:hidden;background:var(--s2)}
+.sc-planet-hdr{display:flex;align-items:center;gap:.5rem;padding:.48rem .75rem;cursor:pointer;user-select:none;transition:background .12s}
+.sc-planet-hdr:hover{background:var(--s3)}
+.sc-chevron{color:var(--tx3);font-size:.58rem;transition:transform .15s;flex-shrink:0}
+.sc-planet.open .sc-chevron{transform:rotate(90deg)}
+.sc-planet-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.88rem;letter-spacing:.05em;color:var(--tx);flex:1}
+.sc-planet-stats{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--tx3);white-space:nowrap}
+.sc-planet-pct{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--acc);min-width:28px;text-align:right}
+.sc-planet.complete .sc-planet-pct{color:#4aad9e}
+.sc-planet-bar{height:2px;background:var(--bg)}
+.sc-planet-bar-fill{height:100%;background:var(--acc)}
+.sc-planet.complete .sc-planet-bar-fill{background:#4aad9e}
+.sc-body{display:none;border-top:1px solid var(--bd)}
+.sc-planet.open .sc-body{display:block}
 
+/* Individual node rows */
 .sc-node{display:flex;align-items:center;gap:.5rem;padding:.32rem .85rem;border-bottom:1px solid var(--bd);font-size:.84rem}
 .sc-node:last-child{border-bottom:none}
 .sc-node.junction{background:rgba(192,160,48,.04)}
@@ -306,6 +289,18 @@ body.hide-rank.hide-update .ccore:not(:has(.status-prio,.status-build)){display:
 .sc-node-type{font-size:.65rem;color:var(--tx3);font-family:'Share Tech Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
 .sc-node-mastery{font-size:.54rem;font-family:'Rajdhani',sans-serif;font-weight:700;color:#b89830;border:1px solid rgba(184,152,48,.35);padding:1px 4px;border-radius:3px;letter-spacing:.05em;flex-shrink:0}
 .sc-node-status{font-size:.66rem;flex-shrink:0;width:14px;text-align:center;color:var(--tx3)}
+
+/* Steel Path planet toggle */
+.sc-sp-btn{background:none;border:1px solid var(--bd2);border-radius:3px;color:var(--tx3);font-size:.58rem;font-family:'Rajdhani',sans-serif;font-weight:600;padding:1px 5px;cursor:pointer;transition:all .12s;white-space:nowrap;flex-shrink:0;letter-spacing:.03em}
+.sc-sp-btn:hover{border-color:rgba(184,152,48,.5);color:#b89830}
+.sc-sp-btn.on{border-color:rgba(184,152,48,.45);color:#b89830;background:rgba(184,152,48,.08)}
+
+/* Card note */
+.card-note{width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:4px;padding:.28rem .42rem;color:var(--tx);font-family:'Exo 2',sans-serif;font-size:.72rem;resize:none;outline:none;min-height:40px;line-height:1.45;transition:border-color .15s;display:block}
+.card-note:focus{border-color:var(--acc)}
+.card-note::placeholder{color:var(--tx3)}
+
+/* Node row extras */
 .sc-node-star{background:none;border:none;cursor:pointer;font-size:.65rem;color:var(--tx3);padding:0 2px;line-height:1;transition:color .12s;flex-shrink:0}
 .sc-node-star:hover,.sc-node-star.on{color:#c0a030}
 .sc-node-runs{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--tx3);flex-shrink:0}
@@ -313,16 +308,39 @@ body.hide-rank.hide-update .ccore:not(:has(.status-prio,.status-build)){display:
 .sc-node-note{background:none;border:none;border-bottom:1px solid transparent;color:var(--tx2);font-size:.68rem;font-family:'Exo 2',sans-serif;outline:none;width:90px;padding:0 2px;transition:border-color .12s;min-width:0;flex-shrink:1}
 .sc-node-note:focus{border-bottom-color:var(--acc)}
 .sc-node-note::placeholder{color:var(--tx3)}
+.sc-planet-sp{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--tx3);white-space:nowrap}
+.sc-planet-sp .sp-done{color:#6888c8}
+.sc-mxp-available{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:#b89830}
 
+/* Card selection */
+.card.selected{border-color:color-mix(in srgb,var(--cc) 70%,transparent);background:color-mix(in srgb,var(--cc) 7%,var(--s3));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--cc) 25%,transparent)}
+.card.selected::after{content:'✓';position:absolute;bottom:.38rem;right:.42rem;font-size:.55rem;color:var(--cc);font-family:'Share Tech Mono',monospace;opacity:.8;pointer-events:none}
+
+/* Action bar */
+.action-bar{display:none;align-items:center;gap:.5rem;padding:.45rem 1.4rem;background:var(--s1);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.action-bar.visible{display:flex}
+.ab-count{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--acc);flex-shrink:0}
+.ab-btn{padding:.22rem .6rem;border-radius:4px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-size:.72rem;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;transition:all .12s;white-space:nowrap}
+.ab-btn:hover{border-color:var(--acc);color:var(--acc)}
+.ab-btn-clear{margin-left:auto;color:var(--tx3)}
+.ab-btn-clear:hover{border-color:var(--err);color:var(--err)}
+.ab-hints{display:flex;gap:.28rem;flex-wrap:wrap;align-items:center}
+.ab-hint{display:inline-flex;align-items:center;gap:.22rem;font-size:.62rem;color:var(--tx3);white-space:nowrap}
+.ab-hint kbd{display:inline-flex;align-items:center;height:15px;padding:0 4px;border-radius:3px;border:1px solid var(--bd2);background:var(--s2);color:var(--tx2);font-family:'Share Tech Mono',monospace;font-size:.58rem;line-height:1;letter-spacing:0}
+.ab-sep{color:var(--bd2);font-size:.7rem;user-select:none}
+
+/* Node row — 3-state colour coding */
 .sc-node.done .sc-node-status{color:var(--acc)}
 .sc-node.done .sc-node-name{color:var(--tx)}
 .sc-node.sp-done{background:rgba(68,104,168,.06)}
-.sc-node.sp-done .sc-node-status{color:#6888c8}
-.sc-node.sp-done .sc-node-name{color:#8aaae0}
-.sc-node.sp-done .sc-node-icon{color:#6888c8}
+.sc-node.sp-done .sc-node-status{color:#8866e8}
+.sc-node.sp-done .sc-node-name{color:#aa99ee}
+.sc-node.sp-done .sc-node-icon{color:#8866e8}
 .sc-node:not(.done) .sc-node-status{color:var(--tx3)}
+#toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--s3);border:1px solid var(--acc);border-radius:6px;padding:.45rem .85rem;font-size:.78rem;color:var(--acc);z-index:100;opacity:0;transition:opacity .25s;pointer-events:none}
+#toast.show{opacity:1}
 
-/* Refresh panel & Lists */
+/* Refresh panel (shown when player ID is known) */
 .refresh-panel{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:.75rem 1rem;margin-bottom:.9rem;display:none}
 .refresh-panel.visible{display:block}
 .rp-top{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem}
@@ -332,6 +350,7 @@ body.hide-rank.hide-update .ccore:not(:has(.status-prio,.status-build)){display:
 .rp-url{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--tx2);background:var(--bg);border:1px solid var(--bd2);border-radius:5px;padding:.3rem .6rem;word-break:break-all;line-height:1.4;margin-bottom:.5rem}
 .rp-note{font-size:.65rem;color:var(--tx3);line-height:1.5}
 
+/* List styles */
 .list-bar{background:var(--s1);border-bottom:1px solid var(--bd);padding:.45rem 1.4rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
 .list-chip{display:flex;align-items:center;gap:.22rem;padding:.16rem .55rem;border-radius:3px;border:1px solid var(--bd2);font-size:.7rem;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;transition:all .12s;background:var(--s2);color:var(--tx2);user-select:none}
 .list-chip:hover{border-color:var(--acc);color:var(--acc)}
@@ -341,13 +360,20 @@ body.hide-rank.hide-update .ccore:not(:has(.status-prio,.status-build)){display:
 .list-new-btn{padding:.16rem .55rem;border-radius:3px;border:1px dashed var(--bd2);font-size:.7rem;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;background:transparent;color:var(--tx3);transition:all .12s}
 .list-new-btn:hover{border-color:var(--acc);color:var(--acc)}
 
+/* Add to list popover in action bar */
 .ab-list-wrap{position:relative}
 .ab-list-pop{position:absolute;top:100%;left:0;margin-top:4px;background:var(--s1);border:1px solid var(--bd2);border-radius:6px;padding:.3rem;min-width:160px;z-index:30;display:none;flex-direction:column;gap:2px;box-shadow:0 4px 12px rgba(0,0,0,.4)}
 .ab-list-pop.open{display:flex}
 .ab-list-opt{padding:.25rem .6rem;border-radius:4px;font-size:.75rem;font-family:'Rajdhani',sans-serif;font-weight:600;cursor:pointer;color:var(--tx2);transition:background .1s;border:none;background:none;text-align:left;width:100%}
 .ab-list-opt:hover{background:var(--s2);color:var(--tx)}
 .ab-list-opt.new{color:var(--acc);border-top:1px solid var(--bd);margin-top:2px;padding-top:.3rem}
+.fnote{padding:.4rem 1.4rem;font-size:.66rem;color:var(--tx3);background:var(--s2);border-top:1px solid var(--bd);display:flex;gap:1rem;flex-wrap:wrap;line-height:1.6}
+.fnote span{color:var(--tx2)}
 
+/* Font size increase */
+html,body{font-size:15px}
+
+/* Header stats with category tooltip */
 .hstat-wrap{position:relative;display:flex;flex-direction:column;align-items:center;padding:.15rem .6rem;background:var(--s2);border:1px solid var(--bd);border-radius:4px;cursor:default}
 .hstat-tip{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:6px;background:var(--s1);border:1px solid var(--bd2);border-radius:7px;padding:.5rem .65rem;display:none;flex-direction:column;gap:.25rem;z-index:40;min-width:190px;box-shadow:0 4px 16px rgba(0,0,0,.5)}
 .hstat-wrap:hover .hstat-tip{display:flex}
@@ -356,15 +382,59 @@ body.hide-rank.hide-update .ccore:not(:has(.status-prio,.status-build)){display:
 .hstat-tip-val{font-family:'Share Tech Mono',monospace;color:var(--acc);font-size:.68rem}
 .hstat-tip-lbl{font-size:.56rem;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase;margin-bottom:.1rem}
 
+/* mbar — calculator only, prominent toggle */
+.mbar{background:var(--s2);border-bottom:1px solid var(--bd);padding:.5rem 1.4rem;display:flex;flex-direction:column;gap:.5rem}
+.mbar-calc{display:none;flex-direction:column;gap:.5rem;padding-top:.5rem;border-top:1px solid var(--bd);margin-top:.1rem}
+.mbar-calc.open{display:flex}
 .mbar-calc-toggle{width:100%;background:var(--s3);border:1px solid var(--bd2);border-radius:6px;padding:.45rem .8rem;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.08em;color:var(--tx2);cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all .15s;text-transform:uppercase}
 .mbar-calc-toggle:hover{border-color:var(--acc);color:var(--acc)}
+
+/* ccore collapses when rank + update hidden and no status badges */
+body.hide-rank.hide-update .ccore:not(:has(.status-prio,.status-build)){display:none}
+
+/* Source frow inline */
 .frow-inline{flex-direction:row;align-items:center;gap:.6rem;padding:.55rem 1.4rem}
 .frow-inline .flbl{min-width:52px;flex-shrink:0}
 
-#toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--s3);border:1px solid var(--acc);border-radius:6px;padding:.45rem .85rem;font-size:.78rem;color:var(--acc);z-index:100;opacity:0;transition:opacity .25s;pointer-events:none}
-#toast.show{opacity:1}
-.fnote{padding:.4rem 1.4rem;font-size:.66rem;color:var(--tx3);background:var(--s2);border-top:1px solid var(--bd);display:flex;gap:1rem;flex-wrap:wrap;line-height:1.6}
-.fnote span{color:var(--tx2)}
+/* Planet grid */
+.sc-planet-grid{display:grid;grid-template-columns:repeat(var(--cols,3),1fr);gap:.45rem;margin-top:.35rem}
+.sc-planet-tile{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:.7rem .85rem;cursor:pointer;transition:border-color .12s,background .12s;position:relative}
+.sc-planet-tile:hover{border-color:var(--bd2);background:var(--s3)}
+.sc-planet-tile.complete{border-color:color-mix(in srgb,var(--acc) 40%,var(--bd))}
+.sc-planet-tile.priority{border-left:3px solid var(--acc)}
+.sc-planet-tile.open{grid-column:1/-1;cursor:default;border-color:var(--acc);background:var(--s2)}
+.sc-tile-hdr{display:flex;align-items:center;gap:.45rem;margin-bottom:.35rem}
+.sc-tile-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.05rem;letter-spacing:.04em;color:var(--tx);flex:1}
+.sc-tile-pct{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);flex-shrink:0}
+.sc-planet-tile.complete .sc-tile-pct{color:#4aad9e}
+.sc-tile-star{background:none;border:none;cursor:pointer;font-size:.7rem;color:var(--tx3);padding:1px 2px;line-height:1;transition:color .12s;flex-shrink:0}
+.sc-tile-star:hover,.sc-tile-star.on{color:#c0a030}
+.sc-dual-bar{position:relative;height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:.35rem}
+.sc-dual-base{position:absolute;left:0;top:0;height:100%;background:var(--acc);border-radius:3px;transition:width .3s}
+.sc-dual-sp{position:absolute;left:0;top:0;height:100%;background:#8866e8;border-radius:3px;transition:width .3s}
+.sc-tile-stats{font-size:.72rem;color:var(--tx3);font-family:'Share Tech Mono',monospace}
+.sc-tile-stats .sp-done{color:#9977ee}
+.sc-tile-body{display:none;border-top:1px solid var(--bd);margin-top:.45rem;padding-top:.35rem}
+.sc-planet-tile.open .sc-tile-body{display:block}
+.sc-controls{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.3rem;flex-wrap:wrap}
+.sc-col-ctrl{display:flex;align-items:center;gap:.35rem;font-size:.68rem;color:var(--tx3);flex-shrink:0}
+.sc-col-ctrl span{font-family:'Share Tech Mono',monospace}
+.sc-col-btn{background:var(--s2);border:1px solid var(--bd2);border-radius:4px;color:var(--tx2);cursor:pointer;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.8rem;line-height:1;transition:all .12s;font-family:'Share Tech Mono',monospace}
+.sc-col-btn:hover{border-color:var(--acc);color:var(--acc)}
+
+/* Planet detail panel — fixed below grid, avoids grid reflow issues */
+.sc-planet-detail{display:none;border:1px solid var(--acc);border-radius:8px;overflow:hidden;background:var(--s2);margin-top:.5rem}
+.sc-planet-detail.open{display:block}
+.sc-planet-detail-hdr{display:flex;align-items:center;gap:.6rem;padding:.5rem .85rem;background:var(--s1);border-bottom:1px solid var(--bd);cursor:pointer}
+.sc-planet-detail-hdr:hover{background:var(--s3)}
+.sc-detail-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.05rem;color:var(--tx);flex:1}
+.sc-detail-close{color:var(--tx3);font-size:.78rem;cursor:pointer;padding:2px 6px;border:1px solid var(--bd2);border-radius:4px;background:none;font-family:'Rajdhani',sans-serif;font-weight:600;transition:all .12s}
+.sc-detail-close:hover{border-color:var(--err);color:var(--err)}
+.sc-planet-tile.selected{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 6%,var(--s2))}
+/* Remove open expansion — tiles stay compact */
+.sc-planet-tile.open{grid-column:unset !important;cursor:pointer !important;border-color:var(--acc)}
+.sc-tile-body{display:none !important} /* Body always hidden — use detail panel */
+
 </style>
 </head>
 <body>
@@ -507,6 +577,7 @@ body.hide-rank.hide-update .ccore:not(:has(.status-prio,.status-build)){display:
       <select class="csel" id="upd-sel" onchange="onUpdateFilter(this.value)">
         <option value="">All updates</option>
       </select>
+      <label class="ctog"><input type="checkbox" id="tog-review" onchange="render()"> Needs review</label>
       <label class="ctog"><input type="checkbox" id="tog-founders" onchange="render()"> Show Founders</label>
       <label class="ctog"><input type="checkbox" id="tog-forma" onchange="render()"> Needs Forma only</label>
       <label class="ctog"><input type="checkbox" id="tog-unmaxed" onchange="render()"> Unmaxed only</label>
@@ -527,8 +598,24 @@ body.hide-rank.hide-update .ccore:not(:has(.status-prio,.status-build)){display:
     <div id="action-bar" class="action-bar">
       <span class="ab-count" id="ab-count">0 selected</span>
       <div class="hdivider" style="height:14px;opacity:.25;margin:0 .1rem"></div>
-      <div class="ab-kb-hint">
-        <code>Esc</code> Clear · <code>S</code> Star · <code>W</code> Wiki · <code>Del</code> Unselect
+      <div class="ab-hints">
+        <span class="ab-hint"><kbd>click</kbd> select</span>
+        <span class="ab-sep">·</span>
+        <span class="ab-hint"><kbd>ctrl</kbd><kbd>click</kbd> toggle</span>
+        <span class="ab-sep">·</span>
+        <span class="ab-hint"><kbd>shift</kbd><kbd>click</kbd> range</span>
+        <span class="ab-sep">·</span>
+        <span class="ab-hint"><kbd>S</kbd> star</span>
+        <span class="ab-sep">·</span>
+        <span class="ab-hint"><kbd>W</kbd> wiki</span>
+        <span class="ab-sep">·</span>
+        <span class="ab-hint"><kbd>P</kbd> priority</span>
+        <span class="ab-sep">·</span>
+        <span class="ab-hint"><kbd>B</kbd> building</span>
+        <span class="ab-sep">·</span>
+        <span class="ab-hint"><kbd>ctrl+A</kbd> all</span>
+        <span class="ab-sep">·</span>
+        <span class="ab-hint"><kbd>esc</kbd> clear</span>
       </div>
       <button class="ab-btn" onclick="selectAll()">Select all visible</button>
       <button class="ab-btn" onclick="starSelected()">★ Star</button>
@@ -548,7 +635,8 @@ body.hide-rank.hide-update .ccore:not(:has(.status-prio,.status-build)){display:
 
   <div id="view-sc">
     <div class="scgrid" id="scgrid"></div>
-    <div class="fnote">Star chart data from warframestat.us — <span>Steel Path completions cannot be separated from Normal in this profile format.</span> Node counts may vary slightly as DE adds missions.</div>
+    <div id="sc-planet-detail" class="sc-planet-detail"></div>
+  <div class="fnote">Star chart data from warframestat.us — <span>Steel Path completions cannot be separated from Normal in this profile format.</span> Node counts may vary slightly as DE adds missions.</div>
   </div>
 
   <div class="fnote" id="fnote">
@@ -591,6 +679,7 @@ const CAT = {
   other:           {l:'Other',          c:'#506070', g:'??'},
 };
 
+// Visual groupings for category chip filter
 const CAT_GROUPS = [
   { label: 'Warframes',   keys: ['warframe'] },
   { label: 'Weapons',     keys: ['primary','secondary','melee','zaw','kitgun'] },
@@ -629,8 +718,8 @@ const ST = {
   cats: Object.fromEntries(Object.keys(CAT).map(k=>[k,true])),
   acqs: Object.fromEntries(Object.keys(ACQ).map(k=>[k,true])),
   search:'', sort:'mastery-desc', group:'cat', update:'',
-  starred: new Set(),
-  overrides: {},
+  starred: new Set(),   // runtime mirror of userData.entities starred flags
+  overrides: {},        // runtime mirror of userData.entities rank overrides
   updateNames: {},
   nodeDb: null,
   missionDb: null,
@@ -638,7 +727,7 @@ const ST = {
   _lastSelIdx: null,
   _visibleItems: [],
   _hoveredItem: null,
-  activeList: null,
+  activeList: null,   // list ID currently being filtered by
   userData: {
     version: 3,
     meta: {},
@@ -663,13 +752,15 @@ function saveOverride(path, rank) {
   }
   saveUserData();
   render();
+  // Refresh calc panel since mastery totals changed
+  const calc = document.querySelector('.mbar-calc');
+  if (calc) renderCalcPanel(calc, calcTotalMastery());
 }
 
 function xpToRank(xp, multiplier, maxRank) {
   if (!xp || xp <= 0) return 0;
-  // Warframe Affinity Formula: Total XP = Constant * Rank^2
-  // Constant is 500 for Weapons (multiplier 100), 1000 for Frames (multiplier 200)
-  const constant = multiplier * 5; 
+  // Warframe affinity formula: Total XP = constant * rank^2
+  const constant = multiplier * 5;
   return Math.min(Math.floor(Math.sqrt(xp / constant)), maxRank);
 }
 
@@ -679,14 +770,25 @@ function getMajorVersion(rawIntro) {
   return match ? match[1] : '0';
 }
 
+// ── MR Threshold ──
+// Single source of truth for mastery multipliers
+// Confirmed from wiki: Warframes, Companions, Archwings, K-Drives, Necramechs = 200 per rank
+// Weapons, Sentinel Weapons, Amps, Zaws, Kitguns = 100 per rank
+function masteryMult(cat) {
+  const HIGH = ['warframe','necramech','archwing','sentinel',
+                'kubrow','kavat','vulpaphyla','predasite','companion',
+                'moa','hound','kdrive'];
+  return HIGH.includes(cat) ? 200 : 100;
+}
+
 function mrThreshold(rank) {
   if (rank <= 0) return 0;
   if (rank <= 30) return 2500 * rank * rank;
   return 2250000 + 147500 * (rank - 30);
 }
-
 function rankFromMastery(xp) {
   if (xp <= 0) return 0;
+  // Binary search across ranks 1-40
   let lo = 0, hi = 40;
   while (lo < hi) {
     const mid = (lo + hi + 1) >> 1;
@@ -694,41 +796,32 @@ function rankFromMastery(xp) {
   }
   return lo;
 }
-
 function calcTotalMastery() {
-  const itemMxp = ST.items.reduce((s,i) => s+(i.mastery||0), 0);
-  const scMxp   = calcStarChartMxp(ST.missions);
-  
-  const rjMxp = (ST.userData.meta.rjInt || 0) * 1500;
-  const drMxp = (ST.userData.meta.drInt || 0) * 1500;
-  const plexusMxp = ST.userData.meta.plexusDone ? 6000 : 0;
-
+  const itemMxp   = ST.items.reduce((s,i) => s+(i.mastery||0), 0);
+  const scMxp     = calcStarChartMxp(ST.missions);
+  const rjMxp     = (ST.userData.meta?.rjInt || 0) * 1500;
+  const drMxp     = (ST.userData.meta?.drInt || 0) * 1500;
+  const plexusMxp = ST.userData.meta?.plexusDone ? 6000 : 0;
   return itemMxp + scMxp + rjMxp + drMxp + plexusMxp;
 }
 
-function getAdjustedTotalMxp() {
-  const calc = calcTotalMastery();
-  const playerMR = ST.userData.meta.playerLevel || 0;
-  const floor = mrThreshold(playerMR);
-  return Math.max(calc, floor);
-}
-
-// Global handler to save the manual inputs
 function updateManualMxp(key, val) {
-  if (key === 'plexusDone') {
-    ST.userData.meta[key] = val;
-  } else {
-    ST.userData.meta[key] = Math.max(0, parseInt(val) || 0);
-  }
+  if (!ST.userData.meta) ST.userData.meta = {};
+  if (key === 'plexusDone') ST.userData.meta[key] = val;
+  else ST.userData.meta[key] = Math.max(0, parseInt(val) || 0);
   saveUserData();
-  renderMbar(); 
+  // Refresh calc panel in-place — don't rebuild whole mbar (preserves bar projection)
+  const calc = document.querySelector('.mbar-calc');
+  if (calc) renderCalcPanel(calc, calcTotalMastery());
 }
 
+// ── Wiki ──
 function openWikiPage(name) {
   if (!name) return;
   window.open('https://wiki.warframe.com/w/' + name.replace(/ /g, '_'), '_blank');
 }
 
+// ── Entity status ──
 function toggleEntityStatus(path, status, btn) {
   const item = ST.items.find(i => i.path === path);
   const e = getOrCreateEntity(path, item?.cat || 'item');
@@ -737,26 +830,21 @@ function toggleEntityStatus(path, status, btn) {
   pruneEntity(path);
   saveUserData();
 }
-
 function getOrCreateEntity(id, type) {
   if (!ST.userData.entities[id]) ST.userData.entities[id] = { type };
   return ST.userData.entities[id];
 }
-
 function pruneEntity(id) {
   const e = ST.userData.entities[id]; if (!e) return;
   if (!Object.keys(e).some(k => k !== 'type')) delete ST.userData.entities[id];
 }
-
 function saveEntityNote(id, type, text) {
   const e = getOrCreateEntity(id, type);
   const t = text.trim();
   if (t) e.note = t; else delete e.note;
   pruneEntity(id); saveUserData();
 }
-
 function isEntityStarred(id) { return !!ST.userData.entities[id]?.starred; }
-
 function toggleEntityStar(id, type, btn) {
   const e = getOrCreateEntity(id, type);
   e.starred = !e.starred;
@@ -769,6 +857,7 @@ function toggleEntityStar(id, type, btn) {
   return on;
 }
 
+// ── Player ID helpers ──
 function getPlayerId()  { return localStorage.getItem('wft3_playerid') || ''; }
 function savePlayerId(id) { if (id) localStorage.setItem('wft3_playerid', id.trim()); }
 function clearSavedId() {
@@ -795,12 +884,14 @@ function onPlayerIdInput(val) {
   }
 }
 function refreshProfile() {
+  // Show import screen in refresh mode (ID already known)
   document.getElementById('app').style.display = 'none';
   document.getElementById('import-screen').style.display = 'flex';
   document.getElementById('json-input').value = '';
   initImportScreen();
 }
 
+// ── List management ──
 function listById(id) { return ST.userData.lists.find(l => l.id === id); }
 
 function promptNewList(initialPaths) {
@@ -850,6 +941,7 @@ function toggleListPop(btn) {
   if (!pop) return;
   const isOpen = pop.classList.toggle('open');
   if (!isOpen) return;
+  // Build pop contents
   pop.innerHTML = '';
   ST.userData.lists.forEach(l => {
     const opt = document.createElement('button');
@@ -863,6 +955,7 @@ function toggleListPop(btn) {
   newOpt.textContent = '+ New list';
   newOpt.onclick = () => { promptNewList(ST.selection); closeListPop(); };
   pop.appendChild(newOpt);
+  // Close on outside click
   setTimeout(() => {
     const close = e => { if (!pop.contains(e.target) && e.target !== btn) { closeListPop(); document.removeEventListener('click', close); } };
     document.addEventListener('click', close);
@@ -885,6 +978,7 @@ function buildListBar() {
     nameSpan.textContent = l.name;
     chip.appendChild(nameSpan);
 
+    // Progress pill: X/Y maxed
     const listItems = ST.items.filter(it => ST.userData.entities[it.path]?.lists?.includes(l.id));
     if (listItems.length > 0) {
       const maxedCount = listItems.filter(i => i.rank >= i.maxRank && i.maxRank > 0).length;
@@ -899,6 +993,7 @@ function buildListBar() {
     delBtn.textContent = '✕';
     delBtn.addEventListener('click', e => {
       e.stopPropagation();
+      // Inline confirm: replace del button with yes/no
       delBtn.style.display = 'none';
       const confirmSpan = document.createElement('span');
       confirmSpan.style.cssText = 'display:inline-flex;gap:3px;align-items:center;margin-left:3px';
@@ -922,6 +1017,7 @@ function buildListBar() {
 }
 
 /* ── INDEXEDDB ──────────────────────────────── */
+// Two separate databases so clearing cache never touches user data
 let _cacheDb = null;
 let _userDb  = null;
 
@@ -951,6 +1047,7 @@ function openUserDB() {
   });
 }
 
+// Cache DB — API responses (item DB, node DB, update names etc.)
 async function dbGet(store, key) {
   try {
     const db = await openCacheDB();
@@ -972,6 +1069,7 @@ async function dbSet(store, key, val) {
   } catch(e) {}
 }
 
+// User DB — personal data (notes, stars, lists, settings)
 async function userDbGet(key) {
   try {
     const db = await openUserDB();
@@ -998,12 +1096,22 @@ const LS_USER_KEY = 'wft3_userdata';
 
 async function saveUserData() {
   ST.userData.meta.lastSynced = Date.now();
+  // Primary: user IndexedDB
   await userDbSet('userData', ST.userData);
-  try { localStorage.setItem(LS_USER_KEY, JSON.stringify(ST.userData)); } catch(e) {}
+  // Fallback: localStorage (survives IndexedDB being cleared)
+  try {
+    localStorage.setItem(LS_USER_KEY, JSON.stringify(ST.userData));
+  } catch(e) {
+    // localStorage full — not critical, IndexedDB is primary
+    console.warn('localStorage backup failed (may be full):', e);
+  }
 }
 
 async function loadUserData() {
+  // Try primary source first (user IndexedDB)
   let stored = await userDbGet('userData');
+
+  // Fallback to localStorage if IndexedDB was cleared or empty
   if (!stored?.v?.version) {
     try {
       const ls = localStorage.getItem(LS_USER_KEY);
@@ -1011,7 +1119,9 @@ async function loadUserData() {
         const parsed = JSON.parse(ls);
         if (parsed?.version === 3) {
           stored = { v: parsed };
+          // Restore to IndexedDB since we recovered from localStorage
           await userDbSet('userData', parsed);
+          console.info('User data restored from localStorage fallback.');
         }
       }
     } catch(e) {}
@@ -1023,6 +1133,7 @@ async function loadUserData() {
     migrateOldData();
   }
 
+  // Populate runtime mirrors from userData
   ST.starred = new Set(
     Object.entries(ST.userData.entities)
       .filter(([,e]) => e.starred && e.type !== 'node')
@@ -1033,6 +1144,7 @@ async function loadUserData() {
       .filter(([,e]) => e.rank !== undefined)
       .map(([k,e]) => [k, e.rank])
   );
+  // Restore settings
   const s = ST.userData.settings;
   if (s.cats)  Object.assign(ST.cats, s.cats);
   if (s.acqs)  Object.assign(ST.acqs, s.acqs);
@@ -1041,6 +1153,7 @@ async function loadUserData() {
 }
 
 function migrateOldData() {
+  // Migrate wft3 (settings + starred items)
   try {
     const old = JSON.parse(localStorage.getItem('wft3') || '{}');
     if (old.cats)    ST.userData.settings.cats  = old.cats;
@@ -1052,6 +1165,7 @@ function migrateOldData() {
     });
     localStorage.removeItem('wft3');
   } catch(e) {}
+  // Migrate wft3_overrides
   try {
     const ov = JSON.parse(localStorage.getItem('wft3_overrides') || '{}');
     Object.entries(ov).forEach(([path, rank]) => {
@@ -1059,9 +1173,11 @@ function migrateOldData() {
     });
     localStorage.removeItem('wft3_overrides');
   } catch(e) {}
+  // Migrate wft3_sp (planet-level SP toggles — convert to entity flags)
   try { localStorage.removeItem('wft3_sp'); } catch(e) {}
 }
 
+/* ── PROGRESS ────────────────────────────────── */
 function setProgress(pct,msg) {
   const bar = document.getElementById('load-bar');
   const txt = document.getElementById('load-msg');
@@ -1109,6 +1225,8 @@ function classifyItem(item) {
   const isKitgun = DB_CONFIG.KITGUN_CHAMBERS.includes(nameKey);
   const isMoa = path.includes('moapethead') || (path.includes('/moapets/') && (nameKey.includes('moa') || path.includes('head')));
   const isHound = path.includes('zanukapetparthead') || nameKey.includes('hound');
+  const isVulpaphyla = nameKey.includes('vulpaphyla') || path.includes('vulpaphyla');
+  const isPredasite  = nameKey.includes('predasite')  || path.includes('predasite');
   const isKDrive = path.includes('kdrives/boards') || ['bad baby','feverspine','flatbelly','needlenose','runway'].some(k=>nameKey.includes(k));
   const isMech = nameKey==='voidrig' || nameKey==='bonewidow' || path.includes('entratimech');
   const isAmp = (nameKey.includes('prism') && !nameKey.includes('prisma')) || nameKey==='sirocco' || nameKey.includes('phahd') || apiCat==='Amps';
@@ -1131,8 +1249,8 @@ function classifyItem(item) {
   else if (nameKey.includes('sybaris') || ['strun','paris','enkaus'].includes(nameKey)) finalCat='Primary';
   else if (nameKey.includes('gammacor') || ['lato','lex'].includes(nameKey) || nameKey==='grimoire') finalCat='Secondary';
 
-  const isRescued = DB_CONFIG.RESCUE_LIST.includes(nameKey) || isMoa || isHound || isKDrive || isMech || isZaw || isKitgun || isSentinelWep || isAmp;
-  return { finalCat, isRescued, isZaw, isKitgun, isMoa, isHound, isKDrive, isMech, isAmp, scoreBoost: isRescued?400000:0, isJunk:false };
+  const isRescued = DB_CONFIG.RESCUE_LIST.includes(nameKey) || isMoa || isHound || isVulpaphyla || isPredasite || isKDrive || isMech || isZaw || isKitgun || isSentinelWep || isAmp;
+  return { finalCat, isRescued, isZaw, isKitgun, isMoa, isHound, isVulpaphyla, isPredasite, isKDrive, isMech, isAmp, scoreBoost: isRescued?400000:0, isJunk:false };
 }
 
 /* ── API FETCH ──────────────────────────────── */
@@ -1150,7 +1268,7 @@ async function fetchItemDb() {
       const res = classifyItem(item);
       if (res.isJunk) return;
 
-      const { finalCat, isRescued, isZaw, isKitgun, isMoa, isHound, isKDrive, isMech, isAmp, scoreBoost } = res;
+      const { finalCat, isRescued, isZaw, isKitgun, isMoa, isHound, isVulpaphyla, isPredasite, isKDrive, isMech, isAmp, scoreBoost } = res;
       const pathLower = item.uniqueName.toLowerCase();
 
       const isModular = pathLower.includes('/modular/') || pathLower.includes('/zaw/') || pathLower.includes('/kitgun/') || pathLower.includes('/kdrive/') || pathLower.includes('/pets/');
@@ -1166,6 +1284,7 @@ async function fetchItemDb() {
       const nameKey = item.name.toLowerCase();
       if (dbByName[nameKey] && score <= dbByName[nameKey].score) return;
 
+      // Fix: store introduced as a plain string
       const rawIntro = item.introduced
         ? (typeof item.introduced === 'object' ? (item.introduced.name || '') : String(item.introduced))
         : 'Unknown';
@@ -1178,7 +1297,7 @@ async function fetchItemDb() {
           apiCat: finalCat,
           introduced: rawIntro,
           majorUpdate: majorVer,
-          maxRank: (pathLower.includes('kuva') || pathLower.includes('tenet') || pathLower.includes('lich') || pathLower.includes('coda') || isMech) ? 40 : 30
+          maxRank: (pathLower.includes('kuva') || pathLower.includes('tenet') || pathLower.includes('lich') || pathLower.includes('coda') || isMech || pathLower.includes('paracesis')) ? 40 : 30
         }
       };
     });
@@ -1189,6 +1308,7 @@ async function fetchItemDb() {
   } catch(err) { return {}; }
 }
 
+/* ── UPDATE NAMES ───────────────────────────── */
 async function fetchUpdateNames() {
   try {
     const cached = await dbGet('cache', 'update_names');
@@ -1200,6 +1320,7 @@ async function fetchUpdateNames() {
     const map = {};
 
     logs.filter(l => l.type === 'Update').forEach(l => {
+      // Handles both "Update 35: Title" and "Title: Update 35" orderings
       const m = l.name.match(/Update\s+(\d+)[.\d]*\s*[:\-–]?\s*(.+)|(.+?)\s*[:\-–]\s*Update\s+(\d+)/i);
       if (m) {
         const ver = m[1] || m[4];
@@ -1208,6 +1329,7 @@ async function fetchUpdateNames() {
       }
     });
 
+    // Fill well-known older ones the regex may miss
     const fallbacks = {
       '18':'The Second Dream',
       '19':'The War Within',
@@ -1239,6 +1361,7 @@ async function fetchUpdateNames() {
   }
 }
 
+/* ── MISSION DB (wiki mastery data) ─────────── */
 async function fetchMissionDb() {
   if (ST.missionDb) return;
   try {
@@ -1251,6 +1374,7 @@ async function fetchMissionDb() {
     const text = data.parse?.wikitext?.['*'] || '';
 
     const db = {};
+    // Split on top-level node blocks — each starts with { and contains InternalName
     const blocks = text.split(/(?=\s*\{[^{}]*InternalName)/);
     blocks.forEach(block => {
       const internalName = block.match(/InternalName\s*=\s*"([^"]+)"/)?.[1];
@@ -1281,6 +1405,7 @@ async function fetchMissionDb() {
   }
 }
 
+/* ── PROFILE PARSING ────────────────────────── */
 function parseProfile(text) {
   const data = JSON.parse(text);
   const r = data.Results?.[0] || data;
@@ -1305,6 +1430,7 @@ function parseProfile(text) {
   };
 }
 
+/* ── ITEM ENRICHMENT ────────────────────────── */
 function detectAcq(path, name) {
   const p = (path||'').toLowerCase();
   const n = (name||'').toLowerCase();
@@ -1327,12 +1453,23 @@ function enrichAll(xpData, itemDb) {
     const userXP = userXPMap[dbPath] || 0;
     const { finalCat } = classifyItem({ name:api.name, uniqueName:dbPath, category:api.apiCat });
     const catKey = API_CAT_MAP[finalCat] || 'other';
-    const multiplier = ['warframe','necramech','archwing','sentinel','kubrow','kavat','vulpaphyla','predasite','companion','moa','hound','kdrive'].includes(catKey) ? 200 : 100;
+    const multiplier = masteryMult(catKey);
     const maxR = api.maxRank || 30;
+    // For rank-40 items, XP is cumulative across Forma cycles so xpToRank can mislead.
+    // Cap the XP-derived rank at 30; user sets the real rank via the input.
     const xpCap = maxR === 40 ? 30 : maxR;
     const rank = ST.overrides[dbPath] !== undefined
       ? ST.overrides[dbPath]
       : xpToRank(userXP, multiplier, xpCap);
+
+
+    // Items requiring gilding before they grant mastery
+    const GILD_CATS = new Set(['amp','zaw','kitgun','moa','predasite','vulpaphyla']);
+    const requiresGilding = GILD_CATS.has(catKey);
+    const isGilded = requiresGilding
+      ? (ST.userData.entities[dbPath]?.gilded ?? (userXP > 0))
+      : true; // assume gilded if owned; user can uncheck if not
+    const effectiveMastery = isGilded ? rank * multiplier : 0;
 
     return {
       path: dbPath,
@@ -1342,7 +1479,9 @@ function enrichAll(xpData, itemDb) {
       xp: userXP,
       rank,
       maxRank: maxR,
-      mastery: rank * multiplier,
+      mastery: effectiveMastery,
+      requiresGilding,
+      isGilded,
       isOwned: userXP > 0,
       isFounder: api.isFounder,
       update: api.introduced || 'Unknown',
@@ -1352,6 +1491,7 @@ function enrichAll(xpData, itemDb) {
 }
 
 /* ── STAR CHART ─────────────────────────────── */
+
 async function loadStarChartData() {
   await Promise.all([loadNodeDb(), fetchMissionDb()]);
 }
@@ -1364,6 +1504,7 @@ async function loadNodeDb() {
     const resp = await fetch('https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/solNodes.json');
     if (!resp.ok) throw new Error('Nodes fetch failed');
     const raw = await resp.json();
+    // Normalise: static data is already an object keyed by node ID
     const db = Array.isArray(raw)
       ? Object.fromEntries(raw.map(n => [n.id || n.tag, n]))
       : raw;
@@ -1398,8 +1539,9 @@ function processStarChart(missions, nodeDb, missionDb) {
   ];
   const manifestTags  = new Set(JUNCTION_MANIFEST.map(j => j.tag));
   const JUNK_TYPES    = new Set(['ancient retribution','conclave','pvp']);
-  const EXCLUDE_TAGS  = new Set(['SolNode234']); // Dormizone
-  const EXCLUDE_NAMES = ['index endurance']; 
+  // Explicit node exclusions — social spaces + non-mastery modes
+  const EXCLUDE_TAGS  = new Set(['SolNode234']); // Dormizone (Zariman social space)
+  const EXCLUDE_NAMES = ['index endurance']; // Index variant that doesn't count
 
   const baseDone     = new Set(missions.map(m => m.tag).filter(Boolean));
   const spDone       = new Set(missions.filter(m => m.tier >= 1).map(m => m.tag));
@@ -1408,14 +1550,14 @@ function processStarChart(missions, nodeDb, missionDb) {
 
   const mkNode = (tag, name, type, extra, md) => ({
     tag, name, type,
-    enemy:      md?.enemy     || '',
-    minLevel:   md?.minLevel  || 0,
-    maxLevel:   md?.maxLevel  || 0,
-    done:       baseDone.has(tag),
-    spDone:     spDone.has(tag),
-    completes:  completesMap[tag] || 0,
-    masteryExp: md?.masteryExp || 0,
-    isJunction: false,
+    enemy:     md?.enemy     || '',
+    minLevel:  md?.minLevel  || 0,
+    maxLevel:  md?.maxLevel  || 0,
+    done:      baseDone.has(tag),
+    spDone:    spDone.has(tag),
+    completes: completesMap[tag] || 0,
+    masteryExp:md?.masteryExp || 0,
+    isJunction:false,
     ...extra,
   });
 
@@ -1440,15 +1582,14 @@ function processStarChart(missions, nodeDb, missionDb) {
 
     if (EXCLUDE_NAMES.some(n => name.toLowerCase().includes(n))) continue;
 
+    const isRJ = tag.startsWith('CrewBattle') || effType.includes('proxima') || planet.toLowerCase().includes('proxima');
+
     if (!baseDone.has(tag) && !missionDb?.[tag]) continue;
 
     // Deduplicate by name+planet — keep completed version if dupes exist
     const dedupKey = name + '||' + planet;
     if (seenNodes.has(dedupKey) && !baseDone.has(tag)) continue;
     seenNodes.add(dedupKey);
-
-    const isRJ = tag.startsWith('CrewBattle') || effType.includes('proxima') || planet.toLowerCase().includes('proxima');
-
     const nd = mkNode(tag, name, mdata.type || rawType, {}, mdata);
     if (isRJ) railjack.push(nd);
     else if (planet) { if (!planets[planet]) planets[planet]=[]; planets[planet].push(nd); }
@@ -1496,6 +1637,7 @@ function renderStarChart() {
 
   const { planets, railjack } = processStarChart(ST.missions, ST.nodeDb, ST.missionDb);
 
+  // Tallies
   let totalNodes=0,doneNodes=0,spTotal=0,spDoneCount=0,junctionTotal=0,junctionDone=0,mxpAvailable=0;
   planets.forEach(p=>p.nodes.forEach(n=>{
     totalNodes++; if(n.done)doneNodes++;
@@ -1503,16 +1645,14 @@ function renderStarChart() {
     if(n.done){spTotal++;if(n.spDone)spDoneCount++;}
     if(n.masteryExp>0&&(n.isJunction?!n.done:!n.spDone))mxpAvailable+=n.masteryExp;
   }));
-
-  const basePct = totalNodes ? Math.round(doneNodes/totalNodes*100) : 0;
+  const overallPct = totalNodes ? Math.round(doneNodes/totalNodes*100) : 0;
   const spOverallPct = spTotal ? Math.round(spDoneCount/spTotal*100) : 0;
-  
-  // If base nodes are 100% done, switch the main bar to Steel Path progress
-  const isOverallBaseDone = basePct === 100;
-  const displayOverallPct = isOverallBaseDone ? spOverallPct : basePct;
+  const isOverallBaseDone = overallPct === 100;
+  const displayOverallPct = isOverallBaseDone ? spOverallPct : overallPct;
   const overallLabel = isOverallBaseDone ? `${displayOverallPct}% SP` : `${displayOverallPct}%`;
-  const barColor = isOverallBaseDone ? '#6888c8' : 'var(--acc)';
+  const overallBarColor = isOverallBaseDone ? '#8866e8' : 'var(--acc)';
 
+  // Summary bar
   const summary = document.createElement('div'); summary.className='sc-summary';
   summary.innerHTML=`
     <div class="sc-sum-stat"><div class="sc-sum-num">${doneNodes}/${totalNodes}</div><div class="sc-sum-lbl">Base nodes</div></div>
@@ -1521,17 +1661,18 @@ function renderStarChart() {
     <div style="width:1px;height:28px;background:var(--bd2);flex-shrink:0"></div>
     <div class="sc-sum-stat"><div class="sc-sum-num">${junctionDone}/${junctionTotal}</div><div class="sc-sum-lbl">Junctions</div></div>
     ${mxpAvailable>0?`<div style="width:1px;height:28px;background:var(--bd2);flex-shrink:0"></div><div class="sc-sum-stat"><div class="sc-sum-num sc-mxp-available">+${fmtM(mxpAvailable)}</div><div class="sc-sum-lbl">MXP available</div></div>`:''}
-    <div class="scbw" style="flex:1;height:6px"><div class="scb" style="width:${displayOverallPct}%; background:${barColor}"></div></div>
-    <div class="sc-sum-stat" style="align-items:flex-end"><div class="sc-sum-num" style="color:${barColor}; font-weight:${isOverallBaseDone?'700':'400'}">${overallLabel}</div><div class="sc-sum-lbl">Overall</div></div>`;
+    <div class="scbw" style="flex:1;height:6px"><div class="scb" style="width:${displayOverallPct}%;background:${overallBarColor}"></div></div>
+    <div class="sc-sum-stat" style="align-items:flex-end"><div class="sc-sum-num" style="color:${overallBarColor}">${overallLabel}</div><div class="sc-sum-lbl">Overall</div></div>`;
   el.appendChild(summary);
 
+  // Controls row
   const cols = ST.userData.settings?.scCols ?? 3;
   const controls = document.createElement('div'); controls.className = 'sc-controls';
   controls.innerHTML = `
     <div class="sc-legend">
       <span class="sc-legend-item"><span class="sc-legend-dot" style="background:var(--tx3);opacity:.4"></span>Not visited</span>
       <span class="sc-legend-item"><span class="sc-legend-dot" style="background:color-mix(in srgb,var(--acc) 55%,var(--bg))"></span>Base done</span>
-      <span class="sc-legend-item"><span class="sc-legend-dot" style="background:#6888c8"></span>Steel Path done</span>
+      <span class="sc-legend-item"><span class="sc-legend-dot" style="background:#8866e8"></span>Steel Path done</span>
       <span class="sc-legend-item"><span class="sc-legend-dot" style="background:#b89830"></span>◆ Junction (mastery XP)</span>
     </div>
     <div class="sc-col-ctrl">
@@ -1542,8 +1683,10 @@ function renderStarChart() {
     </div>`;
   el.appendChild(controls);
 
+  // Section header
   const ph=document.createElement('div');ph.className='sc-section';ph.textContent='Main Star Chart';el.appendChild(ph);
 
+  // Build the node row function
   function buildNodeRow(n) {
     const row=document.createElement('div');
     row.className='sc-node'+(n.spDone?' sp-done':n.done?' done':'')+(n.isJunction?' junction':'');
@@ -1570,29 +1713,77 @@ function renderStarChart() {
     return row;
   }
 
+  // Sort planets: starred first, then original order
   const sortedPlanets = [...planets].sort((a,b) => {
     const aS = isEntityStarred('planet:'+a.name) ? 0 : 1;
     const bS = isEntityStarred('planet:'+b.name) ? 0 : 1;
     return aS - bS;
   });
 
+  // Planet grid
   const grid = document.createElement('div');
   grid.className = 'sc-planet-grid';
   grid.style.setProperty('--cols', cols);
+
+  let activePlanet = null;
+  const detailPanel = document.getElementById('sc-planet-detail');
+
+  function openPlanetDetail(p, tile) {
+    if (!detailPanel) return;
+    // Deselect previous
+    grid.querySelectorAll('.sc-planet-tile.selected').forEach(t => t.classList.remove('selected'));
+    // If clicking the same planet, close
+    if (activePlanet === p.name) {
+      activePlanet = null;
+      detailPanel.classList.remove('open');
+      detailPanel.innerHTML = '';
+      return;
+    }
+    activePlanet = p.name;
+    tile.classList.add('selected');
+
+    // Build node list
+    const nodes = p.nodes;
+    const hdr = document.createElement('div'); hdr.className = 'sc-planet-detail-hdr';
+    hdr.innerHTML = `<span class="sc-detail-name">${p.name}</span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--tx3)">${nodes.filter(n=>n.done).length}/${nodes.length} base · ${nodes.filter(n=>n.spDone).length} SP</span>
+      <button class="sc-detail-close" onclick="closePlanetDetail()">✕ Close</button>`;
+    hdr.addEventListener('click', e => { if (!e.target.closest('button')) closePlanetDetail(); });
+
+    const nodeList = document.createElement('div');
+    nodes.forEach(n => nodeList.appendChild(buildNodeRow(n)));
+
+    detailPanel.innerHTML = '';
+    detailPanel.appendChild(hdr);
+    detailPanel.appendChild(nodeList);
+    detailPanel.classList.add('open');
+    detailPanel.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+
+  function closePlanetDetail() {
+    activePlanet = null;
+    if (detailPanel) { detailPanel.classList.remove('open'); detailPanel.innerHTML = ''; }
+    grid.querySelectorAll('.sc-planet-tile.selected').forEach(t => t.classList.remove('selected'));
+  }
 
   sortedPlanets.forEach(p => {
     const done  = p.nodes.filter(n=>n.done).length;
     const spD   = p.nodes.filter(n=>n.spDone).length;
     const total = p.nodes.length;
-    
+
     const basePct = total ? Math.round(done/total*100) : 0;
     const spPct   = total ? Math.round(spD/total*100) : 0;
-    
     const isBaseDone = basePct === 100;
     const displayPct = isBaseDone ? spPct : basePct;
     const pctClass = isBaseDone ? 'sc-tile-pct sp-focus' : 'sc-tile-pct';
     const pctLabel = isBaseDone ? `${displayPct}% SP` : `${displayPct}%`;
     const starred = isEntityStarred('planet:'+p.name);
+
+    // Available MXP for this planet
+    const availMxp = p.nodes.reduce((s,n) => {
+      if (n.masteryExp > 0 && (n.isJunction ? !n.done : !n.spDone)) return s + n.masteryExp;
+      return s;
+    }, 0);
 
     const tile = document.createElement('div');
     tile.className = 'sc-planet-tile' + (isBaseDone?' complete':'') + (starred?' priority':'');
@@ -1607,8 +1798,7 @@ function renderStarChart() {
         <div class="sc-dual-base" style="width:${basePct}%"></div>
         <div class="sc-dual-sp" style="width:${spPct}%"></div>
       </div>
-      <div class="sc-tile-stats">${done}/${total} base · <span class="sp-done">${spD}</span> SP</div>
-      <div class="sc-tile-body"></div>`;
+      <div class="sc-tile-stats">${done}/${total} base · <span class="sp-done">${spD}</span> SP${availMxp > 0 ? ` · <span style="color:#b89830">+${fmtM(availMxp)}</span>` : ''}</div>`;
 
     const starBtn = tile.querySelector('.sc-tile-star');
     starBtn.addEventListener('click', e => {
@@ -1617,22 +1807,16 @@ function renderStarChart() {
       tile.classList.toggle('priority', on);
     });
 
-    const hdr  = tile.querySelector('.sc-tile-hdr');
-    const body = tile.querySelector('.sc-tile-body');
-    hdr.addEventListener('click', () => {
-      const isOpen = tile.classList.toggle('open');
-      if (isOpen) {
-        if (!body.children.length) p.nodes.forEach(n=>body.appendChild(buildNodeRow(n)));
-        grid.querySelectorAll('.sc-planet-tile.open').forEach(t => {
-          if (t !== tile) t.classList.remove('open');
-        });
-      }
+    tile.addEventListener('click', e => {
+      if (e.target.closest('.sc-tile-star')) return;
+      openPlanetDetail(p, tile);
     });
 
     grid.appendChild(tile);
-  });
+  })
   el.appendChild(grid);
 
+  // Railjack
   if (railjack.length) {
     const rh=document.createElement('div');rh.className='sc-section';rh.style.marginTop='.75rem';rh.textContent='Railjack';el.appendChild(rh);
     const rjDone=railjack.filter(n=>n.done).length;
@@ -1641,24 +1825,24 @@ function renderStarChart() {
     const rjSpPct=Math.round(rjSp/railjack.length*100);
     const rgrid=document.createElement('div');rgrid.className='sc-planet-grid';rgrid.style.setProperty('--cols',cols);
     const rtile=document.createElement('div');rtile.className='sc-planet-tile'+(rjPct===100?' complete':'');
-    
-    const isBaseDone = rjPct === 100;
-    const displayPct = isBaseDone ? rjSpPct : rjPct;
-    const pctClass = isBaseDone ? 'sc-tile-pct sp-focus' : 'sc-tile-pct';
-    const pctLabel = isBaseDone ? `${displayPct}% SP` : `${displayPct}%`;
-
     rtile.innerHTML=`
-      <div class="sc-tile-hdr"><span class="sc-tile-name">Railjack</span><span class="${pctClass}">${pctLabel}</span></div>
+      <div class="sc-tile-hdr"><span class="sc-tile-name">Railjack</span><span class="sc-tile-pct">${rjPct}%</span></div>
       <div class="sc-dual-bar"><div class="sc-dual-base" style="width:${rjPct}%"></div><div class="sc-dual-sp" style="width:${rjSpPct}%"></div></div>
       <div class="sc-tile-stats">${rjDone}/${railjack.length} base · <span class="sp-done">${rjSp}</span> SP</div>
       <div class="sc-tile-body"></div>`;
-    const rb=rtile.querySelector('.sc-tile-body');
-    rtile.querySelector('.sc-tile-hdr').addEventListener('click',()=>{
-      const open=rtile.classList.toggle('open');
-      if(open&&!rb.children.length)railjack.forEach(n=>rb.appendChild(buildNodeRow(n)));
+    const rjPlanet = {name:'Railjack', nodes: railjack};
+    rtile.addEventListener('click', e => {
+      if (e.target.closest('.sc-tile-star')) return;
+      openPlanetDetail(rjPlanet, rtile);
     });
     rgrid.appendChild(rtile);el.appendChild(rgrid);
   }
+}
+
+function closePlanetDetail() {
+  const detailPanel = document.getElementById('sc-planet-detail');
+  if (detailPanel) { detailPanel.classList.remove('open'); detailPanel.innerHTML = ''; }
+  document.querySelectorAll('.sc-planet-tile.selected').forEach(t => t.classList.remove('selected'));
 }
 
 function setSCCols(n) {
@@ -1672,14 +1856,17 @@ function togglePlanetStar(name, btn) {
   toggleEntityStar('planet:'+name, 'planet', btn);
 }
 
+
 /* ── FILTERING ──────────────────────────────── */
 function filteredItems() {
+  const needsReview  = document.getElementById('tog-review')?.checked;
   const showFounders = document.getElementById('tog-founders')?.checked;
   const unmaxed      = document.getElementById('tog-unmaxed')?.checked;
   const onlyStar     = document.getElementById('tog-starred')?.checked;
   const unowned      = document.getElementById('tog-unowned')?.checked;
   const needsForma   = document.getElementById('tog-forma')?.checked;
   const upd          = document.getElementById('upd-sel')?.value || '';
+
   const primeFilter = document.getElementById('prime-sel')?.value || '';
 
   return ST.items.filter(it => {
@@ -1691,6 +1878,8 @@ function filteredItems() {
     if (unmaxed && it.rank >= it.maxRank && it.maxRank > 0) return false;
     if (onlyStar && !ST.starred.has(it.path)) return false;
     if (needsForma && !(it.maxRank===40 && it.rank<40)) return false;
+    // Needs review: show all items with gildable or rank-40 modifier (ownership controlled by Show Unowned)
+    if (needsReview && !it.requiresGilding && it.maxRank !== 40) return false;
     if (primeFilter === 'prime' && !it.name.toLowerCase().includes(' prime')) return false;
     if (primeFilter === 'nonprime' && it.name.toLowerCase().includes(' prime')) return false;
     if (ST.activeList) {
@@ -1719,6 +1908,7 @@ function buildChips() {
         sep.className = 'chip-sep';
         ce.appendChild(sep);
       }
+      // Group label (toggles whole group)
       const lbl = document.createElement('button');
       lbl.className = 'chip-grp-lbl';
       lbl.textContent = grp.label;
@@ -1735,7 +1925,7 @@ function buildChips() {
       grp.keys.forEach(k => {
         const cfg = CAT[k];
         if (!cfg) return;
-        if (!(cc[k]||0)) return;
+        if (!(cc[k]||0)) return; // hide empty categories
         const b = document.createElement('button');
         b.className = 'chip' + (ST.cats[k] ? ' on' : '');
         b.style.setProperty('--cc', cfg.c);
@@ -1762,6 +1952,7 @@ function buildChips() {
   }
 }
 
+/* ── RENDER: UPDATE DROPDOWN ────────────────── */
 function buildUpdateSel() {
   const sel = document.getElementById('upd-sel');
   if (!sel) return;
@@ -1780,34 +1971,26 @@ function buildUpdateSel() {
 /* ── RENDER: MASTERY BAR ────────────────────── */
 function calcStarChartMxp(missions) {
   if (!missions?.length) return 0;
-  const JUNCTION_TAGS = new Set([
-    'VenusToMercuryJunction','EarthToVenusJunction','EarthToMarsJunction',
-    'MarsToPhobosJunction','MarsToCeresJunction','CeresToJupiterJunction',
-    'JupiterToEuropaJunction','JupiterToSaturnJunction','SaturnToUranusJunction',
-    'UranusToNeptuneJunction','NeptuneToPlutoJunction','PlutoToErisJunction',
-    'ErisToSednaJunction'
-  ]);
   let total = 0;
   missions.forEach(m => {
-    if (JUNCTION_TAGS.has(m.tag)) total += 1000;
-    
-    if (ST.missionDb?.[m.tag]?.masteryExp) {
-      // Add mastery for the normal base node completion
-      total += ST.missionDb[m.tag].masteryExp;
-      
-      // Add mastery a 2nd time if completed on Steel Path (tier >= 1)
-      if (m.tier >= 1) {
-        total += ST.missionDb[m.tag].masteryExp;
-      }
-    }
+    // Railjack nodes give NO mastery (confirmed wiki)
+    if (m.tag.startsWith('CrewBattle')) return;
+    const isJunction = m.tag.endsWith('Junction');
+    // Use missionDb masteryExp; junctions fall back to 1000 if not in DB
+    const mxp = ST.missionDb?.[m.tag]?.masteryExp ?? (isJunction ? 1000 : 0);
+    if (mxp <= 0) return;
+    total += mxp;                  // base completion always gives mastery
+    if (m.tier >= 1) total += mxp; // SP gives same amount again (wiki confirmed)
   });
   return total;
 }
 
+
 function renderMbar() {
   const mbar = document.getElementById('mbar');
   if (!mbar) return;
-  const wasOpen = localStorage.getItem('wft3_calc_open') === '1';
+  const wasOpen = false; // always start collapsed
+  // Keep the static toggle button, just refresh the calc panel
   let calc = mbar.querySelector('.mbar-calc');
   let togBtn = mbar.querySelector('.mbar-calc-toggle');
   if (!togBtn) {
@@ -1822,42 +2005,44 @@ function renderMbar() {
     calc.className = 'mbar-calc' + (wasOpen ? ' open' : '');
     mbar.appendChild(calc);
   }
-
+  const totalM = ST.items.reduce((s,i) => s+(i.mastery||0), 0);
+  const scMxp  = calcStarChartMxp(ST.missions);
   renderCalcPanel(calc, calcTotalMastery());
 }
 
+
 function renderCalcPanel(el, currentMxp) {
-  // Derive the rank directly from the math to prevent visual gaps
-  const calcMR    = rankFromMastery(currentMxp);
-  const nextMR    = calcMR + 1;
-  const th0       = mrThreshold(calcMR);
-  const th1       = mrThreshold(nextMR);
-  const gap       = Math.max(0, th1 - currentMxp);
-  
-  const rankRange = th1 - th0;
-  const progress  = Math.max(0, currentMxp - th0);
-  const pct       = rankRange > 0 ? Math.min(100, (progress / rankRange) * 100) : 100;
-  
+  // Derive MR from actual mastery math, not profile level
+  const playerMR  = rankFromMastery(currentMxp);
+  const nextMR    = playerMR + 1;
+  const th0       = mrThreshold(playerMR);
+  const threshold = mrThreshold(nextMR);
+  const progress  = currentMxp - th0;
+  const range     = threshold - th0;
+  const gap       = Math.max(0, threshold - currentMxp);
+  const pct       = range > 0 ? Math.min(100, Math.round(progress / range * 100)) : 100;
   const wepsNeeded = gap > 0 ? Math.ceil(gap / 3000) : 0;
   const frmsNeeded = gap > 0 ? Math.ceil(gap / 6000) : 0;
 
-  const potential = ST.items.reduce((s,i) => {
-    const mult = ['warframe','necramech','archwing','sentinel','kubrow','kavat','vulpaphyla','predasite','companion','moa','hound','kdrive'].includes(i.cat) ? 200 : 100;
-    return s + (i.maxRank - i.rank) * mult;
-  }, 0);
+  // Intrinsics & Plexus — must be declared before template literal
+  const rjInt      = ST.userData.meta?.rjInt      || 0;
+  const drInt      = ST.userData.meta?.drInt      || 0;
+  const plexusDone = ST.userData.meta?.plexusDone || false;
+  const manualMxp  = rjInt * 1500 + drInt * 1500 + (plexusDone ? 6000 : 0);
+
+  // Potential from all unleveled items
+  const potential = ST.items.reduce((s,i) =>
+    s + (i.maxRank - i.rank) * masteryMult(i.cat), 0);
   const ceilMR = rankFromMastery(currentMxp + potential);
 
+  // List projection
   let listHtml = '';
   if (ST.activeList) {
     const list = listById(ST.activeList);
-    const listItems = ST.items.filter(it => ST.userData.entities[it.path]?.lists?.includes(ST.activeList));
-    const listGain = listItems.reduce((s,i) => {
-      const mult = ['warframe','necramech','archwing','sentinel','kubrow','kavat','vulpaphyla','predasite','companion','moa','hound','kdrive'].includes(i.cat) ? 200 : 100;
-      return s + (i.maxRank - i.rank) * mult;
-    }, 0);
-    const listNewTotal = currentMxp + listGain;
-    const listNewMR    = rankFromMastery(listNewTotal);
-    const mrGain       = listNewMR - calcMR;
+    const listGain = ST.items.filter(it => ST.userData.entities[it.path]?.lists?.includes(ST.activeList))
+      .reduce((s,i) => s + (i.maxRank - i.rank) * masteryMult(i.cat), 0);
+    const listNewMR = rankFromMastery(currentMxp + listGain);
+    const mrGain    = listNewMR - playerMR;
     listHtml = `
       <div class="calc-row" style="background:rgba(74,173,158,.06);border-radius:5px;padding:.35rem .5rem;border:1px solid rgba(74,173,158,.15)">
         <div class="calc-stat">
@@ -1867,21 +2052,16 @@ function renderCalcPanel(el, currentMxp) {
       </div>`;
   }
 
-  const rjInt = ST.userData.meta.rjInt || 0;
-  const drInt = ST.userData.meta.drInt || 0;
-  const plexusDone = ST.userData.meta.plexusDone || false;
-  const manualMxp = (rjInt + drInt) * 1500 + (plexusDone ? 6000 : 0);
-
   el.innerHTML = `
     <div class="calc-row">
-      <div class="calc-stat"><div class="calc-lbl">Progress to MR ${nextMR}</div><div class="calc-val accent">${fmtM(currentMxp)} / ${fmtM(th1)}</div></div>
+      <div class="calc-stat"><div class="calc-lbl">Progress to MR ${nextMR}</div><div class="calc-val accent">${fmtM(currentMxp)} / ${fmtM(threshold)}</div></div>
       <div style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:100px">
         <div style="display:flex;align-items:center;gap:6px">
           <div class="calc-bar-wrap" style="flex:1">
             <div class="calc-bar-fill" id="cbar-cur" style="width:${pct}%"></div>
             <div class="calc-bar-proj" id="cbar-proj" style="left:${pct}%;width:0%"></div>
           </div>
-          <span class="calc-bar-rankup" id="cbar-rank-lbl">MR ${calcMR}→${nextMR}</span>
+          <span class="calc-bar-rankup" id="cbar-rank-lbl">MR ${playerMR}→${nextMR}</span>
         </div>
         <div class="calc-bar-overflow" id="cbar-overflow">
           <div style="display:flex;align-items:center;gap:6px">
@@ -1898,29 +2078,19 @@ function renderCalcPanel(el, currentMxp) {
       To reach MR ${nextMR}: <span style="color:var(--tx)">~${wepsNeeded} weapons</span> or <span style="color:var(--tx)">~${frmsNeeded} frames</span> at max rank
     </div>` : `<div style="font-size:.68rem;color:var(--acc)">Ready to rank up!</div>`}
     ${listHtml}
-    
-    <div class="calc-row" style="padding-top:.5rem; border-top:1px solid var(--bd); margin-top:.3rem">
-      <div class="calc-stat">
-        <div class="calc-lbl">Intrinsics & Plexus</div>
-        <div class="calc-val accent" style="font-size:.7rem">+${fmtM(manualMxp)}</div>
-      </div>
-      <div class="calc-inputs" style="margin-left:auto; gap:.8rem">
-        <div class="calc-input-grp">
-          <span title="Railjack Intrinsics (Max 50)">RJ Int.</span>
-          <input type="number" min="0" max="50" value="${rjInt}" onchange="updateManualMxp('rjInt', this.value)" style="width:44px">
-        </div>
-        <div class="calc-input-grp">
-          <span title="Drifter Intrinsics (Max 40)">Drifter Int.</span>
-          <input type="number" min="0" max="40" value="${drInt}" onchange="updateManualMxp('drInt', this.value)" style="width:44px">
-        </div>
-        <label class="ctog" title="Plexus (6,000 MXP)">
-          <input type="checkbox" onchange="updateManualMxp('plexusDone', this.checked)" ${plexusDone ? 'checked' : ''}> Plexus
-        </label>
-      </div>
-    </div>
-    
-    <div class="calc-row" style="padding-top:.5rem; border-top:1px solid var(--bd); margin-top:.3rem">
+    <div class="calc-row">
       <div class="calc-stat"><div class="calc-lbl">Mastery ceiling</div><div class="calc-val">+${fmtM(potential)} available → MR ${ceilMR} max</div></div>
+    </div>
+    <div class="calc-row" style="padding-top:.5rem;border-top:1px solid var(--bd);margin-top:.3rem;flex-wrap:wrap;gap:.5rem">
+      <div class="calc-stat"><div class="calc-lbl">Intrinsics &amp; Plexus</div><div class="calc-val accent" style="font-size:.7rem">+${fmtM(manualMxp)}</div></div>
+      <div style="display:flex;gap:.7rem;align-items:center;flex-wrap:wrap;margin-left:auto">
+        <div class="calc-input-grp"><span title="Railjack Intrinsics (max 50)">RJ Int.</span>
+          <input type="number" min="0" max="50" value="${rjInt}" onchange="updateManualMxp('rjInt',this.value)" style="width:44px"></div>
+        <div class="calc-input-grp"><span title="Drifter Intrinsics (max 40)">Dr Int.</span>
+          <input type="number" min="0" max="40" value="${drInt}" onchange="updateManualMxp('drInt',this.value)" style="width:44px"></div>
+        <label class="ctog" title="Plexus — 6,000 MXP">
+          <input type="checkbox" onchange="updateManualMxp('plexusDone',this.checked)" ${plexusDone?'checked':''}> Plexus</label>
+      </div>
     </div>
     <div class="calc-inputs">
       <div class="calc-input-grp">
@@ -1932,13 +2102,14 @@ function renderCalcPanel(el, currentMxp) {
       <div class="calc-result" id="wi-result">Enter items to see projection</div>
     </div>`;
 
+  // Seed bars with list projection if a list is active
   if (ST.activeList) {
     const listGain = ST.items
       .filter(it => ST.userData.entities[it.path]?.lists?.includes(ST.activeList))
       .reduce((s,i) => {
-        const mult = (i.cat==='warframe'||i.cat==='necramech'||i.cat==='archwing'||i.cat==='sentinel') ? 200 : 100;
-        return s + (i.maxRank - i.rank) * mult;
+        return s + (i.maxRank - i.rank) * masteryMult(i.cat);
       }, 0);
+    // Use setTimeout to let the DOM settle first
     setTimeout(() => updateCalcBars(listGain), 0);
   }
 }
@@ -1948,28 +2119,27 @@ function toggleCalc(btn) {
   if (!calc) return;
   const open = calc.classList.toggle('open');
   localStorage.setItem('wft3_calc_open', open ? '1' : '0');
-  if (btn) btn.innerHTML = `MR Calculator <span>${open ? '▴' : '▾'}</span>`;
+  if (btn) btn.textContent = open ? 'Calculator ▴' : 'Calculator ▾';
 }
 
 function updateCalcBars(projMxp) {
   const current  = calcTotalMastery();
-  const calcMR   = rankFromMastery(current);
-  const nextMR   = calcMR + 1;
-  const th0 = mrThreshold(calcMR);
+  const playerMR = rankFromMastery(current);
+  const nextMR   = playerMR + 1;
   const th1 = mrThreshold(nextMR);
+  // Read fill bar's actual rendered width to guarantee zero gap between fill and projection
+  const currentPct = parseFloat(document.getElementById('cbar-cur')?.style.width) || 0;
   const th2 = mrThreshold(nextMR + 1);
 
-  const rankRange1 = th1 - th0;
-  const progress   = Math.max(0, current - th0);
-  const currentPct = rankRange1 > 0 ? Math.min(100, (progress / rankRange1) * 100) : 100;
+  const remaining  = Math.max(0, th1 - Math.min(current, th1));
 
-  const remaining  = Math.max(0, th1 - Math.max(current, th0));
+  // Capped projection on first bar
   const projOnBar1 = Math.min(projMxp, remaining);
-  const projPct1   = rankRange1 > 0 ? (projOnBar1 / rankRange1 * 100) : 0;
+  const projPct1   = Math.round(projOnBar1 / th1 * 100);
 
+  // Overflow into next rank
   const overflow    = Math.max(0, projMxp - remaining);
-  const rankRange2  = th2 - th1;
-  const overflowPct = rankRange2 > 0 ? Math.min(100, (overflow / rankRange2) * 100) : 0;
+  const overflowPct = th2 > th1 ? Math.min(100, Math.round(overflow / (th2 - th1) * 100)) : 0;
 
   const barP  = document.getElementById('cbar-proj');
   const barO  = document.getElementById('cbar-over');
@@ -1986,7 +2156,7 @@ function updateCalcBars(projMxp) {
     gapEl.textContent = remaining2 > 0 ? `+${fmtM(remaining2)} left` : '✓ Rank up!';
     gapEl.style.color = remaining2 <= 0 ? 'var(--acc)' : '';
   }
-  if (rankLbl) rankLbl.textContent = `MR ${calcMR}→${nextMR}`;
+  if (rankLbl) rankLbl.textContent = `MR ${playerMR}→${nextMR}`;
   if (overLbl) overLbl.textContent = `MR ${nextMR}→${nextMR+1} (+${fmtM(overflow)})`;
 }
 
@@ -1995,12 +2165,12 @@ function updateWhatIf() {
   const f = parseInt(document.getElementById('wi-frames')?.value)  || 0;
   const extra = w * 3000 + f * 6000;
 
+  // If user hasn't entered anything, show list projection on bar instead
   const listGain = (() => {
     if (!ST.activeList) return 0;
     return ST.items.filter(it => ST.userData.entities[it.path]?.lists?.includes(ST.activeList))
       .reduce((s,i) => {
-        const mult = ['warframe','necramech','archwing','sentinel','kubrow','kavat','vulpaphyla','predasite','companion','moa','hound','kdrive'].includes(i.cat) ? 200 : 100;
-        return s + (i.maxRank - i.rank) * mult;
+        return s + (i.maxRank - i.rank) * masteryMult(i.cat);
       }, 0);
   })();
 
@@ -2011,8 +2181,8 @@ function updateWhatIf() {
     if (extra === 0) { res.textContent = 'Enter items to see projection'; return; }
     const newTotal = calcTotalMastery() + extra;
     const newRank  = rankFromMastery(newTotal);
-    const calcMR = rankFromMastery(calcTotalMastery());
-    res.textContent = `+${fmtM(extra)} → MR ${newRank}${newRank > calcMR ? ` (+${newRank - calcMR} rank${newRank-calcMR!==1?'s':''})` : ' (no change)'}`;
+    const mr = ST.userData.meta.playerLevel || 0;
+    res.textContent = `+${fmtM(extra)} → MR ${newRank}${newRank > mr ? ` (+${newRank - mr} rank${newRank-mr!==1?'s':''})` : ' (no change)'}`;
   }
 }
 
@@ -2028,11 +2198,11 @@ function makeCard(it, catMax) {
   const pct = it.maxRank > 0 ? Math.round((it.rank / it.maxRank) * 100) : 0;
 
   const rankDisplay = it.maxRank === 40
-    ? `<input class="rank-input" type="number" value="${it.rank}" min="0" max="40" title="Set actual rank">`
+    ? `<input class="rank-input" type="number" value="${it.rank}" min="0" max="40" title="Set actual rank (XP cannot determine this for Forma'd weapons)">`
     : `<span class="rank-cur">${it.rank}</span>`;
 
   const d = document.createElement('div');
-  d.className = 'card' + (it.isOwned ? '' : ' unowned');
+  d.className = 'card' + (it.isOwned ? '' : ' unowned') + (it.requiresGilding && !it.isGilded ? ' needs-gilding' : '');
   d.style.setProperty('--cc', cfg.c);
 
   const entity  = ST.userData.entities[it.path] || {};
@@ -2053,7 +2223,8 @@ function makeCard(it, catMax) {
     <div class="card-extra">
       <div class="cmeta">
         <span class="abadge" style="color:${acfg.c};border-color:${acfg.c}40;background:${acfg.c}10">${acfg.l}</span>
-        ${maxed ? `<span class="maxed-tag" style="color:#a08020;font-size:.7rem;font-family:'Rajdhani',sans-serif;font-weight:700;">MAXED</span>` : ''}
+        ${it.requiresGilding ? `<label class="gild-tog" title="Must be gilded to grant mastery"><input type="checkbox" ${it.isGilded?"checked":""}> Gilded</label>` : ""}
+        ${maxed && it.isGilded !== false ? `<span class="maxed-tag" style="color:#a08020;font-size:.7rem;font-family:'Rajdhani',sans-serif;font-weight:700;">MAXED</span>` : ""}
       </div>
       <div class="xbw"><div class="xbf" style="width:${pct}%;background:${cfg.c}"></div></div>
       <div class="cbot">
@@ -2067,6 +2238,7 @@ function makeCard(it, catMax) {
   d.addEventListener('mouseenter', () => { ST._hoveredItem = it; });
   d.addEventListener('click', e => handleCardClick(e, it));
 
+  // Attach listeners post-render (avoids HTML injection issues with note content)
   const starBtn = d.querySelector('.sbtn');
   starBtn.addEventListener('click', e => { e.stopPropagation(); toggleEntityStar(it.path, it.cat, starBtn); });
 
@@ -2081,6 +2253,22 @@ function makeCard(it, catMax) {
   noteEl.addEventListener('blur', () => saveEntityNote(it.path, it.cat, noteEl.value));
   noteEl.addEventListener('click', e => e.stopPropagation());
   noteEl.addEventListener('keydown', e => e.stopPropagation());
+
+  // Gilded toggle for amps, zaws, kitguns, MOAs, predasites, vulpaphylas
+  const gildEl = d.querySelector('.gild-tog input');
+  if (gildEl) {
+    gildEl.addEventListener('change', e => {
+      e.stopPropagation();
+      const e2 = getOrCreateEntity(it.path, it.cat);
+      e2.gilded = gildEl.checked;
+      it.isGilded = gildEl.checked;
+      it.mastery  = gildEl.checked ? it.rank * masteryMult(it.cat) : 0;
+      d.classList.toggle('needs-gilding', !gildEl.checked);
+      saveUserData();
+      render(); // refresh mastery totals
+    });
+    gildEl.addEventListener('click', e => e.stopPropagation());
+  }
 
   return d;
 }
@@ -2098,7 +2286,7 @@ function render() {
     return 0;
   });
 
-  ST._visibleItems = items; 
+  ST._visibleItems = items; // used by shift-click range and Ctrl+A
 
   const wrap = document.getElementById('items-wrap');
   if (!wrap) return;
@@ -2111,6 +2299,7 @@ function render() {
   const scEl = document.getElementById('s-sc-mxp');
   if (scEl) scEl.textContent = scMxp > 0 ? fmtM(scMxp) : '—';
 
+  // Update category tooltip in header
   const tipEl = document.getElementById('hstat-cat-tip');
   if (tipEl) {
     const bycat = {};
@@ -2135,6 +2324,7 @@ function render() {
     sec.appendChild(g); frag.appendChild(sec);
   } else {
     if (grp === 'cat') {
+      // Horizontal kanban — one column per active category, in logical order
       const colWrap = document.createElement('div');
       colWrap.className = 'col-wrap';
       const catOrder = CAT_GROUPS.flatMap(g => g.keys);
@@ -2282,7 +2472,7 @@ function switchTab(t) {
   document.getElementById('tab-items').className = 'tab'+(t==='items'?' active':'');
   document.getElementById('tab-sc').className    = 'tab'+(t==='sc'?' active':'');
   if (t==='sc') {
-    renderStarChart(); 
+    renderStarChart(); // show loading state immediately
     loadStarChartData().then(() => renderStarChart());
   }
 }
@@ -2299,7 +2489,9 @@ function saveSettings() {
   ST.userData.settings = { cats:ST.cats, acqs:ST.acqs, sort:ST.sort, group:ST.group };
   saveUserData();
 }
-function loadSettings() {}
+function loadSettings() {
+  // loadUserData handles this — this is a no-op kept for call-site compatibility
+}
 
 function setStatusSelected(status) {
   if (!ST.selection.size) return;
@@ -2341,6 +2533,7 @@ function importData(inp) {
         ST.userData = d;
         await userDbSet('userData', ST.userData);
         try { localStorage.setItem(LS_USER_KEY, JSON.stringify(ST.userData)); } catch(e) {}
+        // Re-derive runtime mirrors
         ST.starred = new Set(Object.entries(ST.userData.entities).filter(([,e])=>e.starred&&e.type!=='node').map(([k])=>k));
         ST.overrides = Object.fromEntries(Object.entries(ST.userData.entities).filter(([,e])=>e.rank!==undefined).map(([k,e])=>[k,e.rank]));
         toast('Imported ✓ — reloading…');
@@ -2363,11 +2556,13 @@ async function handleImport() {
   try { profile = parseProfile(text); }
   catch(e) { showE(e instanceof SyntaxError ? 'Invalid JSON — try "Load from file" instead.' : 'Parse error: ' + e.message); return; }
   if (!profile.xpData.length) { showE('No XP data found in this JSON.'); return; }
+  // Extract and persist player ID from the raw JSON if present
   try {
     const raw = JSON.parse(text);
     const r = raw.Results?.[0] || raw;
     const id = r.PlayerId || r.playerId || r.AccountId || r.accountId || '';
     if (id) savePlayerId(id);
+    // Also try to find ID in the URL query if injected somehow (fallback to manual input)
     const manualId = document.getElementById('player-id-input')?.value.trim();
     if (!id && manualId) savePlayerId(manualId);
   } catch(e) {}
@@ -2396,6 +2591,7 @@ async function loadAndShow(profile) {
   buildListBar();
   renderMbar();
   render();
+  // Show refresh button if player ID is stored
   const pid = getPlayerId();
   const rbtn = document.getElementById('hbtn-refresh');
   if (rbtn) rbtn.style.display = pid ? 'block' : 'none';
@@ -2408,6 +2604,7 @@ function initImportScreen() {
   const idEntry = document.getElementById('id-entry');
   const refreshPanel = document.getElementById('refresh-panel');
   if (id) {
+    // Known ID — show refresh panel
     if (idEntry) idEntry.style.display = 'none';
     if (refreshPanel) {
       refreshPanel.classList.add('visible');
@@ -2417,6 +2614,7 @@ function initImportScreen() {
       if (url)  url.textContent  = profileUrl(id);
     }
   } else {
+    // No ID — show entry fields
     if (idEntry) idEntry.style.display = 'block';
     if (refreshPanel) refreshPanel.classList.remove('visible');
   }
@@ -2494,6 +2692,8 @@ document.getElementById('file-in')?.addEventListener('change',e=>{
 
 (async function init() {
   await loadUserData();
+  // XP Bar and Notes pills start as off — sync body classes
+  // Standard tag hidden by default, Maxed shown by default
   document.body.classList.add('hide-xpbar', 'hide-notes', 'hide-source');
   initImportScreen();
   const gs = document.getElementById('grp-sel');
