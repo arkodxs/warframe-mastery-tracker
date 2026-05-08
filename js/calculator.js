@@ -32,39 +32,39 @@ function renderCalcPanel(el, currentMxp) {
       <div class="calc-row" style="background:rgba(74,173,158,.06);border-radius:5px;padding:.35rem .5rem;border:1px solid rgba(74,173,158,.15)">
         <div class="calc-stat">
           <div class="calc-lbl">Max all in "${list?.name || 'list'}"</div>
-          <div class="calc-val accent">+${fmtM(listGain)} → MR ${listNewMR}${mrGain > 0 ? ` <span style="color:#b89030">(+${mrGain} rank${mrGain!==1?'s':''})</span>` : ' <span style="color:var(--tx3)">(no change)</span>'}</div>
+          <div class="calc-val accent">+${fmtM(listGain)} → ${formatRankLabel(listNewMR)}${mrGain > 0 ? ` <span style="color:#b89030">(+${mrGain} rank${mrGain!==1?'s':''})</span>` : ' <span style="color:var(--tx3)">(no change)</span>'}</div>
         </div>
       </div>`;
   }
 
   el.innerHTML = `
     <div class="calc-row">
-      <div class="calc-stat"><div class="calc-lbl">Progress to MR ${nextMR}</div><div class="calc-val accent">${fmtM(currentMxp)} / ${fmtM(threshold)}</div></div>
+      <div class="calc-stat"><div class="calc-lbl">Progress to ${formatRankLabel(nextMR)}</div><div class="calc-val accent">${fmtM(currentMxp)} / ${fmtM(threshold)}</div></div>
       <div style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:100px">
         <div style="display:flex;align-items:center;gap:6px">
           <div class="calc-bar-wrap" style="flex:1">
             <div class="calc-bar-fill" id="cbar-cur" style="width:${pct}%"></div>
             <div class="calc-bar-proj" id="cbar-proj" style="left:${pct}%;width:0%"></div>
           </div>
-          <span class="calc-bar-rankup" id="cbar-rank-lbl">MR ${playerMR}→${nextMR}</span>
+          <span class="calc-bar-rankup" id="cbar-rank-lbl">${formatRankLabel(playerMR)}→${formatRankLabel(nextMR)}</span>
         </div>
         <div class="calc-bar-overflow" id="cbar-overflow">
           <div style="display:flex;align-items:center;gap:6px">
             <div class="calc-bar-wrap" style="flex:1">
               <div class="calc-bar-proj" id="cbar-over" style="left:0%;width:0%"></div>
             </div>
-            <span class="calc-bar-rankup" id="cbar-over-lbl">MR ${nextMR}→${nextMR+1}</span>
+            <span class="calc-bar-rankup" id="cbar-over-lbl">${formatRankLabel(nextMR)}→${formatRankLabel(nextMR+1)}</span>
           </div>
         </div>
       </div>
       <div class="calc-stat" style="align-items:flex-end"><div class="calc-lbl">Gap</div><div class="calc-val" id="cbar-gap">+${fmtM(gap)}</div></div>
     </div>
     ${gap > 0 ? `<div class="calc-row" style="font-size:.68rem;color:var(--tx3)">
-      To reach MR ${nextMR}: <span style="color:var(--tx)">~${wepsNeeded} weapons</span> or <span style="color:var(--tx)">~${frmsNeeded} frames</span> at max rank
+      To reach ${formatRankLabel(nextMR)}: <span style="color:var(--tx)">~${wepsNeeded} weapons</span> or <span style="color:var(--tx)">~${frmsNeeded} frames</span> at max rank
     </div>` : `<div style="font-size:.68rem;color:var(--acc)">Ready to rank up!</div>`}
     ${listHtml}
     <div class="calc-row">
-      <div class="calc-stat"><div class="calc-lbl">Mastery ceiling</div><div class="calc-val">+${fmtM(potential)} available → MR ${ceilMR} max</div></div>
+      <div class="calc-stat"><div class="calc-lbl">Mastery ceiling</div><div class="calc-val">+${fmtM(potential)} available → ${formatRankLabel(ceilMR)} max</div></div>
     </div>
     <div class="calc-row" style="padding-top:.5rem;border-top:1px solid var(--bd);margin-top:.3rem;flex-wrap:wrap;gap:.5rem">
       <div class="calc-stat"><div class="calc-lbl">Intrinsics &amp; Plexus</div><div class="calc-val accent" style="font-size:.7rem">+${fmtM(manualMxp)}</div></div>
@@ -135,8 +135,8 @@ function updateCalcBars(projMxp) {
     gapEl.textContent = remaining2 > 0 ? `+${fmtM(remaining2)} left` : '✓ Rank up!';
     gapEl.style.color = remaining2 <= 0 ? 'var(--acc)' : '';
   }
-  if (rankLbl) rankLbl.textContent = `MR ${playerMR}→${nextMR}`;
-  if (overLbl) overLbl.textContent = `MR ${nextMR}→${nextMR+1} (+${fmtM(overflow)})`;
+  if (rankLbl) rankLbl.textContent = `${formatRankLabel(playerMR)}→${formatRankLabel(nextMR)}`;
+  if (overLbl) overLbl.textContent = `${formatRankLabel(nextMR)}→${formatRankLabel(nextMR+1)} (+${fmtM(overflow)})`;
 }
 
 function updateWhatIf() {
@@ -158,6 +158,6 @@ function updateWhatIf() {
     const newTotal = calcTotalMastery() + extra;
     const newRank  = rankFromMastery(newTotal);
     const mr = ST.userData.meta.playerLevel || 0;
-    res.textContent = `+${fmtM(extra)} → MR ${newRank}${newRank > mr ? ` (+${newRank - mr} rank${newRank-mr!==1?'s':''})` : ' (no change)'}`;
+    res.textContent = `+${fmtM(extra)} → ${formatRankLabel(newRank)}${newRank > mr ? ` (+${newRank - mr} rank${newRank-mr!==1?'s':''})` : ' (no change)'}`;
   }
 }

@@ -29,6 +29,11 @@ function rankFromMastery(xp) {
   return lo;
 }
 
+function formatRankLabel(rank) {
+  if (rank <= 30) return `MR ${rank}`;
+  return `LR${rank - 30}`;
+}
+
 function calcTotalMastery() {
   const itemMxp   = ST.items.reduce((s,i) => s + (i.mastery || 0), 0);
   const scMxp     = calcStarChartMxp(ST.missions);
