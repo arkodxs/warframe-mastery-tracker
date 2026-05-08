@@ -1203,6 +1203,7 @@ function classifyItem(item) {
   const path = (item.uniqueName || '').toLowerCase();
   const apiCat = item.category || 'Other';
 
+  // Specific rescues
   if (nameKey === 'runway') return { finalCat:'K-Drive', isRescued:true, scoreBoost:500000 };
   if (nameKey === 'helminth charger') return { finalCat:'Kubrow', isRescued:true, scoreBoost:500000 };
 
@@ -1218,19 +1219,32 @@ function classifyItem(item) {
     'specter','howl of','lucky','twin kavats','core','gyro','bracket','stabilizer','mutagen',
     'antigen','incarnon genesis','helminth'
   ];
-  if (junkKeywords.some(k=>nameKey.includes(k)) || ZAW_SLOP.some(s=>nameKey.includes(s)) || apiCat==='Mods' || path.includes('/upgrades/'))
+  
+  // Explicitly ban items that track XP but yield 0 Mastery (Venari does give XP)
+  const ZERO_MASTERY = [
+    'plexus', 'bondi k-drive',
+    "garuda's talons", "garuda prime talons", 'iron staff', 'iron staff prime',
+    'regulators', 'regulators prime', 'dex pixia', 'dex pixia prime',
+    'desert wind', 'desert wind prime', 'artemis bow', 'artemis bow prime',
+    'balefire charger', 'diwata', 'diwata prime', 'valkyr talons', 'valkyr prime talons',
+    'shadow claws', 'noctowl'
+  ];
+
+  if (ZERO_MASTERY.includes(nameKey) || junkKeywords.some(k=>nameKey.includes(k)) || ZAW_SLOP.some(s=>nameKey.includes(s)) || apiCat==='Mods' || path.includes('/upgrades/'))
     return { isJunk:true };
 
   const isZaw = DB_CONFIG.ZAW_STRIKES.includes(nameKey);
   const isKitgun = DB_CONFIG.KITGUN_CHAMBERS.includes(nameKey);
   const isMoa = path.includes('moapethead') || (path.includes('/moapets/') && (nameKey.includes('moa') || path.includes('head')));
   const isHound = path.includes('zanukapetparthead') || nameKey.includes('hound');
-  const isVulpaphyla = nameKey.includes('vulpaphyla') || path.includes('vulpaphyla');
-  const isPredasite  = nameKey.includes('predasite')  || path.includes('predasite');
   const isKDrive = path.includes('kdrives/boards') || ['bad baby','feverspine','flatbelly','needlenose','runway'].some(k=>nameKey.includes(k));
   const isMech = nameKey==='voidrig' || nameKey==='bonewidow' || path.includes('entratimech');
   const isAmp = (nameKey.includes('prism') && !nameKey.includes('prisma')) || nameKey==='sirocco' || nameKey.includes('phahd') || apiCat==='Amps';
   const isSentinelWep = apiCat==='Sentinel Weapons' || path.includes('sentinelweapons') || ['akaten','batoten','cryotra','helstrum','lacerten','multron','tazicor','vulcax','deconstructor','verglas','sweeper','stinger','vulklok','artax','burst laser'].some(k=>nameKey.includes(k));
+  
+  // NEW: Identify Deimos Pets specifically
+  const isVulp = nameKey.includes('vulpaphyla');
+  const isPred = nameKey.includes('predasite');
 
   let finalCat = apiCat;
   if (isMech) finalCat='Necramechs';
@@ -1241,16 +1255,17 @@ function classifyItem(item) {
   else if (isKitgun) finalCat='Kitguns';
   else if (isKDrive) finalCat='K-Drive';
   else if (isSentinelWep) finalCat='Sentinel Weapons';
-  else if (nameKey.includes('vulpaphyla')) finalCat='Vulpaphyla';
-  else if (nameKey.includes('predasite')) finalCat='Predasite';
+  else if (isVulp) finalCat='Vulpaphyla';
+  else if (isPred) finalCat='Predasite';
   else if (nameKey.includes('kavat') || nameKey.includes('venari')) finalCat='Kavat';
   else if (nameKey.includes('kubrow')) finalCat='Kubrow';
   else if (nameKey==='wyrm prime' || (apiCat==='Sentinels' && !isSentinelWep)) finalCat='Sentinels';
   else if (nameKey.includes('sybaris') || ['strun','paris','enkaus'].includes(nameKey)) finalCat='Primary';
   else if (nameKey.includes('gammacor') || ['lato','lex'].includes(nameKey) || nameKey==='grimoire') finalCat='Secondary';
 
-  const isRescued = DB_CONFIG.RESCUE_LIST.includes(nameKey) || isMoa || isHound || isVulpaphyla || isPredasite || isKDrive || isMech || isZaw || isKitgun || isSentinelWep || isAmp;
-  return { finalCat, isRescued, isZaw, isKitgun, isMoa, isHound, isVulpaphyla, isPredasite, isKDrive, isMech, isAmp, scoreBoost: isRescued?400000:0, isJunk:false };
+  const isRescued = DB_CONFIG.RESCUE_LIST.includes(nameKey) || isMoa || isHound || isKDrive || isMech || isZaw || isKitgun || isSentinelWep || isAmp || isVulp || isPred;
+  
+  return { finalCat, isRescued, isZaw, isKitgun, isMoa, isHound, isKDrive, isMech, isAmp, scoreBoost: isRescued?400000:0, isJunk:false };
 }
 
 /* ── API FETCH ──────────────────────────────── */
