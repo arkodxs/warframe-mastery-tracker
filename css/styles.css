@@ -63,6 +63,15 @@ code{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--acc);b
 .hbtn-warn{border-color:rgba(200,112,24,.4);color:#b87020}
 .hbtn-warn:hover{border-color:#c87018;color:#c87018}
 
+/* Make the Refresh button prominent */
+#hbtn-refresh, #rm-open-btn {
+  background: var(--acc);
+  color: #001a14;
+  border-color: transparent;
+}
+#hbtn-refresh:hover, #rm-open-btn:hover { opacity: .92 }
+#hbtn-refresh:disabled, #rm-open-btn:disabled { opacity: .35; cursor: not-allowed }
+
 /* Tabs */
 .tabs{display:flex;background:var(--s1);border-bottom:1px solid var(--bd)}
 .tab{padding:.55rem 1.4rem;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.92rem;letter-spacing:.08em;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}

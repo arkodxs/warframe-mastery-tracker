@@ -29,7 +29,7 @@
         style="width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:6px;padding:.5rem .75rem;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.8rem;outline:none;transition:border-color .2s;margin-bottom:.4rem"
         oninput="onPlayerIdInput(this.value)">
       <div id="id-url-preview" class="ep" style="display:none">http://content.warframe.com/dynamic/getProfileViewingData.php?playerId=<span id="id-url-val">—</span>
-        <button onclick="openProfileUrl()" class="btn btn-g" style="margin-left:.6rem;padding:.2rem .6rem;font-size:.7rem">Open URL</button>
+        <button onclick="openProfileUrlAndFocus()" class="btn btn-g" style="margin-left:.6rem;padding:.2rem .6rem;font-size:.7rem">Open URL</button>
       </div>
     </div>
 
@@ -42,7 +42,7 @@
       </div>
       <div class="rp-url" id="rp-url-display"></div>
       <div class="rp-actions">
-        <button class="btn btn-p" onclick="openProfileUrl()">Open profile URL →</button>
+        <button class="btn btn-p" onclick="openProfileUrlAndFocus()">Open profile URL →</button>
         <span class="rp-note">Opens in new tab — copy the full page content and paste below.</span>
       </div>
     </div>
@@ -51,6 +51,7 @@
     <div class="ir">
       <button class="btn btn-g" onclick="document.getElementById('file-in').click()">Load from file</button>
       <input type="file" id="file-in" accept=".json,.txt" style="display:none">
+      <button id="import-detect-btn" class="btn btn-p" style="display:none;margin-right:.5rem" onclick="confirmDetectedImport()">Import detected profile</button>
       <button class="btn btn-p" onclick="handleImport()">Import profile →</button>
       <span class="inote">Data stays local — never sent anywhere</span>
     </div>
@@ -85,14 +86,41 @@
     </div>
     <div class="hact">
       <button class="hbtn" onclick="copyFilteredNames()">Copy Names</button>
-      <button class="hbtn" id="hbtn-refresh" onclick="refreshProfile()" style="display:none">Refresh Profile</button>
       <button class="hbtn" onclick="exportData()">Save data ↓</button>
       <button class="hbtn" onclick="document.getElementById('imp-in').click()">Load data ↑</button>
       <input type="file" id="imp-in" accept=".json" style="display:none" onchange="importData(this)">
       <button class="hbtn" onclick="resetApp()">↺ New</button>
       <button class="hbtn hbtn-warn" onclick="auditDatabase()">⚠ Audit</button>
+      <button class="hbtn btn-g" id="hbtn-refresh" onclick="refreshProfile()">Refresh</button>
     </div>
   </header>
+
+  <!-- Refresh modal (overlay) -->
+  <div id="refresh-modal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:1200;">
+    <div style="background:var(--bg);border:1px solid var(--bd2);padding:1rem 1.25rem;border-radius:8px;max-width:820px;width:92%;box-shadow:0 6px 30px rgba(0,0,0,.6);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+        <div style="font-weight:600">Refresh profile</div>
+        <button class="hbtn" onclick="closeRefreshModal()">✕</button>
+      </div>
+      <div style="font-size:.85rem;color:var(--tx3);margin-bottom:.6rem">Open your profile page and copy the full JSON response into the box below. Data stays local.</div>
+      <div style="display:flex;gap:.6rem;align-items:center;margin-bottom:.6rem">
+        <div style="flex:1">
+          <div style="font-size:.7rem;color:var(--tx3);margin-bottom:.25rem">Saved ID</div>
+          <div id="rm-rp-id" style="font-family:Share Tech Mono,monospace;color:var(--tx);padding:.3rem .5rem;border:1px solid var(--bd2);border-radius:6px;background:var(--bg2)"></div>
+        </div>
+        <div style="flex:0">
+          <button id="rm-open-btn" class="btn btn-g" onclick="openProfileFromModal()">Open profile →</button>
+        </div>
+      </div>
+      <textarea id="refresh-json-input" placeholder="Paste the full JSON response here…" style="width:100%;height:180px;padding:.6rem;border:1px solid var(--bd2);border-radius:6px;background:var(--bg);color:var(--tx);resize:vertical;font-family:monospace"></textarea>
+      <div id="rm-err" style="display:none;color:var(--err);margin-top:.4rem"></div>
+      <div style="display:flex;gap:.6rem;justify-content:flex-end;margin-top:.6rem">
+        <button class="btn" onclick="closeRefreshModal()">Cancel</button>
+        <button id="rm-detect-btn" class="btn btn-p" style="display:none" onclick="confirmRefreshImport()">Import detected profile</button>
+        <button class="btn btn-g" onclick="confirmRefreshImport(true)">Import pasted JSON</button>
+      </div>
+    </div>
+  </div>
 
   <div class="tabs">
     <div class="tab active" id="tab-items" onclick="switchTab('items')">Items</div>

@@ -233,6 +233,79 @@ function openProfileUrl() {
   if (!id) { toast('Enter your player ID first'); return; }
   window.open(profileUrl(id), '_blank');
 }
+// Open profile URL in a new tab and focus the paste box when the user returns
+function openProfileUrlAndFocus() {
+  const id = getPlayerId() || document.getElementById('player-id-input')?.value.trim();
+  if (!id) { toast('Enter your player ID first'); return; }
+  const url = profileUrl(id);
+  if (!canOpenProfile()) return;
+  recordProfileOpenAttempt();
+  // Try opening a small popup window (user gesture allows this in most browsers)
+  try {
+    const features = 'width=900,height=700,menubar=no,toolbar=no,location=no,status=no';
+    const popup = window.open(url, '_blank', features);
+    if (popup) {
+      window.__profilePopup = popup;
+      try { popup.focus(); } catch(e){}
+    } else {
+      // fallback to regular tab
+      window.open(url, '_blank');
+    }
+  } catch (e) { window.open(url, '_blank'); }
+  // When window regains focus, focus the json input and show a hint
+  function onFocus() {
+    const ta = document.getElementById('json-input');
+    if (ta) {
+      ta.focus();
+      try { ta.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e){}
+    }
+    toast('Paste the profile JSON into the import box');
+    window.removeEventListener('focus', onFocus);
+  }
+  window.addEventListener('focus', onFocus);
+}
+
+// --- Profile open rate-limiting helpers ---
+const PROFILE_RATE_LIMIT_MAX = 5; // attempts
+const PROFILE_RATE_LIMIT_WINDOW = 10 * 60 * 1000; // 10 minutes
+const PROFILE_RATE_LIMIT_COOLDOWN = 15 * 60 * 1000; // 15 minutes
+
+function recordProfileOpenAttempt() {
+  const now = Date.now();
+  window.__profileOpenHistory = window.__profileOpenHistory || [];
+  window.__profileOpenHistory.push(now);
+  // prune
+  window.__profileOpenHistory = window.__profileOpenHistory.filter(t => t > now - PROFILE_RATE_LIMIT_WINDOW);
+  if (window.__profileOpenHistory.length > PROFILE_RATE_LIMIT_MAX) {
+    window.__profileBlockedUntil = now + PROFILE_RATE_LIMIT_COOLDOWN;
+  }
+  updateProfileOpenButtonState();
+}
+
+function canOpenProfile() {
+  const now = Date.now();
+  if (window.__profileBlockedUntil && window.__profileBlockedUntil > now) {
+    const rem = Math.ceil((window.__profileBlockedUntil - now) / 60000);
+    showRefreshError(`Rate limit hit — try again in ${rem} min`);
+    updateProfileOpenButtonState();
+    return false;
+  }
+  return true;
+}
+
+function updateProfileOpenButtonState() {
+  const blocked = window.__profileBlockedUntil && window.__profileBlockedUntil > Date.now();
+  const modalBtn = document.getElementById('rm-open-btn');
+  if (modalBtn) modalBtn.disabled = !!blocked;
+  const headerBtn = document.getElementById('hbtn-refresh');
+  if (headerBtn) headerBtn.disabled = !!blocked;
+}
+
+function showRefreshError(msg) {
+  const el = document.getElementById('rm-err');
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+  else toast(msg);
+}
 function onPlayerIdInput(val) {
   const id = val.trim();
   const preview = document.getElementById('id-url-preview');
@@ -245,13 +318,81 @@ function onPlayerIdInput(val) {
   }
 }
 function refreshProfile() {
-  // Show import screen in refresh mode (ID already known)
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('import-screen').style.display = 'flex';
-  document.getElementById('json-input').value = '';
-  ST.activeList = null;
-  ST.search = '';
-  initImportScreen();
+  // Open lightweight refresh modal instead of full import screen
+  openRefreshModal();
+}
+
+function openRefreshModal() {
+  const modal = document.getElementById('refresh-modal');
+  if (!modal) return;
+  const id = getPlayerId() || '';
+  const disp = document.getElementById('rm-rp-id');
+  if (disp) disp.textContent = id || '—';
+  modal.style.display = 'flex';
+  // Setup paste-detect for modal textarea
+  const ta = document.getElementById('refresh-json-input');
+  const detectBtn = document.getElementById('rm-detect-btn');
+  const errEl = document.getElementById('rm-err'); if (errEl) errEl.style.display = 'none';
+  if (ta) {
+    ta.value = '';
+    if (detectBtn) detectBtn.style.display = 'none';
+    const onPaste = (e) => {
+      try {
+        const text = (e.clipboardData || window.clipboardData).getData('text');
+        if (!text || text.trim().length === 0) return;
+        let profile;
+        try { profile = parseProfile(text); } catch(_) { profile = null; }
+        if (profile && profile.xpData && profile.xpData.length) {
+          ta.value = text;
+          if (detectBtn) detectBtn.style.display = 'inline-block';
+          if (errEl) { errEl.style.display='none'; }
+          toast('Profile JSON detected — click Import to continue');
+        }
+      } catch (err) { }
+    };
+    ta.removeEventListener('paste', ta._onPaste || (()=>{}));
+    ta._onPaste = onPaste;
+    ta.addEventListener('paste', onPaste);
+  }
+  // focus textarea for convenience
+  setTimeout(()=>{ try{ (document.getElementById('refresh-json-input')||{}).focus(); }catch(e){} },100);
+  // Update open button state based on rate limits
+  updateProfileOpenButtonState();
+}
+
+function closeRefreshModal() {
+  const modal = document.getElementById('refresh-modal'); if (!modal) return; modal.style.display = 'none';
+}
+
+function openProfileFromModal() {
+  const id = getPlayerId() || document.getElementById('player-id-input')?.value.trim();
+  if (!id) { toast('Enter your player ID first'); return; }
+  if (!canOpenProfile()) return;
+  recordProfileOpenAttempt();
+  const url = profileUrl(id);
+  try {
+    const features = 'width=900,height=700,menubar=no,toolbar=no,location=no,status=no';
+    const popup = window.open(url, '_blank', features);
+    if (popup) { window.__profilePopup = popup; try { popup.focus(); } catch(e) {} }
+    else window.open(url, '_blank');
+  } catch(e) { window.open(url, '_blank'); }
+}
+
+async function confirmRefreshImport(fromPasted=false) {
+  const ta = document.getElementById('refresh-json-input');
+  const errEl = document.getElementById('rm-err'); if (errEl) { errEl.style.display='none'; }
+  const text = (ta?.value || '').trim();
+  if (!text) { if (errEl) { errEl.textContent='Paste profile JSON first'; errEl.style.display='block'; } return; }
+  let profile;
+  try { profile = parseProfile(text); } catch(e) { if (errEl) { errEl.textContent='Invalid profile JSON'; errEl.style.display='block'; } return; }
+  if (!profile || !profile.xpData || profile.xpData.length===0) { if (errEl) { errEl.textContent='No XP data found in this JSON'; errEl.style.display='block'; } return; }
+  // Persist player ID if present in profile
+  try { const raw = JSON.parse(text); const r = raw.Results?.[0] || raw; const id = r.PlayerId || r.playerId || r.AccountId || r.accountId || ''; if (id) savePlayerId(id); } catch(e){}
+  try { localStorage.setItem('wft3_profile', text); } catch(e){}
+  // Close popup if open
+  try { if (window.__profilePopup && !window.__profilePopup.closed) window.__profilePopup.close(); } catch(e){}
+  closeRefreshModal();
+  await loadAndShow(profile);
 }
 
 // ── List management ──
@@ -2306,10 +2447,9 @@ async function loadAndShow(profile) {
   void fetchMissionDb().then(() => {
     if (document.getElementById('app')?.style.display === 'flex') renderMbar();
   });
-  // Show refresh button if player ID is stored
-  const pid = getPlayerId();
+  // Ensure refresh button is visible (it will show saved ID inside modal if none saved yet)
   const rbtn = document.getElementById('hbtn-refresh');
-  if (rbtn) rbtn.style.display = pid ? 'block' : 'none';
+  if (rbtn) rbtn.style.display = 'inline-block';
   rebuildPlannerFilterOptions();
   const plannerSortSel = document.getElementById('planner-sort');
   if (plannerSortSel) plannerSortSel.value = ST.plannerSort;
@@ -2340,6 +2480,42 @@ function initImportScreen() {
     if (idEntry) idEntry.style.display = 'block';
     if (refreshPanel) refreshPanel.classList.remove('visible');
   }
+  // Setup paste auto-detect on json input
+  const ta = document.getElementById('json-input');
+  const detectBtn = document.getElementById('import-detect-btn');
+  if (ta) {
+    // hide any leftover detect UI
+    if (detectBtn) detectBtn.style.display = 'none';
+    const onPaste = (e) => {
+      try {
+        const text = (e.clipboardData || window.clipboardData).getData('text');
+        if (!text || text.trim().length === 0) return;
+        let profile;
+        try { profile = parseProfile(text); } catch(_) { profile = null; }
+        if (profile && profile.xpData && profile.xpData.length) {
+          // Auto-fill textarea and show confirm button
+          ta.value = text;
+          if (detectBtn) {
+            detectBtn.style.display = 'inline-block';
+            detectBtn.focus();
+          }
+          toast('Profile JSON detected — click Import to continue');
+        }
+      } catch (err) { /* ignore */ }
+    };
+    ta.removeEventListener('paste', ta._onPaste || (()=>{}));
+    ta._onPaste = onPaste;
+    ta.addEventListener('paste', onPaste);
+  }
+}
+
+function confirmDetectedImport() {
+  const btn = document.getElementById('import-detect-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Importing…'; }
+  // Close popup if opened
+  try { if (window.__profilePopup && !window.__profilePopup.closed) window.__profilePopup.close(); } catch(e){}
+  // Trigger the regular import flow
+  void handleImport();
 }
 
 function resetApp() {
@@ -2350,6 +2526,7 @@ function resetApp() {
   ST.activeList = null;
   ST.search = '';
   initImportScreen();
+  updateProfileOpenButtonState();
 }
 
 /* ── AUDIT ──────────────────────────────────── */
