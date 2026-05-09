@@ -55,7 +55,7 @@ function renderStarChart() {
     </div>`;
   el.appendChild(controls);
 
-  const ph = document.createElement('div'); ph.className = 'sc-section'; ph.textContent = 'Main Star Chart'; el.appendChild(ph);
+  const ph = document.createElement('div'); ph.className = 'sc-section'; ph.textContent = 'Star Chart'; el.appendChild(ph);
 
   function buildNodeRow(n) {
     const row = document.createElement('div');
@@ -96,13 +96,23 @@ function renderStarChart() {
   let activePlanet = null;
   const detailPanel = document.getElementById('sc-planet-detail');
 
+  function renderEmptyDetail() {
+    if (!detailPanel) return;
+    detailPanel.classList.add('open');
+    detailPanel.innerHTML = `
+      <div class="sc-planet-detail-hdr" style="cursor:default">
+        <span class="sc-detail-name">Select a planet</span>
+        <button class="sc-detail-close" onclick="closePlanetDetail()">✕ Close</button>
+      </div>
+      <div class="sc-detail-empty">Pick a tile on the left to view the node breakdown, junctions, and Steel Path status here.</div>`;
+  }
+
   function openPlanetDetail(p, tile) {
     if (!detailPanel) return;
     grid.querySelectorAll('.sc-planet-tile.selected').forEach(t => t.classList.remove('selected'));
     if (activePlanet === p.name) {
       activePlanet = null;
-      detailPanel.classList.remove('open');
-      detailPanel.innerHTML = '';
+      renderEmptyDetail();
       return;
     }
     activePlanet = p.name;
@@ -122,16 +132,30 @@ function renderStarChart() {
     detailPanel.appendChild(hdr);
     detailPanel.appendChild(nodeList);
     detailPanel.classList.add('open');
-    detailPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   function closePlanetDetail() {
     activePlanet = null;
-    if (detailPanel) { detailPanel.classList.remove('open'); detailPanel.innerHTML = ''; }
+    renderEmptyDetail();
     grid.querySelectorAll('.sc-planet-tile.selected').forEach(t => t.classList.remove('selected'));
   }
 
-  sortedPlanets.forEach(p => {
+  const chartEntries = [
+    ...sortedPlanets.map(p => ({ type: 'planet', name: p.name, data: p })),
+    { type: 'railjack', name: 'Railjack', data: { name: 'Railjack', nodes: railjack } },
+  ];
+
+  const railjackEntryIndex = chartEntries.findIndex(entry => entry.type === 'railjack');
+  if (railjackEntryIndex !== -1) {
+    const [railjackEntry] = chartEntries.splice(railjackEntryIndex, 1);
+    chartEntries.sort((a, b) => a.name.localeCompare(b.name));
+    chartEntries.push(railjackEntry);
+  } else {
+    chartEntries.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  chartEntries.forEach(entry => {
+    const p = entry.data;
     const done = p.nodes.filter(n => n.done).length;
     const spD = p.nodes.filter(n => n.spDone).length;
     const total = p.nodes.length;
@@ -150,7 +174,8 @@ function renderStarChart() {
     }, 0);
 
     const tile = document.createElement('div');
-    tile.className = 'sc-planet-tile' + (isBaseDone ? ' complete' : '') + (starred ? ' priority' : '');
+    tile.className = 'sc-planet-tile' + (entry.type === 'railjack' ? ' railjack' : '') + (isBaseDone ? ' complete' : '') + (starred ? ' priority' : '');
+    if (entry.type === 'railjack') tile.style.gridColumn = '1 / -1';
 
     tile.innerHTML = `
       <div class="sc-tile-hdr">
@@ -180,31 +205,20 @@ function renderStarChart() {
   });
   el.appendChild(grid);
 
-  if (railjack.length) {
-    const rh = document.createElement('div'); rh.className = 'sc-section'; rh.style.marginTop = '.75rem'; rh.textContent = 'Railjack'; el.appendChild(rh);
-    const rjDone = railjack.filter(n => n.done).length;
-    const rjSp = railjack.filter(n => n.spDone).length;
-    const rjPct = Math.round(rjDone / railjack.length * 100);
-    const rjSpPct = Math.round(rjSp / railjack.length * 100);
-    const rgrid = document.createElement('div'); rgrid.className = 'sc-planet-grid'; rgrid.style.setProperty('--cols', cols);
-    const rtile = document.createElement('div'); rtile.className = 'sc-planet-tile' + (rjPct === 100 ? ' complete' : '');
-    rtile.innerHTML = `
-      <div class="sc-tile-hdr"><span class="sc-tile-name">Railjack</span><span class="sc-tile-pct">${rjPct}%</span></div>
-      <div class="sc-dual-bar"><div class="sc-dual-base" style="width:${rjPct}%"></div><div class="sc-dual-sp" style="width:${rjSpPct}%"></div></div>
-      <div class="sc-tile-stats">${rjDone}/${railjack.length} base · <span class="sp-done">${rjSp}</span> SP</div>
-      <div class="sc-tile-body"></div>`;
-    const rjPlanet = { name: 'Railjack', nodes: railjack };
-    rtile.addEventListener('click', e => {
-      if (e.target.closest('.sc-tile-star')) return;
-      openPlanetDetail(rjPlanet, rtile);
-    });
-    rgrid.appendChild(rtile); el.appendChild(rgrid);
-  }
+  if (!detailPanel?.innerHTML) renderEmptyDetail();
 }
 
 function closePlanetDetail() {
   const detailPanel = document.getElementById('sc-planet-detail');
-  if (detailPanel) { detailPanel.classList.remove('open'); detailPanel.innerHTML = ''; }
+  if (detailPanel) {
+    detailPanel.classList.add('open');
+    detailPanel.innerHTML = `
+      <div class="sc-planet-detail-hdr" style="cursor:default">
+        <span class="sc-detail-name">Select a planet</span>
+        <button class="sc-detail-close" onclick="closePlanetDetail()">✕ Close</button>
+      </div>
+      <div class="sc-detail-empty">Pick a tile on the left to view the node breakdown, junctions, and Steel Path status here.</div>`;
+  }
   document.querySelectorAll('.sc-planet-tile.selected').forEach(t => t.classList.remove('selected'));
 }
 

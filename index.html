@@ -235,9 +235,13 @@
   </div>
 
   <div id="view-sc">
-    <div class="scgrid" id="scgrid"></div>
-    <div id="sc-planet-detail" class="sc-planet-detail"></div>
-  <div class="fnote">Star chart data from warframestat.us — <span>Steel Path completions cannot be separated from Normal in this profile format.</span> Node counts may vary slightly as DE adds missions.</div>
+    <div class="sc-shell">
+      <div class="sc-main">
+        <div class="scgrid" id="scgrid"></div>
+      </div>
+      <div id="sc-planet-detail" class="sc-planet-detail"></div>
+    </div>
+    <div class="fnote">Star chart data from warframestat.us — <span>Steel Path completions cannot be separated from Normal in this profile format.</span> Node counts may vary slightly as DE adds missions.</div>
   </div>
 
   <div id="view-planner">
@@ -272,6 +276,9 @@
       <select class="csel" id="planner-list" onchange="onPlannerList(this.value)">
         <option value="none">No list filter</option>
       </select>
+      <label class="ctog planner-pill-toggle"><input type="checkbox" id="planner-pill-owned" onchange="onPlannerPillToggle('owned', this.checked)"> Owned</label>
+      <label class="ctog planner-pill-toggle"><input type="checkbox" id="planner-pill-rankmax" onchange="onPlannerPillToggle('rankmax', this.checked)"> Rank max</label>
+      <label class="ctog planner-pill-toggle"><input type="checkbox" id="planner-pill-status" onchange="onPlannerPillToggle('status', this.checked)"> No status</label>
       <span class="planner-keyhint"><kbd>W</kbd> open wiki for selected/hovered row</span>
     </div>
     <div class="planner-list" id="planner-wrap"></div>

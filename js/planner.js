@@ -123,6 +123,7 @@ function onPlannerSort(v) {
 function renderPlanner() {
   const wrap = document.getElementById('planner-wrap');
   if (!wrap) return;
+  syncPlannerPillToggles();
 
   const rows = plannerRows();
   ST._plannerVisibleRows = rows;
@@ -140,6 +141,7 @@ function renderPlanner() {
     in_progress: 'In progress',
     done: 'Done',
   };
+  const pillPrefs = getPlannerPillPrefs();
 
   const makePlannerRow = (r) => {
     const details = document.createElement('details');
@@ -168,14 +170,18 @@ function renderPlanner() {
       <summary>
         <div class="planner-main">
           <button type="button" class="planner-star${r.starred ? ' on' : ''}" title="Toggle favorite">★</button>
-          <div class="planner-meta">
+          <div class="planner-content">
+            <div class="planner-line1">
             <span class="planner-name">${escapeHtml(r.item.name)}</span>
             <span class="planner-stars">${Number(r.planner.total_stars).toFixed(1)} ★</span>
             <span class="planner-cat">${escapeHtml(r.planner.category)}</span>
-            <span class="planner-chip ${ownedCls}">${r.item.isOwned ? 'Owned' : 'Unowned'}</span>
-            <span class="planner-chip ${rankStateCls}">${rankStateLbl}</span>
-            <span class="planner-chip farm">${escapeHtml(farmLabel)}</span>
+            </div>
+            <div class="planner-badges">
+            ${pillPrefs.owned ? `<span class="planner-chip ${ownedCls}">${r.item.isOwned ? 'Owned' : 'Unowned'}</span>` : ''}
+            ${pillPrefs.rankmax ? `<span class="planner-chip ${rankStateCls}">${rankStateLbl}</span>` : ''}
+            ${pillPrefs.status ? `<span class="planner-chip farm">${escapeHtml(farmLabel)}</span>` : ''}
             ${notePresent ? '<span class="planner-chip note">Note</span>' : ''}
+            </div>
           </div>
         </div>
         <div class="planner-right">

@@ -1550,6 +1550,7 @@ function onPlannerSort(v) {
 function renderPlanner() {
   const wrap = document.getElementById('planner-wrap');
   if (!wrap) return;
+  syncPlannerPillToggles();
 
   const rows = plannerRows();
   ST._plannerVisibleRows = rows;
@@ -1567,6 +1568,7 @@ function renderPlanner() {
     in_progress: 'In progress',
     done: 'Done',
   };
+  const pillPrefs = getPlannerPillPrefs();
 
   const makePlannerRow = (r) => {
     const details = document.createElement('details');
@@ -1596,14 +1598,18 @@ function renderPlanner() {
       <summary>
         <div class="planner-main">
           <button type="button" class="planner-star${r.starred ? ' on' : ''}" title="Toggle favorite">★</button>
-          <div class="planner-meta">
+          <div class="planner-content">
+            <div class="planner-line1">
             <span class="planner-name">${escapeHtml(r.item.name)}</span>
             <span class="planner-stars">${Number(r.planner.total_stars).toFixed(1)} ★</span>
             <span class="planner-cat">${escapeHtml(r.planner.category)}</span>
-            <span class="planner-chip ${ownedCls}">${r.item.isOwned ? 'Owned' : 'Unowned'}</span>
-            <span class="planner-chip ${rankStateCls}">${rankStateLbl}</span>
-            <span class="planner-chip farm">${escapeHtml(farmLabel)}</span>
+            </div>
+            <div class="planner-badges">
+            ${pillPrefs.owned ? `<span class="planner-chip ${ownedCls}">${r.item.isOwned ? 'Owned' : 'Unowned'}</span>` : ''}
+            ${pillPrefs.rankmax ? `<span class="planner-chip ${rankStateCls}">${rankStateLbl}</span>` : ''}
+            ${pillPrefs.status ? `<span class="planner-chip farm">${escapeHtml(farmLabel)}</span>` : ''}
             ${notePresent ? '<span class="planner-chip note">Note</span>' : ''}
+            </div>
           </div>
         </div>
         <div class="planner-right">
@@ -2357,11 +2363,47 @@ function toast(msg,dur=2200) {
 
 /* ── PERSISTENCE ────────────────────────────── */
 function saveSettings() {
-  ST.userData.settings = { cats:ST.cats, acqs:ST.acqs, sort:ST.sort, group:ST.group, plannerSort:ST.plannerSort, plannerLayout:ST.plannerLayout, plannerActiveList: ST.plannerActiveList };
+  ST.userData.settings = {
+    cats: ST.cats,
+    acqs: ST.acqs,
+    sort: ST.sort,
+    group: ST.group,
+    plannerSort: ST.plannerSort,
+    plannerLayout: ST.plannerLayout,
+    plannerActiveList: ST.plannerActiveList,
+    plannerPills: ST.userData.settings?.plannerPills || { owned: true, rankmax: true, status: true }
+  };
   saveUserData();
 }
 function loadSettings() {
   // loadUserData handles this — this is a no-op kept for call-site compatibility
+}
+
+function getPlannerPillPrefs() {
+  const p = ST.userData.settings?.plannerPills || {};
+  return {
+    owned: p.owned !== false,
+    rankmax: p.rankmax !== false,
+    status: p.status !== false,
+  };
+}
+
+function syncPlannerPillToggles() {
+  const prefs = getPlannerPillPrefs();
+  const owned = document.getElementById('planner-pill-owned');
+  const rankmax = document.getElementById('planner-pill-rankmax');
+  const status = document.getElementById('planner-pill-status');
+  if (owned) owned.checked = prefs.owned;
+  if (rankmax) rankmax.checked = prefs.rankmax;
+  if (status) status.checked = prefs.status;
+}
+
+function onPlannerPillToggle(key, checked) {
+  if (!ST.userData.settings) ST.userData.settings = {};
+  const current = ST.userData.settings.plannerPills || { owned: true, rankmax: true, status: true };
+  ST.userData.settings.plannerPills = { ...current, [key]: checked };
+  saveUserData();
+  renderPlanner();
 }
 
 function setStatusSelected(status) {
@@ -2480,6 +2522,7 @@ async function loadAndShow(profile) {
   if (plannerLayoutSel) plannerLayoutSel.value = ST.plannerLayout;
   const plannerListSel = document.getElementById('planner-list');
   if (plannerListSel) plannerListSel.value = ST.plannerActiveList || 'none';
+  syncPlannerPillToggles();
   saveUserData();
   toast(`Sync complete: ${ST.items.length} items tracked.`);
 }
