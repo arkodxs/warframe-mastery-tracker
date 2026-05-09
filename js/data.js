@@ -1,5 +1,26 @@
 'use strict';
 
+const ITEM_EXPECTED_COUNTS = {
+  'Warframes':115,'Primary':192,'Secondary':146,'Melee':221,'Zaws':11,'Kitguns':6,
+  'Archwing':5,'Arch-Gun':20,'Arch-Melee':8,'Necramechs':2,'Kubrow':6,'Kavat':5,'Vulpaphyla':3,
+  'Predasite':3,'MOAs':4,'Hounds':3,'Sentinels':17,'Sentinel Weapons':24,'Amps':10,'K-Drive':5
+};
+
+const DB_CONFIG = {
+  VALID_CATS: [
+    'Warframes','Primary','Secondary','Melee','Archwing','Arch-Gun','Arch-Melee',
+    'Sentinels','Sentinel Weapons','Pets','Amps','Necramechs','Zaws','Kitguns',
+    'MOAs','Hounds','Kubrow','Kavat','Vulpaphyla','Predasite','K-Drive','Plexus'
+  ],
+  KITGUN_CHAMBERS: ['catchmoon','gaze','rattleguts','tombfinger','sporelacer','vermisplicer'],
+  ZAW_STRIKES: ['balla','cyath','dehtat','dokrahm','kronsh','mewan','ooltha','rabvee','sepfahn','plague keewar','plague kripath'],
+  RESCUE_LIST: ['mausolon','morgha','cortege','mandonel','grimoire','bo prime','kuva ghoulsaw','ghoulsaw','dark split-sword','bo','mk1-bo','prisma veritux','prisma dual decurions','imperator','imperator vandal','prisma imperator','jat kittag','innodem','wyrm prime','quassus prime','prisma sybaris','prisma gammacor','rathbone','lato','strun','paris','lex','enkaus','phahd','runway'],
+};
+
+// expose for legacy consumers
+window.DB_CONFIG = DB_CONFIG;
+window.__wfData = Object.assign(window.__wfData || {}, { DB_CONFIG });
+
 function getMajorVersion(rawIntro) {
   if (!rawIntro) return '0';
   const match = String(rawIntro).match(/(\d+)/);
@@ -12,8 +33,24 @@ function classifyItem(item) {
   const path = (item.uniqueName || '').toLowerCase();
   const apiCat = item.category || 'Other';
 
+  const FORCE_INCLUDE_BY_NAME = new Set(['innodem', 'jat kittag']);
+  const FORCE_INCLUDE_BY_PATH = [
+    '/lotus/weapons/tenno/zariman/melee/dagger/zarimandaggerweapon'
+  ];
+  const FORCE_EXCLUDE_BY_NAME = new Set(['plague akwin', 'plague bokwin']);
+  const FORCE_EXCLUDE_PATH_PARTS = ['/handles/'];
+
+  if (FORCE_EXCLUDE_BY_NAME.has(nameKey) || FORCE_EXCLUDE_PATH_PARTS.some(p => path.includes(p))) {
+    return { isJunk:true };
+  }
+
+  if (FORCE_INCLUDE_BY_NAME.has(nameKey) || FORCE_INCLUDE_BY_PATH.some(p => path.includes(p))) {
+    return { finalCat:'Melee', isRescued:true, scoreBoost:400000, isJunk:false };
+  }
+
   if (nameKey === 'runway') return { finalCat:'K-Drive', isRescued:true, scoreBoost:500000 };
   if (nameKey === 'helminth charger') return { finalCat:'Kubrow', isRescued:true, scoreBoost:500000 };
+  if (nameKey === 'jat kittag') return { finalCat:'Melee', isRescued:true, scoreBoost:400000, isJunk:false };
 
   const ZAW_SLOP = ['jai','ruhang','ekwana','vargeet','jayap','laka','korb','shtung','peye','kwath','kroostra','seekalla'];
   const junkKeywords = [
@@ -81,7 +118,8 @@ async function fetchItemDb() {
       for (const [path, item] of Object.entries(db)) {
         if (!item || typeof item !== 'object') continue;
         const nameKey = String(item.name || '').toLowerCase();
-        if (nameKey === 'paracesis' || String(path).toLowerCase().includes('paracesis')) {
+        const p = String(path).toLowerCase();
+        if (nameKey === 'paracesis' || p.includes('paracesis') || nameKey.startsWith('tenet ') || p.includes('tenet')) {
           item.maxRank = 40;
         }
       }
@@ -100,7 +138,7 @@ async function fetchItemDb() {
 
       const { finalCat, isRescued, isZaw, isKitgun, isMoa, isHound, isVulpaphyla, isPredasite, isKDrive, isMech, isAmp, scoreBoost } = res;
       const pathLower = item.uniqueName.toLowerCase();
-      const isModular = pathLower.includes('/modular/') || pathLower.includes('/zaw/') || pathLower.includes('/kitgun/') || pathLower.includes('/kdrive/') || pathLower.includes('/pets/');
+      const isModular = pathLower.includes('/modular/') || pathLower.includes('/modularmelee') || pathLower.includes('/zaw/') || pathLower.includes('/kitgun/') || pathLower.includes('/kdrive/') || pathLower.includes('/pets/');
       if (isModular && !isZaw && !isKitgun && !isMoa && !isHound && !isKDrive && !isMech && !isAmp && !isRescued) return;
 
       const isRecognized = DB_CONFIG.VALID_CATS.some(c => c === finalCat || (c.endsWith('s') && c.slice(0, -1) === finalCat));
@@ -125,16 +163,66 @@ async function fetchItemDb() {
           apiCat: finalCat,
           introduced: rawIntro,
           majorUpdate: majorVer,
-          maxRank: (pathLower.includes('kuva') || pathLower.includes('tenet') || pathLower.includes('lich') || pathLower.includes('coda') || isMech || pathLower.includes('paracesis') || item.name === 'Paracesis') ? 40 : 30
+          maxRank: (pathLower.includes('kuva') || pathLower.includes('tenet') || pathLower.includes('lich') || pathLower.includes('coda') || isMech || pathLower.includes('paracesis') || nameKey.startsWith('tenet ') || item.name === 'Paracesis') ? 40 : 30
         }
       };
     });
 
     Object.values(dbByName).forEach(winner => { db[winner.path] = winner.data; });
     normalizeRank40Items(db);
+    // Optional developer auto-audit: set localStorage 'wft_auto_audit' to '1'
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('wft_auto_audit') === '1') {
+      try { validateItemCounts(db); } catch (e) { console.warn('Auto-audit failed', e); }
+    }
     await dbSet('cache', 'item_db', db);
     return db;
   } catch (err) { return {}; }
+}
+
+function validateItemCounts(db) {
+  const actualCounts = {};
+  Object.values(db).forEach(item => {
+    const cat = item.apiCat || 'Unknown';
+    actualCounts[cat] = (actualCounts[cat] || 0) + 1;
+  });
+  
+  let mismatchFound = false;
+  for (const [cat, expected] of Object.entries(ITEM_EXPECTED_COUNTS)) {
+    const actual = actualCounts[cat] || 0;
+    if (actual !== expected) {
+      console.warn(`Item count mismatch: ${cat} — expected ${expected}, got ${actual} (diff: ${actual - expected})`);
+      mismatchFound = true;
+    }
+  }
+  if (!mismatchFound) console.log('✓ All item category counts match expected values');
+}
+
+function explainCategoryMismatch(category, dbInput) {
+  const db = dbInput || ST.itemDb || {};
+  const currentDb = db.v || db;
+  const cat = String(category || '').trim();
+  const catLower = cat.toLowerCase();
+  if (!cat) {
+    console.warn('Provide a category name. Example: explainCategoryMismatch("Melee")');
+    return null;
+  }
+
+  const dbValues = Object.values(currentDb || {});
+  const source = dbValues.length > 0 ? dbValues : (Array.isArray(ST.items) ? ST.items : []);
+  const items = source.filter(i => {
+    if (!i) return false;
+    const a = String(i.apiCat || '').toLowerCase();
+    const b = String(i.category || '').toLowerCase();
+    const c = String(i.cat || '').toLowerCase();
+    return a === catLower || b === catLower || c === catLower;
+  });
+  const expected = ITEM_EXPECTED_COUNTS[cat];
+  const actual = items.length;
+  const diff = (expected == null) ? null : (actual - expected);
+
+  console.log(`Category ${cat}: current ${actual}${expected == null ? '' : ` / expected ${expected} (diff ${diff >= 0 ? '+' : ''}${diff})`}`);
+  console.table(items.map(i => ({ name: i.name, path: i.path || '', maxRank: i.maxRank })));
+  return { category: cat, expected, actual, diff, names: items.map(i => i.name) };
 }
 
 async function fetchUpdateNames() {
@@ -186,6 +274,15 @@ async function fetchUpdateNames() {
     return {};
   }
 }
+
+window.__wfData = Object.assign(window.__wfData || {}, {
+  ITEM_EXPECTED_COUNTS,
+  classifyItem,
+  fetchItemDb,
+  fetchUpdateNames,
+  validateItemCounts,
+  explainCategoryMismatch,
+});
 
 async function fetchMissionDb() {
   if (ST.missionDb) return ST.missionDb;

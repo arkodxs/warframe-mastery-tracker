@@ -228,3 +228,9 @@ function setSCCols(n) {
   saveUserData();
   renderStarChart();
 }
+
+window.__wfStarChart = Object.assign(window.__wfStarChart || {}, {
+  renderStarChart,
+  closePlanetDetail,
+  setSCCols,
+});

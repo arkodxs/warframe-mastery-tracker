@@ -575,6 +575,36 @@ async function dbSet(store, key, val) {
   } catch(e) {}
 }
 
+async function dbDelete(store, key) {
+  try {
+    const db = await openCacheDB();
+    return new Promise((ok, err) => {
+      const tx = db.transaction('cache', 'readwrite');
+      tx.objectStore('cache').delete(key);
+      tx.oncomplete = ok;
+      tx.onerror = () => err(tx.error);
+    });
+  } catch(e) {}
+}
+
+async function dbClearCache() {
+  try {
+    const db = await openCacheDB();
+    return new Promise((ok, err) => {
+      const tx = db.transaction('cache', 'readwrite');
+      tx.objectStore('cache').clear();
+      tx.oncomplete = ok;
+      tx.onerror = () => err(tx.error);
+    });
+  } catch(e) {}
+}
+
+// Expose cache helpers for console use
+window.dbGet = dbGet;
+window.dbSet = dbSet;
+window.dbDelete = dbDelete;
+window.dbClearCache = dbClearCache;
+
 // User DB — personal data (notes, stars, lists, settings)
 async function userDbGet(key) {
   try {
@@ -694,207 +724,23 @@ function setProgress(pct,msg) {
   if(txt && msg) txt.textContent = msg;
 }
 
-/* ── ITEM CLASSIFICATION ─────────────────────── */
-const DB_CONFIG = {
-  VALID_CATS: [
-    'Warframes','Primary','Secondary','Melee','Archwing','Arch-Gun','Arch-Melee',
-    'Sentinels','Sentinel Weapons','Pets','Amps','Necramechs','Zaws','Kitguns',
-    'MOAs','Hounds','Kubrow','Kavat','Vulpaphyla','Predasite','K-Drive','Plexus'
-  ],
-  KITGUN_CHAMBERS: ['catchmoon','gaze','rattleguts','tombfinger','sporelacer','vermisplicer'],
-  ZAW_STRIKES: ['balla','cyath','dehtat','dokrahm','kronsh','mewan','ooltha','rabvee','sepfahn','plague keewar','plague kripath'],
-  RESCUE_LIST: ['mausolon','morgha','cortege','mandonel','grimoire','bo prime','kuva ghoulsaw','ghoulsaw','dark split-sword','bo','mk1-bo','prisma veritux','prisma dual decurions','imperator','imperator vandal','prisma imperator','jat kittag','innodem','wyrm prime','quassus prime','prisma sybaris','prisma gammacor','rathbone','lato','strun','paris','lex','enkaus','phahd','runway'],
-};
-
+/* ── ITEM CLASSIFICATION (delegates to data layer) ─────────────────────── */
 function classifyItem(item) {
-  const name = item.name || '';
-  const nameKey = name.toLowerCase();
-  const path = (item.uniqueName || '').toLowerCase();
-  const apiCat = item.category || 'Other';
-
-  // Specific rescues
-  if (nameKey === 'runway') return { finalCat:'K-Drive', isRescued:true, scoreBoost:500000 };
-  if (nameKey === 'helminth charger') return { finalCat:'Kubrow', isRescued:true, scoreBoost:500000 };
-
-  const ZAW_SLOP = ['jai','ruhang','ekwana','vargeet','jayap','laka','korb','shtung','peye','kwath','kroostra','seekalla'];
-  const junkKeywords = [
-    'glyph','noggle','theme','shawzin','floof','mandala','pattern','narta','display','poster','scene',
-    'extractor','decoration','syandana','finish','lacquer','ephemera','sigil','skin','blueprint',
-    'helmet','stencil','vignette','globule','token','steel path','domestik','pedestal','maggot',
-    'ascaris','tag','casing','capsule','engine','weapon pod','barrel','receiver','stock','statue',
-    'necramite','cells','component','node','misc','resource','gear','fish','quest','box','basket',
-    'book','bop','trophy','shard','instrument','debt-bond','booster','segment','pizza','lunch',
-    'cardboard','theorem','lure','pheromone','genetic','upgrade','bust','egg','collar','code',
-    'specter','howl of','lucky','twin kavats','core','gyro','bracket','stabilizer','mutagen',
-    'antigen','incarnon genesis','helminth'
-  ];
-  
-  // Explicitly ban items that track XP but yield 0 Mastery (Venari does give XP)
-  const ZERO_MASTERY = [
-    'plexus', 'bondi k-drive',
-    "garuda's talons", "garuda prime talons", 'iron staff', 'iron staff prime',
-    'regulators', 'regulators prime', 'dex pixia', 'dex pixia prime',
-    'desert wind', 'desert wind prime', 'artemis bow', 'artemis bow prime',
-    'balefire charger', 'diwata', 'diwata prime', 'valkyr talons', 'valkyr prime talons',
-    'shadow claws', 'noctowl'
-  ];
-
-  if (ZERO_MASTERY.includes(nameKey) || junkKeywords.some(k=>nameKey.includes(k)) || ZAW_SLOP.some(s=>nameKey.includes(s)) || apiCat==='Mods' || path.includes('/upgrades/'))
-    return { isJunk:true };
-
-  const isZaw = DB_CONFIG.ZAW_STRIKES.includes(nameKey);
-  const isKitgun = DB_CONFIG.KITGUN_CHAMBERS.includes(nameKey);
-  const isMoa = path.includes('moapethead') || (path.includes('/moapets/') && (nameKey.includes('moa') || path.includes('head')));
-  const isHound = path.includes('zanukapetparthead') || nameKey.includes('hound');
-  const isKDrive = path.includes('kdrives/boards') || ['bad baby','feverspine','flatbelly','needlenose','runway'].some(k=>nameKey.includes(k));
-  const isMech = nameKey==='voidrig' || nameKey==='bonewidow' || path.includes('entratimech');
-  const isAmp = (nameKey.includes('prism') && !nameKey.includes('prisma')) || nameKey==='sirocco' || nameKey.includes('phahd') || apiCat==='Amps';
-  const isSentinelWep = apiCat==='Sentinel Weapons' || path.includes('sentinelweapons') || ['akaten','batoten','cryotra','helstrum','lacerten','multron','tazicor','vulcax','deconstructor','verglas','sweeper','stinger','vulklok','artax','burst laser'].some(k=>nameKey.includes(k));
-  
-  // NEW: Identify Deimos Pets specifically
-  const isVulp = nameKey.includes('vulpaphyla');
-  const isPred = nameKey.includes('predasite');
-
-  let finalCat = apiCat;
-  if (isMech) finalCat='Necramechs';
-  else if (isAmp) finalCat='Amps';
-  else if (isMoa) finalCat='MOAs';
-  else if (isHound) finalCat='Hounds';
-  else if (isZaw) finalCat='Zaws';
-  else if (isKitgun) finalCat='Kitguns';
-  else if (isKDrive) finalCat='K-Drive';
-  else if (isSentinelWep) finalCat='Sentinel Weapons';
-  else if (isVulp) finalCat='Vulpaphyla';
-  else if (isPred) finalCat='Predasite';
-  else if (nameKey.includes('kavat') || nameKey.includes('venari')) finalCat='Kavat';
-  else if (nameKey.includes('kubrow')) finalCat='Kubrow';
-  else if (nameKey==='wyrm prime' || (apiCat==='Sentinels' && !isSentinelWep)) finalCat='Sentinels';
-  else if (nameKey.includes('sybaris') || ['strun','paris','enkaus'].includes(nameKey)) finalCat='Primary';
-  else if (nameKey.includes('gammacor') || ['lato','lex'].includes(nameKey) || nameKey==='grimoire') finalCat='Secondary';
-
-  const isRescued = DB_CONFIG.RESCUE_LIST.includes(nameKey) || isMoa || isHound || isKDrive || isMech || isZaw || isKitgun || isSentinelWep || isAmp || isVulp || isPred;
-  
-  return { finalCat, isRescued, isZaw, isKitgun, isMoa, isHound, isKDrive, isMech, isAmp, scoreBoost: isRescued?400000:0, isJunk:false };
+  if (window.__wfData?.classifyItem) return window.__wfData.classifyItem(item);
+  // Fallback only before data layer initializes
+  return { isJunk:true };
 }
 
 /* ── API FETCH ──────────────────────────────── */
 async function fetchItemDb() {
-  try {
-    const cached = await dbGet('cache','item_db');
-    const normalizeRank40Items = (db) => {
-      if (!db || typeof db !== 'object') return db;
-      for (const [path, item] of Object.entries(db)) {
-        if (!item || typeof item !== 'object') continue;
-        const nameKey = String(item.name || '').toLowerCase();
-        if (nameKey === 'paracesis' || String(path).toLowerCase().includes('paracesis')) {
-          item.maxRank = 40;
-        }
-      }
-      return db;
-    };
-    if (cached && (Date.now()-cached.t)<CACHE_TTL) return normalizeRank40Items(cached.v);
-
-    const resp = await fetch('https://raw.githubusercontent.com/wfcd/warframe-items/master/data/json/All.json');
-    const items = await resp.json();
-    const db = {}, dbByName = {};
-
-    items.forEach(item => {
-      if (!item || !item.uniqueName || !item.name) return;
-      const res = classifyItem(item);
-      if (res.isJunk) return;
-
-      const { finalCat, isRescued, isZaw, isKitgun, isMoa, isHound, isVulpaphyla, isPredasite, isKDrive, isMech, isAmp, scoreBoost } = res;
-      const pathLower = item.uniqueName.toLowerCase();
-
-      const isModular = pathLower.includes('/modular/') || pathLower.includes('/zaw/') || pathLower.includes('/kitgun/') || pathLower.includes('/kdrive/') || pathLower.includes('/pets/');
-      if (isModular && !isZaw && !isKitgun && !isMoa && !isHound && !isKDrive && !isMech && !isAmp && !isRescued) return;
-
-      const isRecognized = DB_CONFIG.VALID_CATS.some(c => c===finalCat || (c.endsWith('s') && c.slice(0,-1)===finalCat));
-      if (!isRecognized && !isRescued) return;
-
-      let score = (item.masteryExp||0) + scoreBoost;
-      if (item.introduced) score += 5000;
-      if (pathLower.includes('/npc/')) score -= 500000;
-
-      const nameKey = item.name.toLowerCase();
-      if (dbByName[nameKey] && score <= dbByName[nameKey].score) return;
-
-      // Fix: store introduced as a plain string
-      const rawIntro = item.introduced
-        ? (typeof item.introduced === 'object' ? (item.introduced.name || '') : String(item.introduced))
-        : 'Unknown';
-      const majorVer = getMajorVersion(rawIntro);
-
-      dbByName[nameKey] = {
-        path: pathLower, score,
-        data: {
-          name: item.name,
-          apiCat: finalCat,
-          introduced: rawIntro,
-          majorUpdate: majorVer,
-          maxRank: (pathLower.includes('kuva') || pathLower.includes('tenet') || pathLower.includes('lich') || pathLower.includes('coda') || isMech || pathLower.includes('paracesis') || item.name === 'Paracesis') ? 40 : 30
-        }
-      };
-    });
-
-    Object.values(dbByName).forEach(winner => { db[winner.path] = winner.data; });
-    normalizeRank40Items(db);
-    await dbSet('cache','item_db',db);
-    return db;
-  } catch(err) { return {}; }
+  if (window.__wfData?.fetchItemDb) return window.__wfData.fetchItemDb();
+  return {};
 }
 
 /* ── UPDATE NAMES ───────────────────────────── */
 async function fetchUpdateNames() {
-  try {
-    const cached = await dbGet('cache', 'update_names');
-    if (cached && (Date.now() - cached.t) < CACHE_TTL) return cached.v;
-
-    const resp = await fetch('https://raw.githubusercontent.com/WFCD/warframe-patchlogs/master/data/patchlogs.json');
-    if (!resp.ok) throw new Error('Patchlog fetch failed');
-    const logs = await resp.json();
-    const map = {};
-
-    logs.filter(l => l.type === 'Update').forEach(l => {
-      // Handles both "Update 35: Title" and "Title: Update 35" orderings
-      const m = l.name.match(/Update\s+(\d+)[.\d]*\s*[:\-–]?\s*(.+)|(.+?)\s*[:\-–]\s*Update\s+(\d+)/i);
-      if (m) {
-        const ver = m[1] || m[4];
-        const title = (m[2] || m[3] || '').replace(/\s*\|\s*Warframe.*/i, '').trim();
-        if (ver && title && !map[ver]) map[ver] = title;
-      }
-    });
-
-    // Fill well-known older ones the regex may miss
-    const fallbacks = {
-      '18':'The Second Dream',
-      '19':'The War Within',
-      '20':"Octavia's Anthem",
-      '21':'Chains of Harrow',
-      '22':'Plains of Eidolon',
-      '23':'The Sacrifice',
-      '24':'Fortuna',
-      '25':'The Jovian Concord',
-      '26':'Empyrean',
-      '27':'Heart of Deimos',
-      '28':'The Deadlock Protocol',
-      '29':'Sisters of Parvos',
-      '30':'The New War',
-      '31':'Angels of the Zariman',
-      '32':'Veilbreaker',
-      '33':"Citrine's Last Wish",
-      '34':'Whispers in the Walls',
-      '35':'Dante Unbound',
-      '36':'Jade Shadows',
-    };
-    Object.entries(fallbacks).forEach(([v, t]) => { if (!map[v]) map[v] = t; });
-
-    await dbSet('cache', 'update_names', map);
-    return map;
-  } catch(e) {
-    console.warn('Update names fetch failed:', e);
-    return {};
-  }
+  if (window.__wfData?.fetchUpdateNames) return window.__wfData.fetchUpdateNames();
+  return {};
 }
 
 /* ── MISSION DB (wiki mastery data) ─────────── */
@@ -1175,226 +1021,25 @@ function processStarChart(missions, nodeDb, missionDb) {
 
 
 function renderStarChart() {
-  const el = document.getElementById('scgrid');
-  if (!el) return;
-  el.innerHTML = '';
-
-  if (!ST.nodeDb || !Object.keys(ST.nodeDb).length) {
-    el.innerHTML = '<div style="color:var(--tx3);font-size:.88rem;padding:2rem 0">Loading star chart data…</div>';
-    return;
+  if (window.__wfStarChart?.renderStarChart && window.__wfStarChart.renderStarChart !== renderStarChart) {
+    return window.__wfStarChart.renderStarChart();
   }
-
-  const { planets, railjack } = processStarChart(ST.missions, ST.nodeDb, ST.missionDb);
-
-  // Tallies
-  let totalNodes=0,doneNodes=0,spTotal=0,spDoneCount=0,junctionTotal=0,junctionDone=0,mxpAvailable=0;
-  planets.forEach(p=>p.nodes.forEach(n=>{
-    totalNodes++; if(n.done)doneNodes++;
-    if(n.isJunction){junctionTotal++;if(n.done)junctionDone++;}
-    if(n.done){spTotal++;if(n.spDone)spDoneCount++;}
-    if(n.masteryExp>0&&(n.isJunction?!n.done:!n.spDone))mxpAvailable+=n.masteryExp;
-  }));
-  const overallPct = totalNodes ? Math.round(doneNodes/totalNodes*100) : 0;
-  const spOverallPct = spTotal ? Math.round(spDoneCount/spTotal*100) : 0;
-  const isOverallBaseDone = overallPct === 100;
-  const displayOverallPct = isOverallBaseDone ? spOverallPct : overallPct;
-  const overallLabel = isOverallBaseDone ? `${displayOverallPct}% SP` : `${displayOverallPct}%`;
-  const overallBarColor = isOverallBaseDone ? '#8866e8' : 'var(--acc)';
-
-  // Summary bar
-  const summary = document.createElement('div'); summary.className='sc-summary';
-  summary.innerHTML=`
-    <div class="sc-sum-stat"><div class="sc-sum-num">${doneNodes}/${totalNodes}</div><div class="sc-sum-lbl">Base nodes</div></div>
-    <div style="width:1px;height:28px;background:var(--bd2);flex-shrink:0"></div>
-    <div class="sc-sum-stat"><div class="sc-sum-num">${spDoneCount}/${spTotal}</div><div class="sc-sum-lbl">Steel Path</div></div>
-    <div style="width:1px;height:28px;background:var(--bd2);flex-shrink:0"></div>
-    <div class="sc-sum-stat"><div class="sc-sum-num">${junctionDone}/${junctionTotal}</div><div class="sc-sum-lbl">Junctions</div></div>
-    ${mxpAvailable>0?`<div style="width:1px;height:28px;background:var(--bd2);flex-shrink:0"></div><div class="sc-sum-stat"><div class="sc-sum-num sc-mxp-available">+${fmtM(mxpAvailable)}</div><div class="sc-sum-lbl">MXP available</div></div>`:''}
-    <div class="scbw" style="flex:1;height:6px"><div class="scb" style="width:${displayOverallPct}%;background:${overallBarColor}"></div></div>
-    <div class="sc-sum-stat" style="align-items:flex-end"><div class="sc-sum-num" style="color:${overallBarColor}">${overallLabel}</div><div class="sc-sum-lbl">Overall</div></div>`;
-  el.appendChild(summary);
-
-  // Controls row
-  const cols = ST.userData.settings?.scCols ?? 3;
-  const controls = document.createElement('div'); controls.className = 'sc-controls';
-  controls.innerHTML = `
-    <div class="sc-legend">
-      <span class="sc-legend-item"><span class="sc-legend-dot" style="background:var(--tx3);opacity:.4"></span>Not visited</span>
-      <span class="sc-legend-item"><span class="sc-legend-dot" style="background:color-mix(in srgb,var(--acc) 55%,var(--bg))"></span>Base done</span>
-      <span class="sc-legend-item"><span class="sc-legend-dot" style="background:#8866e8"></span>Steel Path done</span>
-      <span class="sc-legend-item"><span class="sc-legend-dot" style="background:#b89830"></span>◆ Junction (mastery XP)</span>
-    </div>
-    <div class="sc-col-ctrl">
-      <span>Columns</span>
-      <button class="sc-col-btn" onclick="setSCCols(${Math.max(1,cols-1)})">−</button>
-      <span>${cols}</span>
-      <button class="sc-col-btn" onclick="setSCCols(${Math.min(5,cols+1)})">+</button>
-    </div>`;
-  el.appendChild(controls);
-
-  // Section header
-  const ph=document.createElement('div');ph.className='sc-section';ph.textContent='Main Star Chart';el.appendChild(ph);
-
-  // Build the node row function
-  function buildNodeRow(n) {
-    const row=document.createElement('div');
-    row.className='sc-node'+(n.spDone?' sp-done':n.done?' done':'')+(n.isJunction?' junction':'');
-    const lvl=n.minLevel&&n.maxLevel?`${n.minLevel}–${n.maxLevel}`:'';
-    const typeStr=[n.type,n.enemy,lvl].filter(Boolean).join(' · ');
-    row.innerHTML=`
-      <span class="sc-node-status">${n.done?'✓':'○'}</span>
-      <span class="sc-node-icon">${n.isJunction?'◆':'●'}</span>
-      <span class="sc-node-name">${n.name}</span>
-      <span class="sc-node-type">${typeStr}</span>
-      ${n.completes>0?`<span class="sc-node-runs">${n.completes}×</span>`:''}
-      ${n.masteryExp>0&&(n.isJunction?!n.done:!n.spDone)?`<span class="sc-node-mxp" title="${n.isJunction?'Junction':'SP'} completion awards ${n.masteryExp} mastery XP">+${n.masteryExp}</span>`:''}
-      <a class="sc-node-wiki" href="https://wiki.warframe.com/w/${n.name.replace(/ /g,'_')}" target="_blank" onclick="event.stopPropagation()">wiki ↗</a>
-      <button class="sc-node-star">★</button>
-      <input class="sc-node-note" type="text" placeholder="note…">`;
-    const sb=row.querySelector('.sc-node-star');
-    if(isEntityStarred(n.tag))sb.classList.add('on');
-    sb.addEventListener('click',e=>{e.stopPropagation();toggleEntityStar(n.tag,'node',sb);});
-    const ni=row.querySelector('.sc-node-note');
-    ni.value=ST.userData.entities[n.tag]?.note||'';
-    ni.addEventListener('blur',()=>saveEntityNote(n.tag,'node',ni.value));
-    ni.addEventListener('click',e=>e.stopPropagation());
-    ni.addEventListener('keydown',e=>e.stopPropagation());
-    return row;
-  }
-
-  // Sort planets: starred first, then original order
-  const sortedPlanets = [...planets].sort((a,b) => {
-    const aS = isEntityStarred('planet:'+a.name) ? 0 : 1;
-    const bS = isEntityStarred('planet:'+b.name) ? 0 : 1;
-    return aS - bS;
-  });
-
-  // Planet grid
-  const grid = document.createElement('div');
-  grid.className = 'sc-planet-grid';
-  grid.style.setProperty('--cols', cols);
-
-  let activePlanet = null;
-  const detailPanel = document.getElementById('sc-planet-detail');
-
-  function openPlanetDetail(p, tile) {
-    if (!detailPanel) return;
-    // Deselect previous
-    grid.querySelectorAll('.sc-planet-tile.selected').forEach(t => t.classList.remove('selected'));
-    // If clicking the same planet, close
-    if (activePlanet === p.name) {
-      activePlanet = null;
-      detailPanel.classList.remove('open');
-      detailPanel.innerHTML = '';
-      return;
-    }
-    activePlanet = p.name;
-    tile.classList.add('selected');
-
-    // Build node list
-    const nodes = p.nodes;
-    const hdr = document.createElement('div'); hdr.className = 'sc-planet-detail-hdr';
-    hdr.innerHTML = `<span class="sc-detail-name">${p.name}</span>
-      <span style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--tx3)">${nodes.filter(n=>n.done).length}/${nodes.length} base · ${nodes.filter(n=>n.spDone).length} SP</span>
-      <button class="sc-detail-close" onclick="closePlanetDetail()">✕ Close</button>`;
-    hdr.addEventListener('click', e => { if (!e.target.closest('button')) closePlanetDetail(); });
-
-    const nodeList = document.createElement('div');
-    nodes.forEach(n => nodeList.appendChild(buildNodeRow(n)));
-
-    detailPanel.innerHTML = '';
-    detailPanel.appendChild(hdr);
-    detailPanel.appendChild(nodeList);
-    detailPanel.classList.add('open');
-    detailPanel.scrollIntoView({behavior:'smooth', block:'nearest'});
-  }
-
-  function closePlanetDetail() {
-    activePlanet = null;
-    if (detailPanel) { detailPanel.classList.remove('open'); detailPanel.innerHTML = ''; }
-    grid.querySelectorAll('.sc-planet-tile.selected').forEach(t => t.classList.remove('selected'));
-  }
-
-  sortedPlanets.forEach(p => {
-    const done  = p.nodes.filter(n=>n.done).length;
-    const spD   = p.nodes.filter(n=>n.spDone).length;
-    const total = p.nodes.length;
-
-    const basePct = total ? Math.round(done/total*100) : 0;
-    const spPct   = total ? Math.round(spD/total*100) : 0;
-    const isBaseDone = basePct === 100;
-    const displayPct = isBaseDone ? spPct : basePct;
-    const pctClass = isBaseDone ? 'sc-tile-pct sp-focus' : 'sc-tile-pct';
-    const pctLabel = isBaseDone ? `${displayPct}% SP` : `${displayPct}%`;
-    const starred = isEntityStarred('planet:'+p.name);
-
-    // Available MXP for this planet
-    const availMxp = p.nodes.reduce((s,n) => {
-      if (n.masteryExp > 0 && (n.isJunction ? !n.done : !n.spDone)) return s + n.masteryExp;
-      return s;
-    }, 0);
-
-    const tile = document.createElement('div');
-    tile.className = 'sc-planet-tile' + (isBaseDone?' complete':'') + (starred?' priority':'');
-
-    tile.innerHTML = `
-      <div class="sc-tile-hdr">
-        <span class="sc-tile-name">${p.name}</span>
-        <button class="sc-tile-star${starred?' on':''}">⭑</button>
-        <span class="${pctClass}">${pctLabel}</span>
-      </div>
-      <div class="sc-dual-bar">
-        <div class="sc-dual-base" style="width:${basePct}%"></div>
-        <div class="sc-dual-sp" style="width:${spPct}%"></div>
-      </div>
-      <div class="sc-tile-stats">${done}/${total} base · <span class="sp-done">${spD}</span> SP${availMxp > 0 ? ` · <span style="color:#b89830">+${fmtM(availMxp)}</span>` : ''}</div>`;
-
-    const starBtn = tile.querySelector('.sc-tile-star');
-    starBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      const on = toggleEntityStar('planet:'+p.name, 'planet', starBtn);
-      tile.classList.toggle('priority', on);
-    });
-
-    tile.addEventListener('click', e => {
-      if (e.target.closest('.sc-tile-star')) return;
-      openPlanetDetail(p, tile);
-    });
-
-    grid.appendChild(tile);
-  })
-  el.appendChild(grid);
-
-  // Railjack
-  if (railjack.length) {
-    const rh=document.createElement('div');rh.className='sc-section';rh.style.marginTop='.75rem';rh.textContent='Railjack';el.appendChild(rh);
-    const rjDone=railjack.filter(n=>n.done).length;
-    const rjSp=railjack.filter(n=>n.spDone).length;
-    const rjPct=Math.round(rjDone/railjack.length*100);
-    const rjSpPct=Math.round(rjSp/railjack.length*100);
-    const rgrid=document.createElement('div');rgrid.className='sc-planet-grid';rgrid.style.setProperty('--cols',cols);
-    const rtile=document.createElement('div');rtile.className='sc-planet-tile'+(rjPct===100?' complete':'');
-    rtile.innerHTML=`
-      <div class="sc-tile-hdr"><span class="sc-tile-name">Railjack</span><span class="sc-tile-pct">${rjPct}%</span></div>
-      <div class="sc-dual-bar"><div class="sc-dual-base" style="width:${rjPct}%"></div><div class="sc-dual-sp" style="width:${rjSpPct}%"></div></div>
-      <div class="sc-tile-stats">${rjDone}/${railjack.length} base · <span class="sp-done">${rjSp}</span> SP</div>
-      <div class="sc-tile-body"></div>`;
-    const rjPlanet = {name:'Railjack', nodes: railjack};
-    rtile.addEventListener('click', e => {
-      if (e.target.closest('.sc-tile-star')) return;
-      openPlanetDetail(rjPlanet, rtile);
-    });
-    rgrid.appendChild(rtile);el.appendChild(rgrid);
-  }
+  console.warn('Star chart module not loaded; renderStarChart is unavailable.');
 }
 
 function closePlanetDetail() {
+  if (window.__wfStarChart?.closePlanetDetail && window.__wfStarChart.closePlanetDetail !== closePlanetDetail) {
+    return window.__wfStarChart.closePlanetDetail();
+  }
   const detailPanel = document.getElementById('sc-planet-detail');
   if (detailPanel) { detailPanel.classList.remove('open'); detailPanel.innerHTML = ''; }
   document.querySelectorAll('.sc-planet-tile.selected').forEach(t => t.classList.remove('selected'));
 }
 
 function setSCCols(n) {
+  if (window.__wfStarChart?.setSCCols && window.__wfStarChart.setSCCols !== setSCCols) {
+    return window.__wfStarChart.setSCCols(n);
+  }
   if (!ST.userData.settings) ST.userData.settings = {};
   ST.userData.settings.scCols = n;
   saveUserData();
@@ -1481,40 +1126,11 @@ function comparePlannerRows(a, b) {
 }
 
 function plannerRows() {
-  ensurePlannerData();
-  const rows = ST.items
-    .filter(it => it.cat === 'warframe' && !/\sprime$/i.test(it.name))
-    .map(it => {
-      const key = normalizePlannerName(it.name);
-      const p = ST.plannerIndex?.[key];
-      if (!p) return null;
-      const e = ST.userData.entities[it.path] || {};
-      return {
-        item: it,
-        planner: p,
-        entity: e,
-        progressPct: it.maxRank > 0 ? Math.round((it.rank / it.maxRank) * 100) : 0,
-        starred: isEntityStarred(it.path),
-        farmStatus: e.farmStatus || 'unset',
-        checks: e.farmChecks || {},
-        inActiveList: ST.activeList ? !!ST.userData.entities[it.path]?.lists?.includes(ST.activeList) : false,
-      };
-    })
-    .filter(Boolean);
-
-  const mode = document.getElementById('planner-filter')?.value || 'all';
-  const listSel = document.getElementById('planner-list')?.value || 'none';
-  let visible = rows;
-  if (listSel !== 'none') {
-    visible = rows.filter(r => ST.userData.entities[r.item.path]?.lists?.includes(listSel));
-    // keep runtime activeList in sync with UI
-    ST.activeList = listSel;
-  } else if (mode === 'starred') visible = rows.filter(r => r.starred);
-  else if (mode === 'unowned') visible = rows.slice();
-
-  visible.sort(comparePlannerRows);
-
-  return visible;
+  if (window.__wfPlanner?.plannerRows && window.__wfPlanner.plannerRows !== plannerRows) {
+    return window.__wfPlanner.plannerRows();
+  }
+  console.warn('Planner module not loaded; plannerRows is unavailable.');
+  return [];
 }
 
 function onPlannerLayout(v) {
@@ -1548,170 +1164,14 @@ function onPlannerSort(v) {
 }
 
 function renderPlanner() {
+  if (window.__wfPlanner?.renderPlanner && window.__wfPlanner.renderPlanner !== renderPlanner) {
+    return window.__wfPlanner.renderPlanner();
+  }
   const wrap = document.getElementById('planner-wrap');
-  if (!wrap) return;
-  syncPlannerPillToggles();
-
-  const rows = plannerRows();
-  ST._plannerVisibleRows = rows;
-  if (!rows.length) {
-    wrap.innerHTML = '<div class="planner-empty">No matching base frames for current Planner filters.</div>';
-    ST._plannerSelectedPath = null;
-    ST._plannerHoveredPath = null;
-    return;
+  if (wrap) {
+    wrap.innerHTML = '<div class="planner-empty">Planner module not loaded.</div>';
   }
-
-  const farmLabels = {
-    unset: 'No status',
-    can_now: 'Can farm now',
-    blocked: 'Blocked',
-    in_progress: 'In progress',
-    done: 'Done',
-  };
-  const pillPrefs = getPlannerPillPrefs();
-
-  const makePlannerRow = (r) => {
-    const details = document.createElement('details');
-    details.className = 'planner-row';
-    details.dataset.path = r.item.path;
-    if (ST._plannerSelectedPath === r.item.path) details.classList.add('selected');
-    // Reflect ownership/maxed state visually like the Items tab
-    if (!r.item.isOwned) details.classList.add('unowned');
-    if (r.item.maxRank > 0 && r.item.rank < r.item.maxRank) details.classList.add('unmaxxed');
-
-    const farmLabel = farmLabels[r.farmStatus] || 'No status';
-    const notePresent = !!r.entity.note;
-    const ownedCls = r.item.isOwned ? 'owned' : 'unowned';
-    const rankStateCls = r.item.rank <= 0 ? 'rank-zero' : (r.item.rank >= r.item.maxRank ? 'rank-max' : 'rank-mid');
-    const rankStateLbl = r.item.rank <= 0 ? 'Rank 0' : (r.item.rank >= r.item.maxRank ? 'Rank Max' : 'Rank In Progress');
-    const breakdownHtml = Object.entries(PLANNER_BREAKDOWN).map(([k, cfg]) => {
-      const val = Number(r.planner.breakdown?.[k] || 0).toFixed(1);
-      return `<div class="planner-break"><div class="planner-break-top"><span class="planner-break-name">${cfg.name}</span><span class="planner-break-val">${val}</span></div><div class="planner-break-desc">${cfg.desc}</div></div>`;
-    }).join('');
-
-    const checksHtml = Object.entries(PLANNER_BREAKDOWN).map(([k, cfg]) => {
-      const checked = r.checks[k] ? 'checked' : '';
-      return `<label class="planner-check"><input data-check="${k}" type="checkbox" ${checked}> ${cfg.name}</label>`;
-    }).join('');
-
-    details.innerHTML = `
-      <summary>
-        <div class="planner-main">
-          <button type="button" class="planner-star${r.starred ? ' on' : ''}" title="Toggle favorite">★</button>
-          <div class="planner-content">
-            <div class="planner-line1">
-            <span class="planner-name">${escapeHtml(r.item.name)}</span>
-            <span class="planner-stars">${Number(r.planner.total_stars).toFixed(1)} ★</span>
-            <span class="planner-cat">${escapeHtml(r.planner.category)}</span>
-            </div>
-            <div class="planner-badges">
-            ${pillPrefs.owned ? `<span class="planner-chip ${ownedCls}">${r.item.isOwned ? 'Owned' : 'Unowned'}</span>` : ''}
-            ${pillPrefs.rankmax ? `<span class="planner-chip ${rankStateCls}">${rankStateLbl}</span>` : ''}
-            ${pillPrefs.status ? `<span class="planner-chip farm">${escapeHtml(farmLabel)}</span>` : ''}
-            ${notePresent ? '<span class="planner-chip note">Note</span>' : ''}
-            </div>
-          </div>
-        </div>
-        <div class="planner-right">
-          <select class="planner-farmsel" title="Farm status">
-            <option value="unset" ${r.farmStatus==='unset'?'selected':''}>No status</option>
-            <option value="can_now" ${r.farmStatus==='can_now'?'selected':''}>Can farm now</option>
-            <option value="blocked" ${r.farmStatus==='blocked'?'selected':''}>Blocked</option>
-            <option value="in_progress" ${r.farmStatus==='in_progress'?'selected':''}>In progress</option>
-            <option value="done" ${r.farmStatus==='done'?'selected':''}>Done</option>
-          </select>
-          <span class="planner-expand">▾</span>
-        </div>
-      </summary>
-      <div class="planner-body">
-        <div class="planner-section"><h3>Why This Rating</h3><div class="planner-justify">${escapeHtml(r.planner.justification || 'No notes provided.')}</div></div>
-        <div class="planner-section"><h3>Difficulty Breakdown</h3><div class="planner-breakdown">${breakdownHtml}</div></div>
-        <div class="planner-body-row"><div class="planner-section" style="flex:1;min-width:260px"><h3>Shared Note</h3><textarea class="planner-textarea" placeholder="Add a planning note…">${escapeHtml(r.entity.note || '')}</textarea></div></div>
-        <div class="planner-section"><h3>Personal Checklist</h3><div class="planner-checks">${checksHtml}</div></div>
-      </div>`;
-
-    const starBtn = details.querySelector('.planner-star');
-    starBtn.addEventListener('click', e => {
-      e.preventDefault();
-      e.stopPropagation();
-      toggleEntityStar(r.item.path, r.item.cat, starBtn);
-      if ((document.getElementById('planner-filter')?.value || 'all') === 'starred') renderPlanner();
-    });
-
-    details.querySelector('summary')?.addEventListener('click', (e) => {
-      // Toggle selection without forcing a full re-render to avoid
-      // interrupting native details open/close behavior.
-      const prev = ST._plannerSelectedPath;
-      ST._plannerSelectedPath = (prev === r.item.path) ? null : r.item.path;
-      // Update classes in-place
-      if (prev) {
-        const prevEl = document.querySelector(`.planner-row[data-path="${prev}"]`);
-        if (prevEl) prevEl.classList.remove('selected');
-      }
-      if (ST._plannerSelectedPath) details.classList.add('selected'); else details.classList.remove('selected');
-    });
-    details.addEventListener('mouseenter', () => { ST._plannerHoveredPath = r.item.path; });
-
-    const farmSel = details.querySelector('.planner-farmsel');
-    farmSel.addEventListener('click', e => e.stopPropagation());
-    farmSel.addEventListener('change', () => {
-      setPlannerFarmStatus(r.item.path, r.item.cat, farmSel.value);
-      renderPlanner();
-    });
-
-    const noteEl = details.querySelector('.planner-textarea');
-    noteEl.addEventListener('blur', () => saveEntityNote(r.item.path, r.item.cat, noteEl.value));
-    noteEl.addEventListener('click', e => e.stopPropagation());
-    noteEl.addEventListener('keydown', e => e.stopPropagation());
-
-    details.querySelectorAll('input[data-check]').forEach(input => {
-      input.addEventListener('change', () => {
-        setPlannerCheck(r.item.path, r.item.cat, input.dataset.check, input.checked);
-      });
-    });
-
-    return details;
-  };
-
-  wrap.innerHTML = '';
-  if (ST.plannerLayout === 'list') {
-    const frag = document.createDocumentFragment();
-    rows.forEach(r => frag.appendChild(makePlannerRow(r)));
-    wrap.appendChild(frag);
-    return;
-  }
-
-  const stageMap = {};
-  PLANNER_STAGE_ORDER.forEach(s => { stageMap[s] = []; });
-  rows.forEach(r => {
-    const stage = PLANNER_STAGE_ORDER.includes(r.planner.category) ? r.planner.category : 'Late Game';
-    stageMap[stage].push(r);
-  });
-
-  const colWrap = document.createElement('div');
-  colWrap.className = 'planner-col-wrap';
-  PLANNER_STAGE_ORDER.forEach(stage => {
-    const colRows = stageMap[stage] || [];
-    colRows.sort(comparePlannerRows);
-    const col = document.createElement('div');
-    col.className = 'planner-col';
-    const hdr = document.createElement('div');
-    hdr.className = 'planner-col-hdr';
-    hdr.innerHTML = `<span class="planner-col-name">${escapeHtml(stage)}</span><span class="planner-col-count">${colRows.length}</span>`;
-    col.appendChild(hdr);
-    if (!colRows.length) {
-      const empty = document.createElement('div');
-      empty.className = 'planner-empty';
-      empty.style.padding = '1.2rem .6rem';
-      empty.style.fontSize = '.72rem';
-      empty.textContent = 'No frames in this stage for current filters.';
-      col.appendChild(empty);
-    } else {
-      colRows.forEach(r => col.appendChild(makePlannerRow(r)));
-    }
-    colWrap.appendChild(col);
-  });
-  wrap.appendChild(colWrap);
+  console.warn('Planner module not loaded; renderPlanner is unavailable.');
 }
 
 
@@ -2595,34 +2055,44 @@ function resetApp() {
   updateProfileOpenButtonState();
 }
 
+/* ── VALIDATION ────────────────────────────── */
+function validateItemCounts(db) {
+  if (window.__wfData?.validateItemCounts) return window.__wfData.validateItemCounts(db);
+  console.warn('Data validator not ready yet. Reload once data.js is loaded.');
+  return null;
+}
+
+function explainCategoryMismatch(category, db) {
+  if (window.__wfData?.explainCategoryMismatch) return window.__wfData.explainCategoryMismatch(category, db);
+  console.warn('Mismatch helper not ready yet. Reload once data.js is loaded.');
+  return null;
+}
+
+// Smoke test helper: render planner and star chart (module-backed)
+window.runSmokeTests = async function() {
+  try {
+    // ensure DB loaded
+    if (window.__wfData?.fetchItemDb) await window.__wfData.fetchItemDb();
+    if (window.__wfPlanner?.renderPlanner) window.__wfPlanner.renderPlanner();
+    else if (typeof renderPlanner === 'function') renderPlanner();
+    if (window.__wfStarChart?.renderStarChart) window.__wfStarChart.renderStarChart();
+    else if (typeof renderStarChart === 'function') renderStarChart();
+    console.log('Smoke tests executed');
+    return true;
+  } catch (e) {
+    console.error('Smoke test failed', e);
+    return false;
+  }
+};
+
 /* ── AUDIT ──────────────────────────────────── */
 async function auditDatabase() {
   const db = await dbGet('cache','item_db');
   if (!db) return console.error('Database not found. Refresh first.');
   const currentDb = db.v || db;
-  const counts = {};
-  const TARGETS = {
-    'Warframes':115,'Primary':192,'Secondary':146,'Melee':221,'Zaws':11,'Kitguns':6,
-    'Amps':10,'MOAs':4,'Hounds':3,'Sentinels':17,'Sentinel Weapons':24,'Archwing':5,
-    'Arch-Gun':20,'Arch-Melee':8,'Necramechs':2,'Kubrow':6,'Kavat':5,'Vulpaphyla':3,
-    'Predasite':3,'K-Drive':5
-  };
-  Object.values(currentDb).forEach(item => { const cat=item.apiCat; counts[cat]=(counts[cat]||0)+1; });
   console.log('%c--- MASTERY AUDIT REPORT ---','font-weight:bold;font-size:14px;color:#4aad9e;');
-  Object.entries(TARGETS).forEach(([cat,target])=>{
-    const current=counts[cat]||0, diff=current-target;
-    let status='%c[OK]', color='color:#4CAF50';
-    if (diff>0) { status=`%c[TOO HIGH: +${diff}]`; color='color:#FF9800'; }
-    else if (diff<0) { status=`%c[MISSING: ${diff}]`; color='color:#F44336'; }
-    console.log(`%s | %c${cat.padEnd(18)} %c| Current: ${current} / Target: ${target}`,color,status,'color:inherit','color:#888');
-    if (diff!==0) {
-      const items=Object.values(currentDb).filter(i=>i.apiCat===cat).map(i=>i.name).join(', ');
-      console.log(`   %cItems found: %c${items||'None'}`,'color:#aaa;font-style:italic','color:#777;font-style:italic');
-    }
-  });
-  Object.keys(counts).forEach(cat=>{
-    if (!TARGETS[cat]) console.log(`%c[UNKNOWN CATEGORY: ${cat}] | Items: ${counts[cat]}`,'color:#E91E63;font-weight:bold;');
-  });
+  console.log('Running item count validation...');
+  validateItemCounts(currentDb);
 }
 
 /* ── INIT ───────────────────────────────────── */

@@ -282,3 +282,13 @@ function renderPlanner() {
   });
   wrap.appendChild(colWrap);
 }
+
+window.__wfPlanner = Object.assign(window.__wfPlanner || {}, {
+  ensurePlannerData,
+  rebuildPlannerFilterOptions,
+  plannerRows,
+  renderPlanner,
+  onPlannerList,
+  onPlannerLayout,
+  onPlannerSort,
+});
