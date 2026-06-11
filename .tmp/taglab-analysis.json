@@ -1,0 +1,106 @@
+{
+  "prevMatchesCount": 3,
+  "prevMatchesSample": [
+    "C:\\Users\\Arko\\OneDrive\\Desktop\\Other Projects\\wf-tracker\\warframe-mastery-tracker\\testharness\\analyze-taglab.js::19::if(lines[i].includes('[object')) matches.push(p + '::' + (i+1) + '::' + lines[i].trim());",
+    "C:\\Users\\Arko\\OneDrive\\Desktop\\Other Projects\\wf-tracker\\warframe-mastery-tracker\\testharness\\analyze-taglab.js::42::if(s.indexOf('[object') !== -1){",
+    "C:\\Users\\Arko\\OneDrive\\Desktop\\Other Projects\\wf-tracker\\warframe-mastery-tracker\\testharness\\analyze-taglab.js::56::console.log('Scanning repository for existing \"[object\" occurrences...');"
+  ],
+  "total": 628,
+  "humanReadable": 628,
+  "blobCount": 0,
+  "blobSamples": [],
+  "humanSamples": [
+    {
+      "name": "Acceltra",
+      "resources": [
+        "4× Neurodes",
+        "200× Hexenon",
+        "925× Plastids",
+        "8000× Nano Spores"
+      ]
+    },
+    {
+      "name": "Acceltra Prime",
+      "resources": [
+        "1× Barrel",
+        "1× Receiver",
+        "1× Stock",
+        "10× Orokin Cell"
+      ]
+    },
+    {
+      "name": "Ack & Brunt",
+      "resources": [
+        "5× Detonite Injector",
+        "7500× Salvage",
+        "3300× Cryotic",
+        "1× Forma"
+      ]
+    },
+    {
+      "name": "Acrid",
+      "resources": [
+        "5× Mutagen Mass",
+        "6000× Salvage",
+        "5000× Nano Spores",
+        "1× Forma"
+      ]
+    },
+    {
+      "name": "Aegrit",
+      "resources": [
+        "8500× Alloy Plate",
+        "12500× Ferrite",
+        "2200× Kuva",
+        "2× Morphics"
+      ]
+    },
+    {
+      "name": "Aeolak",
+      "resources": [
+        "50× Thrax Plasm",
+        "5× Voidplume Quill",
+        "5× Voidgel Orb",
+        "2000× Oxium",
+        "1800× Cryotic",
+        "5× Entrati Lanthorn",
+        "3000× Alloy Plate",
+        "5× Orokin Cell"
+      ]
+    },
+    {
+      "name": "Afentis",
+      "resources": [
+        "8000× Ferrite",
+        "3500× Rubedo",
+        "1200× Cryotic",
+        "2× Argon Crystal"
+      ]
+    },
+    {
+      "name": "Afuris",
+      "resources": [
+        "1× Furis",
+        "1× Orokin Cell"
+      ]
+    },
+    {
+      "name": "Afuris Prime",
+      "resources": [
+        "2× Barrel",
+        "2× Receiver",
+        "1× Link"
+      ]
+    },
+    {
+      "name": "Agkuza",
+      "resources": [
+        "1× Blade",
+        "1× Handle",
+        "1× Guard"
+      ]
+    }
+  ],
+  "fixedCount": 0,
+  "fixedSamples": []
+}

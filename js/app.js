@@ -68,7 +68,7 @@ const ST = {
   items:[], missions:[],
   cats: Object.fromEntries(Object.keys(CAT).map(k=>[k,true])),
   acqs: Object.fromEntries(Object.keys(ACQ).map(k=>[k,true])),
-  search:'', sort:'mastery-desc', group:'cat', update:'',
+  search:'', sort:'mastery-desc', group:'cat', update:'', primeFilter:'',
   plannerSort:'stars-desc',
   plannerLayout:'columns',
   starred: new Set(),   // runtime mirror of userData.entities starred flags
@@ -221,6 +221,63 @@ function toggleEntityStar(id, type, btn) {
 // ── Player ID helpers ──
 function getPlayerId()  { return localStorage.getItem('wft3_playerid') || ''; }
 function savePlayerId(id) { if (id) localStorage.setItem('wft3_playerid', id.trim()); }
+
+function extractPlayerIdFromRawProfile(raw) {
+  const root = raw?.Results?.[0] || raw || {};
+
+  function normalizeIdValue(v) {
+    if (typeof v === 'string' || typeof v === 'number') {
+      const s = String(v).trim();
+      return s || '';
+    }
+    if (v && typeof v === 'object') {
+      const oid = v.$oid || v.oid || v.id || v.Id || v.value;
+      if (typeof oid === 'string' || typeof oid === 'number') {
+        const s = String(oid).trim();
+        if (s) return s;
+      }
+    }
+    return '';
+  }
+
+  const direct = [
+    root.PlayerId, root.playerId, root.PlayerID, root.playerID,
+    root.AccountId, root.accountId, root.AccountID, root.accountID,
+  ].map(normalizeIdValue).find(Boolean);
+  if (direct) return direct;
+
+  // Fallback: shallow recursive scan for common id-like keys.
+  const seen = new Set();
+  function scan(obj, depth) {
+    if (!obj || typeof obj !== 'object' || depth > 3 || seen.has(obj)) return '';
+    seen.add(obj);
+    for (const [k, v] of Object.entries(obj)) {
+      const key = String(k || '').toLowerCase();
+      if (key.includes('playerid') || key.includes('accountid')) {
+        const norm = normalizeIdValue(v);
+        if (norm) return norm;
+      }
+    }
+    for (const v of Object.values(obj)) {
+      const found = scan(v, depth + 1);
+      if (found) return found;
+    }
+    return '';
+  }
+  return scan(root, 0);
+}
+
+function persistPlayerIdFromProfileText(text) {
+  try {
+    const raw = JSON.parse(text);
+    const id = extractPlayerIdFromRawProfile(raw);
+    if (id) savePlayerId(id);
+    return id || '';
+  } catch (_) {
+    return '';
+  }
+}
+
 function clearSavedId() {
   localStorage.removeItem('wft3_playerid');
   document.getElementById('refresh-panel').classList.remove('visible');
@@ -383,11 +440,13 @@ async function confirmRefreshImport(fromPasted=false) {
   const errEl = document.getElementById('rm-err'); if (errEl) { errEl.style.display='none'; }
   const text = (ta?.value || '').trim();
   if (!text) { if (errEl) { errEl.textContent='Paste profile JSON first'; errEl.style.display='block'; } return; }
+  const existingId = getPlayerId() || document.getElementById('player-id-input')?.value.trim() || '';
+  if (existingId) savePlayerId(existingId);
   let profile;
   try { profile = parseProfile(text); } catch(e) { if (errEl) { errEl.textContent='Invalid profile JSON'; errEl.style.display='block'; } return; }
   if (!profile || !profile.xpData || profile.xpData.length===0) { if (errEl) { errEl.textContent='No XP data found in this JSON'; errEl.style.display='block'; } return; }
-  // Persist player ID if present in profile
-  try { const raw = JSON.parse(text); const r = raw.Results?.[0] || raw; const id = r.PlayerId || r.playerId || r.AccountId || r.accountId || ''; if (id) savePlayerId(id); } catch(e){}
+  // Persist player ID if present in profile payload (supports multiple key shapes)
+  persistPlayerIdFromProfileText(text);
   try { localStorage.setItem('wft3_profile', text); } catch(e){}
   // Close popup if open
   try { if (window.__profilePopup && !window.__profilePopup.closed) window.__profilePopup.close(); } catch(e){}
@@ -684,8 +743,11 @@ async function loadUserData() {
   const s = ST.userData.settings;
   if (s.cats)  Object.assign(ST.cats, s.cats);
   if (s.acqs)  Object.assign(ST.acqs, s.acqs);
+  if (typeof s.search === 'string') ST.search = s.search;
   if (s.sort)  ST.sort  = s.sort;
   if (s.group) ST.group = s.group;
+  if (typeof s.update === 'string') ST.update = s.update;
+  if (typeof s.primeFilter === 'string') ST.primeFilter = s.primeFilter;
   if (s.plannerSort) ST.plannerSort = s.plannerSort;
   if (s.plannerLayout) ST.plannerLayout = s.plannerLayout;
   if (s.plannerActiveList) ST.plannerActiveList = s.plannerActiveList;
@@ -804,6 +866,7 @@ async function fetchMissionDb() {
 function parseProfile(text) {
   const data = JSON.parse(text);
   const r = data.Results?.[0] || data;
+  const playerId = extractPlayerIdFromRawProfile(data);
   const srcA = (r.XPInfo||r.xpInfo||[]).filter(e=>e&&(e.ItemType||e.itemType)&&(e.XP||e.xp))
     .map(e=>({path:e.ItemType||e.itemType, xp:e.XP||e.xp}));
   const srcB = (data.Stats?.Weapons||[]).filter(w=>w&&w.type&&(w.xp||0)>0)
@@ -819,6 +882,7 @@ function parseProfile(text) {
       completes:m.Completes|| m.completes|| 1,
     }));
   return {
+    playerId,
     playerName:  r.DisplayName||r.displayName||'Tenno',
     playerLevel: r.PlayerLevel||r.playerLevel||0,
     xpData, missions,
@@ -1183,9 +1247,8 @@ function filteredItems() {
   const onlyStar     = document.getElementById('tog-starred')?.checked;
   const unowned      = document.getElementById('tog-unowned')?.checked;
   const needsForma   = document.getElementById('tog-forma')?.checked;
-  const upd          = document.getElementById('upd-sel')?.value || '';
-
-  const primeFilter = document.getElementById('prime-sel')?.value || '';
+  const upd          = ST.update || '';
+  const primeFilter  = ST.primeFilter || '';
 
   return ST.items.filter(it => {
     if (!showFounders && it.isFounder && !it.isOwned) return false;
@@ -1284,6 +1347,7 @@ function buildUpdateSel() {
     o.textContent = title ? `${v} — ${title}` : `Update ${v}`;
     sel.appendChild(o);
   });
+  sel.value = ST.update || '';
 }
 
 /* ── RENDER: MASTERY BAR ────────────────────── */
@@ -1704,11 +1768,37 @@ function render() {
 
 /* ── HANDLERS ───────────────────────────────── */
 let _st;
-function onSearch(v) { clearTimeout(_st); _st=setTimeout(()=>{ ST.search=v; document.getElementById('cx').style.display=v?'block':'none'; render(); },150); }
-function clearSearch() { ST.search=''; document.getElementById('search-input').value=''; document.getElementById('cx').style.display='none'; render(); }
+function onSearch(v) {
+  clearTimeout(_st);
+  _st = setTimeout(() => {
+    const next = String(v || '');
+    const changed = next !== ST.search;
+    if (changed && ST.selection.size) {
+      clearSelection();
+      toast('Selection cleared after search change');
+    }
+    ST.search = next;
+    document.getElementById('cx').style.display = next ? 'block' : 'none';
+    render();
+    saveSettings();
+  }, 150);
+}
+function clearSearch() {
+  const hadSearch = !!ST.search;
+  ST.search='';
+  document.getElementById('search-input').value='';
+  document.getElementById('cx').style.display='none';
+  if (hadSearch && ST.selection.size) {
+    clearSelection();
+    toast('Selection cleared after search reset');
+  }
+  render();
+  saveSettings();
+}
 function onSort(v)   { ST.sort=v; render(); saveSettings(); }
 function onGroup(v)  { ST.group=v; render(); saveSettings(); }
-function onUpdateFilter() { render(); }
+function onUpdateFilter(v) { ST.update = v || ''; render(); saveSettings(); }
+function onPrimeFilter(v) { ST.primeFilter = v || ''; render(); saveSettings(); }
 function toggleField(field, el) {
   const isOn = el.classList.toggle('off');
   document.body.classList.toggle(`hide-${field}`, isOn);
@@ -1748,6 +1838,14 @@ function updateSelectionDisplay() {
   });
 }
 
+function syncStarButtonVisuals(paths) {
+  const targets = paths ? [...paths] : [...ST.selection];
+  targets.forEach(path => {
+    const btn = document.querySelector(`.card[data-path="${CSS.escape(path)}"] .sbtn`);
+    if (btn) btn.classList.toggle('on', isEntityStarred(path));
+  });
+}
+
 function clearSelection() {
   ST.selection.clear(); ST._lastSelIdx = null;
   updateSelectionDisplay();
@@ -1761,6 +1859,10 @@ function selectAll() {
 function starSelected() {
   if (!ST.selection.size) return;
   const allStarred = [...ST.selection].every(p => isEntityStarred(p));
+  if (ST.selection.size > 1) {
+    const action = allStarred ? 'unstar' : 'star';
+    if (!window.confirm(`${action === 'star' ? 'Star' : 'Unstar'} ${ST.selection.size} selected items?`)) return;
+  }
   ST.selection.forEach(path => {
     const item = ST.items.find(i => i.path === path);
     const type = item?.cat || 'item';
@@ -1768,15 +1870,21 @@ function starSelected() {
     if (allStarred && currently) toggleEntityStar(path, type, null);
     else if (!allStarred && !currently) toggleEntityStar(path, type, null);
   });
+  syncStarButtonVisuals(ST.selection);
   updateSelectionDisplay();
   toast(allStarred ? `☆ Unstarred ${ST.selection.size}` : `★ Starred ${ST.selection.size}`);
 }
 
 function unstarSelected() {
+  if (!ST.selection.size) return;
+  if (ST.selection.size > 1) {
+    if (!window.confirm(`Unstar ${ST.selection.size} selected items?`)) return;
+  }
   ST.selection.forEach(path => {
     const item = ST.items.find(i => i.path === path);
     if (isEntityStarred(path)) toggleEntityStar(path, item?.cat || 'item', null);
   });
+  syncStarButtonVisuals(ST.selection);
   updateSelectionDisplay();
   toast(`☆ Unstarred ${ST.selection.size}`);
 }
@@ -1826,8 +1934,11 @@ function saveSettings() {
   ST.userData.settings = {
     cats: ST.cats,
     acqs: ST.acqs,
+    search: ST.search,
     sort: ST.sort,
     group: ST.group,
+    update: ST.update,
+    primeFilter: ST.primeFilter,
     plannerSort: ST.plannerSort,
     plannerLayout: ST.plannerLayout,
     plannerActiveList: ST.plannerActiveList,
@@ -1929,16 +2040,10 @@ async function handleImport() {
   try { profile = parseProfile(text); }
   catch(e) { showE(e instanceof SyntaxError ? 'Invalid JSON — try "Load from file" instead.' : 'Parse error: ' + e.message); return; }
   if (!profile.xpData.length) { showE('No XP data found in this JSON.'); return; }
-  // Extract and persist player ID from the raw JSON if present
-  try {
-    const raw = JSON.parse(text);
-    const r = raw.Results?.[0] || raw;
-    const id = r.PlayerId || r.playerId || r.AccountId || r.accountId || '';
-    if (id) savePlayerId(id);
-    // Also try to find ID in the URL query if injected somehow (fallback to manual input)
-    const manualId = document.getElementById('player-id-input')?.value.trim();
-    if (!id && manualId) savePlayerId(manualId);
-  } catch(e) {}
+  // Persist player ID from payload; fallback to manual input if payload lacks it.
+  const parsedId = persistPlayerIdFromProfileText(text);
+  const manualId = document.getElementById('player-id-input')?.value.trim();
+  if (!parsedId && manualId) savePlayerId(manualId);
   localStorage.setItem('wft3_profile', text);
   await loadAndShow(profile);
   function showE(m) { if (errEl) { errEl.textContent=m; errEl.className='err-box'; errEl.style.display='block'; } }
@@ -1948,7 +2053,10 @@ async function loadAndShow(profile) {
   document.getElementById('import-screen').style.display='none';
   document.getElementById('loading-screen').style.display='flex';
   ST.activeList = null;
-  ST.search = '';
+  if (profile?.playerId) {
+    savePlayerId(profile.playerId);
+    ST.userData.meta.playerId = profile.playerId;
+  }
   setProgress(15,'Downloading item database…');
   const [itemDb, updateNames] = await Promise.all([fetchItemDb(), fetchUpdateNames()]);
   ST.updateNames = updateNames;
@@ -1962,10 +2070,20 @@ async function loadAndShow(profile) {
   document.getElementById('app').style.display='flex';
   document.getElementById('player-info').textContent=`${profile.playerName} · ${formatRankLabel(profile.playerLevel)}`;
   const searchInput = document.getElementById('search-input');
-  if (searchInput) searchInput.value = '';
+  if (searchInput) searchInput.value = ST.search || '';
+  const cx = document.getElementById('cx');
+  if (cx) cx.style.display = ST.search ? 'block' : 'none';
   updateEasterEgg();
   buildChips();
   buildUpdateSel();
+  const sortSel = document.getElementById('sort-sel');
+  if (sortSel) sortSel.value = ST.sort;
+  const grpSel = document.getElementById('grp-sel');
+  if (grpSel) grpSel.value = ST.group;
+  const primeSel = document.getElementById('prime-sel');
+  if (primeSel) primeSel.value = ST.primeFilter || '';
+  const updSel = document.getElementById('upd-sel');
+  if (updSel) updSel.value = ST.update || '';
   buildListBar();
   renderMbar();
   render();
@@ -2132,6 +2250,12 @@ document.getElementById('file-in')?.addEventListener('change',e=>{
 window.addEventListener('load', () => {
   void (async function init() {
   await loadUserData();
+  // Backfill saved player ID from last cached profile payload after reloads.
+  if (!getPlayerId()) {
+    const cachedProfile = localStorage.getItem('wft3_profile') || '';
+    const recoveredId = cachedProfile ? persistPlayerIdFromProfileText(cachedProfile) : '';
+    if (!recoveredId && ST.userData.meta?.playerId) savePlayerId(ST.userData.meta.playerId);
+  }
   // XP Bar and Notes pills start as off — sync body classes
   // Standard tag hidden by default, Maxed shown by default
   document.body.classList.add('hide-xpbar', 'hide-notes', 'hide-source');
