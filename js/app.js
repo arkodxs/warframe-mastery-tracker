@@ -322,6 +322,12 @@ function openProfileUrlAndFocus() {
   window.addEventListener('focus', onFocus);
 }
 
+function loadDemo() {
+  if (!window.DEMO_PROFILE) return;
+  const profile = parseProfile(JSON.stringify(window.DEMO_PROFILE));
+  loadAndShow(profile);
+}
+
 // --- Profile open rate-limiting helpers ---
 const PROFILE_RATE_LIMIT_MAX = 5; // attempts
 const PROFILE_RATE_LIMIT_WINDOW = 10 * 60 * 1000; // 10 minutes
