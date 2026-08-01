@@ -486,8 +486,8 @@ body.hide-rank.hide-update .ccore:not(:has(.status-prio,.status-build)){display:
 .sc-tile-star{background:none;border:none;cursor:pointer;font-size:.7rem;color:var(--tx3);padding:1px 2px;line-height:1;transition:color .12s;flex-shrink:0}
 .sc-tile-star:hover,.sc-tile-star.on{color:#c0a030}
 .sc-dual-bar{position:relative;height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:.35rem}
-.sc-dual-base{position:absolute;left:0;top:0;height:100%;background:var(--acc);border-radius:3px;transition:width .3s}
-.sc-dual-sp{position:absolute;left:0;top:0;height:100%;background:#8866e8;border-radius:3px;transition:width .3s}
+.sc-dual-base{position:absolute;left:0;top:0;height:100%;background:var(--acc);border-radius:3px;transition:width .3s;z-index:1;opacity:.78}
+.sc-dual-sp{position:absolute;left:0;top:0;height:100%;background:#8866e8;border-radius:3px;transition:width .3s;z-index:2;box-shadow:0 0 0 1px rgba(136,102,232,.15) inset}
 .sc-tile-stats{font-size:.76rem;color:var(--tx3);font-family:'Share Tech Mono',monospace;line-height:1.35}
 .sc-tile-stats .sp-done{color:#9977ee}
 .sc-tile-body{display:none;border-top:1px solid var(--bd);margin-top:.45rem;padding-top:.35rem}

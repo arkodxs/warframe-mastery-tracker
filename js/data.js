@@ -17,6 +17,11 @@ const DB_CONFIG = {
   RESCUE_LIST: ['mausolon','morgha','cortege','mandonel','grimoire','bo prime','kuva ghoulsaw','ghoulsaw','dark split-sword','bo','mk1-bo','prisma veritux','prisma dual decurions','imperator','imperator vandal','prisma imperator','jat kittag','innodem','wyrm prime','quassus prime','prisma sybaris','prisma gammacor','rathbone','lato','strun','paris','lex','enkaus','phahd','runway'],
 };
 
+const ITEM_NAME_ALIASES = {
+  'orion and sirius': 'Sirius & Orion',
+  'sirius and orion': 'Sirius & Orion',
+};
+
 // expose for legacy consumers
 window.DB_CONFIG = DB_CONFIG;
 window.__wfData = Object.assign(window.__wfData || {}, { DB_CONFIG });
@@ -131,6 +136,11 @@ async function fetchItemDb() {
     const items = await resp.json();
     const db = {}, dbByName = {};
 
+    const canonicalItemName = (name) => {
+      const key = String(name || '').toLowerCase();
+      return ITEM_NAME_ALIASES[key] || String(name || '');
+    };
+
     items.forEach(item => {
       if (!item || !item.uniqueName || !item.name) return;
       const res = classifyItem(item);
@@ -148,7 +158,8 @@ async function fetchItemDb() {
       if (item.introduced) score += 5000;
       if (pathLower.includes('/npc/')) score -= 500000;
 
-      const nameKey = item.name.toLowerCase();
+      const displayName = canonicalItemName(item.name);
+      const nameKey = displayName.toLowerCase();
       if (dbByName[nameKey] && score <= dbByName[nameKey].score) return;
 
       const rawIntro = item.introduced
@@ -159,7 +170,7 @@ async function fetchItemDb() {
       dbByName[nameKey] = {
         path: pathLower, score,
         data: {
-          name: item.name,
+          name: displayName,
           apiCat: finalCat,
           introduced: rawIntro,
           majorUpdate: majorVer,
@@ -275,14 +286,93 @@ async function fetchUpdateNames() {
   }
 }
 
-window.__wfData = Object.assign(window.__wfData || {}, {
-  ITEM_EXPECTED_COUNTS,
-  classifyItem,
-  fetchItemDb,
-  fetchUpdateNames,
-  validateItemCounts,
-  explainCategoryMismatch,
-});
+const MISSION_DB_KEY = 'mission_db_v2';
+const NODE_MASTERY_MAP_URL = 'data/node-mastery.json';
+
+function toIntOrZero(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function getByIndex(list, idx) {
+  if (!Array.isArray(list)) return '';
+  const i = Number(idx);
+  if (!Number.isInteger(i) || i < 0 || i >= list.length) return '';
+  const val = list[i];
+  return (typeof val === 'string') ? val : '';
+}
+
+async function fetchNodeMasteryMap() {
+  try {
+    const resp = await fetch(NODE_MASTERY_MAP_URL, { cache: 'no-cache' });
+    if (!resp.ok) return {};
+    const parsed = await resp.json();
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+    return parsed;
+  } catch (_) {
+    return {};
+  }
+}
+
+function buildMissionDbFromExports(regions, missionTypes, factions, masteryMap) {
+  const out = {};
+  const rows = Array.isArray(regions) ? regions : [];
+
+  for (const r of rows) {
+    if (!r || typeof r !== 'object') continue;
+    const key = String(r.uniqueName || r.InternalName || '').trim();
+    if (!key) continue;
+
+    const rawMastery = Object.prototype.hasOwnProperty.call(masteryMap, key) ? masteryMap[key] : null;
+    const masteryExp = (rawMastery === null || rawMastery === undefined || rawMastery === '')
+      ? null
+      : toIntOrZero(rawMastery);
+
+    out[key] = {
+      name: String(r.name || key),
+      planet: String(r.systemName || ''),
+      type: String(getByIndex(missionTypes, r.missionIndex) || ''),
+      enemy: String(getByIndex(factions, r.factionIndex) || ''),
+      minLevel: toIntOrZero(r.minEnemyLevel),
+      maxLevel: toIntOrZero(r.maxEnemyLevel),
+      masteryExp,
+    };
+  }
+
+  return out;
+}
+
+async function fetchMissionDbFromWiki() {
+  const resp = await fetch('https://wiki.warframe.com/api.php?action=parse&page=Module:Missions/data&prop=wikitext&format=json&origin=*');
+  if (!resp.ok) throw new Error('Mission wiki fetch failed');
+  const data = await resp.json();
+  const text = data.parse?.wikitext?.['*'] || '';
+
+  const db = {};
+  const blocks = text.split(/(?=\s*\{[^{}]*InternalName)/);
+  blocks.forEach(block => {
+    const internalName = block.match(/InternalName\s*=\s*"([^"]+)"/)?.[1];
+    if (!internalName) return;
+    const masteryExp  = block.match(/MasteryExp\s*=\s*(\d+)/)?.[1];
+    const name        = block.match(/\bName\s*=\s*"([^"]+)"/)?.[1];
+    const planet      = block.match(/Planet\s*=\s*"([^"]+)"/)?.[1];
+    const type        = block.match(/\bType\s*=\s*"([^"]+)"/)?.[1];
+    const enemy       = block.match(/Enemy\s*=\s*"([^"]+)"/)?.[1];
+    const minLevel    = block.match(/MinLevel\s*=\s*(\d+)/)?.[1];
+    const maxLevel    = block.match(/MaxLevel\s*=\s*(\d+)/)?.[1];
+    db[internalName] = {
+      name:      name || internalName,
+      planet:    planet || '',
+      type:      type || '',
+      enemy:     enemy || '',
+      minLevel:  minLevel ? parseInt(minLevel) : 0,
+      maxLevel:  maxLevel ? parseInt(maxLevel) : 0,
+      masteryExp: masteryExp ? parseInt(masteryExp) : 0,
+    };
+  });
+
+  return db;
+}
 
 async function fetchMissionDb() {
   if (ST.missionDb) return ST.missionDb;
@@ -290,43 +380,58 @@ async function fetchMissionDb() {
 
   ST._missionDbPromise = (async () => {
     try {
-      const cached = await dbGet('cache', 'mission_db');
+      const cached = await dbGet('cache', MISSION_DB_KEY);
       if (cached && (Date.now() - cached.t) < MISSION_DB_TTL) {
         ST.missionDb = cached.v;
         return ST.missionDb;
       }
 
-      const resp = await fetch('https://wiki.warframe.com/api.php?action=parse&page=Module:Missions/data&prop=wikitext&format=json&origin=*');
-      if (!resp.ok) throw new Error('Mission wiki fetch failed');
-      const data = await resp.json();
-      const text = data.parse?.wikitext?.['*'] || '';
+      // Primary path: machine-readable exports + static mastery map.
+      try {
+        const [regionsResp, missionTypesResp, factionsResp, masteryMap] = await Promise.all([
+          fetch('https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/ExportRegions.json'),
+          fetch('https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/missionTypes.json'),
+          fetch('https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/factions.json'),
+          fetchNodeMasteryMap(),
+        ]);
 
-      const db = {};
-      const blocks = text.split(/(?=\s*\{[^{}]*InternalName)/);
-      blocks.forEach(block => {
-        const internalName = block.match(/InternalName\s*=\s*"([^"]+)"/)?.[1];
-        if (!internalName) return;
-        const masteryExp  = block.match(/MasteryExp\s*=\s*(\d+)/)?.[1];
-        const name        = block.match(/\bName\s*=\s*"([^"]+)"/)?.[1];
-        const planet      = block.match(/Planet\s*=\s*"([^"]+)"/)?.[1];
-        const type        = block.match(/\bType\s*=\s*"([^"]+)"/)?.[1];
-        const enemy       = block.match(/Enemy\s*=\s*"([^"]+)"/)?.[1];
-        const minLevel    = block.match(/MinLevel\s*=\s*(\d+)/)?.[1];
-        const maxLevel    = block.match(/MaxLevel\s*=\s*(\d+)/)?.[1];
-        db[internalName] = {
-          name:      name || internalName,
-          planet:    planet || '',
-          type:      type || '',
-          enemy:     enemy || '',
-          minLevel:  minLevel ? parseInt(minLevel) : 0,
-          maxLevel:  maxLevel ? parseInt(maxLevel) : 0,
-          masteryExp: masteryExp ? parseInt(masteryExp) : 0,
-        };
-      });
+        if (!regionsResp.ok || !missionTypesResp.ok || !factionsResp.ok) {
+          throw new Error('Export-based mission metadata fetch failed');
+        }
 
-      ST.missionDb = db;
-      await dbSet('cache', 'mission_db', db);
-      return db;
+        const [regions, missionTypes, factions] = await Promise.all([
+          regionsResp.json(),
+          missionTypesResp.json(),
+          factionsResp.json(),
+        ]);
+
+        const db = buildMissionDbFromExports(regions, missionTypes, factions, masteryMap || {});
+        if (!db || Object.keys(db).length === 0) {
+          throw new Error('Export-based mission metadata empty');
+        }
+
+        // Guard for mirrored behavior: if mastery map is missing/unpopulated,
+        // fall back to wiki parser so per-node mastery XP remains available.
+        const masteryKnownCount = Object.values(db).filter(r => {
+          const mxp = r?.masteryExp;
+          return mxp !== null && mxp !== undefined;
+        }).length;
+        if (masteryKnownCount === 0) {
+          throw new Error('Export-based metadata missing mastery map values');
+        }
+
+        ST.missionDb = db;
+        await dbSet('cache', MISSION_DB_KEY, db);
+        return ST.missionDb;
+      } catch (primaryErr) {
+        console.warn('Export-based mission DB build failed, falling back to wiki parser:', primaryErr);
+      }
+
+      // Compatibility fallback: preserve current behavior if primary path fails.
+      const fallbackDb = await fetchMissionDbFromWiki();
+      ST.missionDb = fallbackDb;
+      await dbSet('cache', MISSION_DB_KEY, fallbackDb);
+      return ST.missionDb;
     } catch (e) {
       console.warn('Mission DB fetch failed:', e);
       ST.missionDb = {};
@@ -338,6 +443,16 @@ async function fetchMissionDb() {
 
   return ST._missionDbPromise;
 }
+
+window.__wfData = Object.assign(window.__wfData || {}, {
+  ITEM_EXPECTED_COUNTS,
+  classifyItem,
+  fetchItemDb,
+  fetchUpdateNames,
+  fetchMissionDb,
+  validateItemCounts,
+  explainCategoryMismatch,
+});
 
 function parseProfile(text) {
   const data = JSON.parse(text);

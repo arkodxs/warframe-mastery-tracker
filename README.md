@@ -70,6 +70,30 @@ Nothing is ever sent to any server - all data stays on your browser.
 - Rank-40 items (Kuva/Tenet weapons, Necramechs) require manual rank input since Forma resets make XP-based calculation unreliable.
 - Star chart node counts may differ slightly from in-game as DE occasionally adds or restructures missions.
 
+## Keeping Data Up To Date
+
+### Refresh your personal profile data
+
+Your imported profile is the part you refresh manually. Use **Refresh Profile** in the top bar, paste a fresh copy of your profile JSON, and the app will update your local mastery, nodes, notes, and related progress state.
+
+The app remembers your player ID in the browser for up to 7 days, so you usually do not need to re-enter it every time. If the ID is already saved, the refresh panel will show it and let you reopen the profile page with one click.
+
+### Keep your personal profile link handy
+
+Your profile URL is always the same shape:
+
+```text
+http://content.warframe.com/dynamic/getProfileViewingData.php?playerId=YOUR_ID
+```
+
+Once the app has your ID, you can reuse the **Open profile URL** button instead of copying the link manually. If you want extra safety, bookmark that URL in your browser or save your player ID somewhere outside the app.
+
+### About the app's cached item/wiki data
+
+The item database, update names, star chart nodes, and mission metadata are fetched automatically and cached locally. They refresh on their own when the cache expires, so you normally do not need to manage them manually.
+
+If you ever want a forced fresh pull, clear the site's stored data for the app and reload it. That will make the app refetch the remote item and mission sources on the next launch.
+
 
 ### Planned Features
 - Local saves of user favourites, lists, etc. (not DE data).

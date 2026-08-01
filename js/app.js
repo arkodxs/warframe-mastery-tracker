@@ -811,8 +811,11 @@ async function fetchUpdateNames() {
   return {};
 }
 
-/* ── MISSION DB (wiki mastery data) ─────────── */
+/* ── MISSION DB (metadata + mastery data) ───── */
 async function fetchMissionDb() {
+  if (window.__wfData?.fetchMissionDb) return window.__wfData.fetchMissionDb();
+
+  // Fallback path if data layer is unavailable.
   if (ST.missionDb) return ST.missionDb;
   if (ST._missionDbPromise) return ST._missionDbPromise;
 
@@ -1013,15 +1016,20 @@ function processStarChart(missions, nodeDb, missionDb) {
   const completesMap = Object.fromEntries(missions.map(m => [m.tag, m.completes]));
   const planets = {}, railjack = [];
 
+  const pickMasteryExp = (md) => {
+    if (md && Object.prototype.hasOwnProperty.call(md, 'masteryExp')) return md.masteryExp;
+    return 0;
+  };
+
   const mkNode = (tag, name, type, extra, md) => ({
     tag, name, type,
     enemy:     md?.enemy     || '',
-    minLevel:  md?.minLevel  || 0,
-    maxLevel:  md?.maxLevel  || 0,
+    minLevel:  md?.minLevel  ?? 0,
+    maxLevel:  md?.maxLevel  ?? 0,
     done:      baseDone.has(tag),
     spDone:    spDone.has(tag),
     completes: completesMap[tag] || 0,
-    masteryExp:md?.masteryExp || 0,
+    masteryExp:pickMasteryExp(md),
     isJunction:false,
     ...extra,
   });
@@ -1043,19 +1051,32 @@ function processStarChart(missions, nodeDb, missionDb) {
 
     const rawValue = node.value || '';
     const planet   = node.planet || (rawValue.match(/\(([^)]+)\)$/)?.[1] || '') || mdata.planet || node.systemName || '';
-    const name     = rawValue.replace(/\s*\([^)]+\)$/, '').trim() || mdata.name || tag;
+    const name     = rawValue.replace(/\s*\([^)]+\)$/, '').trim() || node.name || mdata.name || tag;
 
     if (EXCLUDE_NAMES.some(n => name.toLowerCase().includes(n))) continue;
 
     const isRJ = tag.startsWith('CrewBattle') || effType.includes('proxima') || planet.toLowerCase().includes('proxima');
 
-    if (!baseDone.has(tag) && !missionDb?.[tag]) continue;
+    const hasUsableMeta = !!(rawType || rawValue || node.name || planet);
+    if (!baseDone.has(tag) && !missionDb?.[tag] && !hasUsableMeta) continue;
 
     // Deduplicate by name+planet — keep completed version if dupes exist
     const dedupKey = name + '||' + planet;
     if (seenNodes.has(dedupKey) && !baseDone.has(tag)) continue;
     seenNodes.add(dedupKey);
-    const nd = mkNode(tag, name, mdata.type || rawType, {}, mdata);
+    const nodeMin = Number.isFinite(Number(node.minEnemyLevel)) ? Number(node.minEnemyLevel) : undefined;
+    const nodeMax = Number.isFinite(Number(node.maxEnemyLevel)) ? Number(node.maxEnemyLevel) : undefined;
+    const mergedMeta = {
+      name: mdata.name || node.name || name,
+      planet: mdata.planet || planet,
+      type: mdata.type || rawType,
+      enemy: mdata.enemy || '',
+      minLevel: mdata.minLevel ?? nodeMin ?? 0,
+      maxLevel: mdata.maxLevel ?? nodeMax ?? 0,
+      masteryExp: Object.prototype.hasOwnProperty.call(mdata, 'masteryExp') ? mdata.masteryExp : 0,
+    };
+
+    const nd = mkNode(tag, name, mergedMeta.type || rawType, {}, mergedMeta);
     if (isRJ) railjack.push(nd);
     else if (planet) { if (!planets[planet]) planets[planet]=[]; planets[planet].push(nd); }
   }

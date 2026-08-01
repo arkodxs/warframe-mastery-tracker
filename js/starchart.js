@@ -12,6 +12,8 @@ function renderStarChart() {
 
   const { planets, railjack } = processStarChart(ST.missions, ST.nodeDb, ST.missionDb);
 
+  const lowerProgressPct = (basePct, spPct) => Math.min(basePct, spPct);
+
   let totalNodes = 0, doneNodes = 0, spTotal = 0, spDoneCount = 0, junctionTotal = 0, junctionDone = 0, mxpAvailable = 0;
   planets.forEach(p => p.nodes.forEach(n => {
     totalNodes++; if (n.done) doneNodes++;
@@ -21,10 +23,9 @@ function renderStarChart() {
   }));
   const overallPct = totalNodes ? Math.round(doneNodes / totalNodes * 100) : 0;
   const spOverallPct = spTotal ? Math.round(spDoneCount / spTotal * 100) : 0;
-  const isOverallBaseDone = overallPct === 100;
-  const displayOverallPct = isOverallBaseDone ? spOverallPct : overallPct;
-  const overallLabel = isOverallBaseDone ? `${displayOverallPct}% SP` : `${displayOverallPct}%`;
-  const overallBarColor = isOverallBaseDone ? '#8866e8' : 'var(--acc)';
+  const displayOverallPct = lowerProgressPct(overallPct, spOverallPct);
+  const overallLabel = `${displayOverallPct}%`;
+  const overallBarColor = spOverallPct < overallPct ? '#8866e8' : 'var(--acc)';
 
   const summary = document.createElement('div'); summary.className = 'sc-summary';
   summary.innerHTML = `
@@ -162,10 +163,9 @@ function renderStarChart() {
 
     const basePct = total ? Math.round(done / total * 100) : 0;
     const spPct = total ? Math.round(spD / total * 100) : 0;
-    const isBaseDone = basePct === 100;
-    const displayPct = isBaseDone ? spPct : basePct;
-    const pctClass = isBaseDone ? 'sc-tile-pct sp-focus' : 'sc-tile-pct';
-    const pctLabel = isBaseDone ? `${displayPct}% SP` : `${displayPct}%`;
+    const displayPct = lowerProgressPct(basePct, spPct);
+    const pctClass = spPct < basePct ? 'sc-tile-pct sp-focus' : 'sc-tile-pct';
+    const pctLabel = `${displayPct}%`;
     const starred = isEntityStarred('planet:' + p.name);
 
     const availMxp = p.nodes.reduce((s, n) => {
@@ -174,7 +174,8 @@ function renderStarChart() {
     }, 0);
 
     const tile = document.createElement('div');
-    tile.className = 'sc-planet-tile' + (entry.type === 'railjack' ? ' railjack' : '') + (isBaseDone ? ' complete' : '') + (starred ? ' priority' : '');
+    const isFullyDone = basePct === 100 && spPct === 100;
+    tile.className = 'sc-planet-tile' + (entry.type === 'railjack' ? ' railjack' : '') + (isFullyDone ? ' complete' : '') + (starred ? ' priority' : '');
     if (entry.type === 'railjack') tile.style.gridColumn = '1 / -1';
 
     tile.innerHTML = `
