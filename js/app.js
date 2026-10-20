@@ -3,7 +3,6 @@
 /* ── CONFIG ─────────────────────────────────── */
 const API_BASE  = 'https://api.warframestat.us';
 const CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
-const MISSION_DB_TTL = 30 * 24 * 60 * 60 * 1000;
 
 const CAT = {
   warframe:        {l:'Warframes',      c:'#c86838', g:'WF'},
@@ -76,6 +75,7 @@ const ST = {
   updateNames: {},
   nodeDb: null,
   missionDb: null,
+  missionDbError: null, // 'missing' (no node data at all) or 'stale' (cached copy)
   _missionDbPromise: null,
   plannerData: null,
   plannerIndex: null,
@@ -89,8 +89,9 @@ const ST = {
   tab: 'items',
   activeList: null,   // list ID currently being filtered by
   plannerActiveList: null,
+  itemDbMissing: [],   // item source files that failed to load (partial DB)
   userData: {
-    version: 3,
+    version: 4,
     meta: {},
     entities: {},
     lists: [],
@@ -708,28 +709,75 @@ async function saveUserData() {
   }
 }
 
+/* ── USER DATA MIGRATIONS ───────────────────── */
+const USER_DATA_VERSION = 4;
+
+// v4: the item DB moved to WFCD's masterable flag, which changed the canonical
+// path for these items (PvP Zaw tips and the Whisper's Grimoire were picked before).
+const V4_PATH_MOVES = {
+  '/lotus/weapons/ostron/melee/modularmelee01/tip/pvpvarianttipone':   '/lotus/weapons/ostron/melee/modularmelee01/tip/tipone',
+  '/lotus/weapons/ostron/melee/modularmelee01/tip/pvpvarianttiptwo':   '/lotus/weapons/ostron/melee/modularmelee01/tip/tiptwo',
+  '/lotus/weapons/ostron/melee/modularmelee01/tip/pvpvarianttipthree': '/lotus/weapons/ostron/melee/modularmelee01/tip/tipthree',
+  '/lotus/weapons/ostron/melee/modularmelee01/tip/pvpvarianttipfour':  '/lotus/weapons/ostron/melee/modularmelee01/tip/tipfour',
+  '/lotus/weapons/ostron/melee/modularmelee01/tip/pvpvarianttipfive':  '/lotus/weapons/ostron/melee/modularmelee01/tip/tipfive',
+  '/lotus/weapons/ostron/melee/modularmelee01/tip/pvpvarianttipsix':   '/lotus/weapons/ostron/melee/modularmelee01/tip/tipsix',
+  '/lotus/weapons/tenno/grimoire/tndoppelgangergrimoire':              '/lotus/weapons/tenno/grimoire/tngrimoire',
+};
+
+function mergeEntities(older, newer) {
+  const merged = { ...older, ...newer };
+  if (older.lists || newer.lists) merged.lists = [...new Set([...(older.lists || []), ...(newer.lists || [])])];
+  if (older.note && newer.note && older.note !== newer.note) merged.note = `${newer.note}\n${older.note}`;
+  return merged;
+}
+
+// Each entry upgrades data from version N to N+1.
+const USER_DATA_MIGRATIONS = {
+  3: d => {
+    for (const [from, to] of Object.entries(V4_PATH_MOVES)) {
+      const old = d.entities[from];
+      if (!old) continue;
+      d.entities[to] = d.entities[to] ? mergeEntities(old, d.entities[to]) : old;
+      delete d.entities[from];
+    }
+    d.version = 4;
+    return d;
+  },
+};
+
+// Returns the data upgraded to USER_DATA_VERSION, or null if it isn't readable
+// (unknown format, or written by a newer version of the app).
+function migrateUserData(d) {
+  if (!d || typeof d.version !== 'number' || d.version < 3 || d.version > USER_DATA_VERSION) return null;
+  if (!d.entities || typeof d.entities !== 'object') d.entities = {};
+  while (d.version < USER_DATA_VERSION) d = USER_DATA_MIGRATIONS[d.version](d);
+  return d;
+}
+
 async function loadUserData() {
   // Try primary source first (user IndexedDB)
-  let stored = await userDbGet('userData');
+  const stored = await userDbGet('userData');
+  const storedVersion = stored?.v?.version;
+  let data = migrateUserData(stored?.v);
+  let needsSave = !!data && storedVersion !== USER_DATA_VERSION;
 
   // Fallback to localStorage if IndexedDB was cleared or empty
-  if (!stored?.v?.version) {
+  if (!data) {
     try {
       const ls = localStorage.getItem(LS_USER_KEY);
       if (ls) {
-        const parsed = JSON.parse(ls);
-        if (parsed?.version === 3) {
-          stored = { v: parsed };
-          // Restore to IndexedDB since we recovered from localStorage
-          await userDbSet('userData', parsed);
+        data = migrateUserData(JSON.parse(ls));
+        if (data) {
+          needsSave = true; // restore to IndexedDB since we recovered from localStorage
           console.info('User data restored from localStorage fallback.');
         }
       }
     } catch(e) {}
   }
 
-  if (stored?.v?.version === 3) {
-    ST.userData = stored.v;
+  if (data) {
+    ST.userData = data;
+    if (needsSave) await saveUserData();
   } else {
     migrateOldData();
   }
@@ -814,61 +862,9 @@ async function fetchUpdateNames() {
 /* ── MISSION DB (metadata + mastery data) ───── */
 async function fetchMissionDb() {
   if (window.__wfData?.fetchMissionDb) return window.__wfData.fetchMissionDb();
-
-  // Fallback path if data layer is unavailable.
-  if (ST.missionDb) return ST.missionDb;
-  if (ST._missionDbPromise) return ST._missionDbPromise;
-
-  ST._missionDbPromise = (async () => {
-    try {
-      const cached = await dbGet('cache', 'mission_db');
-      if (cached && (Date.now() - cached.t) < MISSION_DB_TTL) {
-        ST.missionDb = cached.v;
-        return ST.missionDb;
-      }
-
-      const resp = await fetch('https://wiki.warframe.com/api.php?action=parse&page=Module:Missions/data&prop=wikitext&format=json&origin=*');
-      if (!resp.ok) throw new Error('Mission wiki fetch failed');
-      const data = await resp.json();
-      const text = data.parse?.wikitext?.['*'] || '';
-
-      const db = {};
-      // Split on top-level node blocks — each starts with { and contains InternalName
-      const blocks = text.split(/(?=\s*\{[^{}]*InternalName)/);
-      blocks.forEach(block => {
-        const internalName = block.match(/InternalName\s*=\s*"([^"]+)"/)?.[1];
-        if (!internalName) return;
-        const masteryExp  = block.match(/MasteryExp\s*=\s*(\d+)/)?.[1];
-        const name        = block.match(/\bName\s*=\s*"([^"]+)"/)?.[1];
-        const planet      = block.match(/Planet\s*=\s*"([^"]+)"/)?.[1];
-        const type        = block.match(/\bType\s*=\s*"([^"]+)"/)?.[1];
-        const enemy       = block.match(/Enemy\s*=\s*"([^"]+)"/)?.[1];
-        const minLevel    = block.match(/MinLevel\s*=\s*(\d+)/)?.[1];
-        const maxLevel    = block.match(/MaxLevel\s*=\s*(\d+)/)?.[1];
-        db[internalName] = {
-          name:      name || internalName,
-          planet:    planet || '',
-          type:      type || '',
-          enemy:     enemy || '',
-          minLevel:  minLevel ? parseInt(minLevel) : 0,
-          maxLevel:  maxLevel ? parseInt(maxLevel) : 0,
-          masteryExp: masteryExp ? parseInt(masteryExp) : 0,
-        };
-      });
-
-      ST.missionDb = db;
-      await dbSet('cache', 'mission_db', db);
-      return db;
-    } catch(e) {
-      console.warn('Mission DB fetch failed:', e);
-      ST.missionDb = {};
-      return ST.missionDb;
-    } finally {
-      ST._missionDbPromise = null;
-    }
-  })();
-
-  return ST._missionDbPromise;
+  ST.missionDb = {};
+  ST.missionDbError = 'missing';
+  return ST.missionDb;
 }
 
 /* ── PROFILE PARSING ────────────────────────── */
@@ -1949,6 +1945,24 @@ function updateEasterEgg() {
   egg.style.display = ST.tab === 'items' && mr >= 30 ? 'block' : 'none';
 }
 
+// Persistent banner: while the item DB is partial or node data is missing,
+// mastery totals are too low.
+function renderDataWarning() {
+  const el = document.getElementById('data-warning');
+  if (!el) return;
+  const missing = ST.itemDbMissing || [];
+  const total = window.__wfData?.ITEM_SOURCE_FILES?.length || 0;
+  const warnings = [];
+  if (missing.length) warnings.push(missing.length >= total
+    ? '⚠ The item database could not be downloaded, so no items can be shown. Check your connection and reload.'
+    : `⚠ The item database is incomplete (${missing.join(', ')} failed to load). Items from those categories are missing and mastery totals will be too low. It will retry automatically within 12 hours.`);
+  if (ST.missionDbError === 'missing') warnings.push(
+    '⚠ Star chart data could not be downloaded, so node mastery XP is missing from your totals. Check your connection and reload.');
+  if (!warnings.length) { el.style.display = 'none'; return; }
+  el.textContent = warnings.join(' ');
+  el.style.display = 'block';
+}
+
 function toast(msg,dur=2200) {
   const el=document.getElementById('toast');
   if(!el) return;
@@ -2039,8 +2053,8 @@ function importData(inp) {
   const r = new FileReader();
   r.onload = async ev => {
     try {
-      const d = JSON.parse(ev.target.result);
-      if (d.version === 3) {
+      const d = migrateUserData(JSON.parse(ev.target.result));
+      if (d) {
         ST.userData = d;
         await userDbSet('userData', ST.userData);
         try { localStorage.setItem(LS_USER_KEY, JSON.stringify(ST.userData)); } catch(e) {}
@@ -2089,6 +2103,7 @@ async function loadAndShow(profile) {
   ST.updateNames = updateNames;
   setProgress(80,'Syncing your progress…');
   ST.items    = enrichAll(profile.xpData, itemDb);
+  renderDataWarning();
   ST.missions = profile.missions;
   ST.userData.meta.playerName  = profile.playerName;
   ST.userData.meta.playerLevel = profile.playerLevel;
@@ -2115,6 +2130,7 @@ async function loadAndShow(profile) {
   renderMbar();
   render();
   void fetchMissionDb().then(() => {
+    renderDataWarning();
     if (document.getElementById('app')?.style.display === 'flex') renderMbar();
   });
   // Ensure refresh button is visible (it will show saved ID inside modal if none saved yet)
@@ -2232,9 +2248,9 @@ window.runSmokeTests = async function() {
 
 /* ── AUDIT ──────────────────────────────────── */
 async function auditDatabase() {
-  const db = await dbGet('cache','item_db');
-  if (!db) return console.error('Database not found. Refresh first.');
-  const currentDb = db.v || db;
+  const db = await dbGet('cache', window.__wfData?.ITEM_DB_KEY || 'item_db_v2');
+  if (!db?.v?.items) return console.error('Database not found. Refresh first.');
+  const currentDb = db.v.items;
   console.log('%c--- MASTERY AUDIT REPORT ---','font-weight:bold;font-size:14px;color:#4aad9e;');
   console.log('Running item count validation...');
   validateItemCounts(currentDb);

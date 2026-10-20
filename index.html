@@ -64,7 +64,7 @@
   <div class="load-hex">⬡</div>
   <div class="load-msg" id="load-msg">Initialising…</div>
   <div class="load-bar-wrap"><div class="load-bar" id="load-bar"></div></div>
-  <div class="load-note">Fetching item database from warframestat.us — cached locally for 7 days. Works offline after first load.</div>
+  <div class="load-note">Fetching item database from WFCD (GitHub) — cached locally for 7 days. Works offline after first load.</div>
 </div>
 
 <!-- ─── APP ──────────────────────────────────── -->
@@ -95,6 +95,8 @@
       <button class="hbtn btn-g" id="hbtn-refresh" onclick="refreshProfile()">Refresh</button>
     </div>
   </header>
+
+  <div id="data-warning" class="data-warning" role="alert" style="display:none"></div>
 
   <!-- Refresh modal (overlay) -->
   <div id="refresh-modal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:1200;">
@@ -242,7 +244,7 @@
       </div>
       <div id="sc-planet-detail" class="sc-planet-detail"></div>
     </div>
-    <div class="fnote">Star chart data from warframestat.us — <span>Steel Path completions cannot be separated from Normal in this profile format.</span> Node counts may vary slightly as DE adds missions.</div>
+    <div class="fnote">Star chart data from DE's public export and the Warframe wiki — <span>+XP badges show mastery still left to earn: Steel Path for nodes, first clear for junctions.</span> Node counts may vary slightly as DE adds missions.</div>
   </div>
 
   <div id="view-planner">

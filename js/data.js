@@ -1,26 +1,41 @@
 'use strict';
 
+// Last verified 2026-10-20 against WFCD warframe-items master.
 const ITEM_EXPECTED_COUNTS = {
-  'Warframes':115,'Primary':192,'Secondary':146,'Melee':221,'Zaws':11,'Kitguns':6,
-  'Archwing':5,'Arch-Gun':20,'Arch-Melee':8,'Necramechs':2,'Kubrow':6,'Kavat':5,'Vulpaphyla':3,
-  'Predasite':3,'MOAs':4,'Hounds':3,'Sentinels':17,'Sentinel Weapons':24,'Amps':10,'K-Drive':5
+  'Warframes':120,'Primary':196,'Secondary':148,'Melee':224,'Zaws':11,'Kitguns':6,
+  'Archwing':5,'Arch-Gun':20,'Arch-Melee':9,'Necramechs':2,'Kubrow':6,'Kavat':5,'Vulpaphyla':3,
+  'Predasite':3,'MOAs':4,'Hounds':3,'Sentinels':17,'Sentinel Weapons':24,'Amps':9,'K-Drive':5
 };
 
 const DB_CONFIG = {
-  VALID_CATS: [
-    'Warframes','Primary','Secondary','Melee','Archwing','Arch-Gun','Arch-Melee',
-    'Sentinels','Sentinel Weapons','Pets','Amps','Necramechs','Zaws','Kitguns',
-    'MOAs','Hounds','Kubrow','Kavat','Vulpaphyla','Predasite','K-Drive','Plexus'
-  ],
   KITGUN_CHAMBERS: ['catchmoon','gaze','rattleguts','tombfinger','sporelacer','vermisplicer'],
   ZAW_STRIKES: ['balla','cyath','dehtat','dokrahm','kronsh','mewan','ooltha','rabvee','sepfahn','plague keewar','plague kripath'],
-  RESCUE_LIST: ['mausolon','morgha','cortege','mandonel','grimoire','bo prime','kuva ghoulsaw','ghoulsaw','dark split-sword','bo','mk1-bo','prisma veritux','prisma dual decurions','imperator','imperator vandal','prisma imperator','jat kittag','innodem','wyrm prime','quassus prime','prisma sybaris','prisma gammacor','rathbone','lato','strun','paris','lex','enkaus','phahd','runway'],
 };
 
-const ITEM_NAME_ALIASES = {
-  'orion and sirius': 'Sirius & Orion',
-  'sirius and orion': 'Sirius & Orion',
-};
+// WFCD stopped publishing the combined All.json (too large), so the item DB is
+// assembled from the per-category files that can contain mastery items.
+const ITEM_SOURCE_BASE = 'https://raw.githubusercontent.com/wfcd/warframe-items/master/data/json/';
+const ITEM_SOURCE_FILES = [
+  'Warframes','Primary','Secondary','Melee','Arch-Gun','Arch-Melee','Archwing',
+  'Pets','Sentinels','SentinelWeapons','Misc'
+];
+const ITEM_DB_KEY = 'item_db_v2';
+const PARTIAL_CACHE_TTL = 12 * 60 * 60 * 1000;
+
+// WFCD flags these as not masterable, but they grant mastery in game.
+const MASTERABLE_PATH_ADDBACKS = [
+  p => p.includes('/operatoramplifiers/') && p.includes('barrel'), // amp prisms
+  p => p.includes('/infkitgun/barrels/'),                            // Sporelacer, Vermisplicer
+  p => p.includes('/khora/kavat/'),                                   // Venari, Venari Prime
+];
+// Enemy copies of player gear, e.g. TnDoppelgangerGrimoire (used by the Whisper).
+const NON_PLAYER_PATH_PARTS = ['doppelganger'];
+
+function isTrackable(item) {
+  const path = (item.uniqueName || '').toLowerCase();
+  if (NON_PLAYER_PATH_PARTS.some(p => path.includes(p))) return false;
+  return item.masterable === true || MASTERABLE_PATH_ADDBACKS.some(rule => rule(path));
+}
 
 // expose for legacy consumers
 window.DB_CONFIG = DB_CONFIG;
@@ -32,55 +47,13 @@ function getMajorVersion(rawIntro) {
   return match ? match[1] : '0';
 }
 
+// Inclusion is decided by isTrackable(); this only maps WFCD's coarse
+// categories (Pets, Misc, ...) onto the tracker's mastery categories.
 function classifyItem(item) {
   const name = item.name || '';
   const nameKey = name.toLowerCase();
   const path = (item.uniqueName || '').toLowerCase();
   const apiCat = item.category || 'Other';
-
-  const FORCE_INCLUDE_BY_NAME = new Set(['innodem', 'jat kittag']);
-  const FORCE_INCLUDE_BY_PATH = [
-    '/lotus/weapons/tenno/zariman/melee/dagger/zarimandaggerweapon'
-  ];
-  const FORCE_EXCLUDE_BY_NAME = new Set(['plague akwin', 'plague bokwin']);
-  const FORCE_EXCLUDE_PATH_PARTS = ['/handles/'];
-
-  if (FORCE_EXCLUDE_BY_NAME.has(nameKey) || FORCE_EXCLUDE_PATH_PARTS.some(p => path.includes(p))) {
-    return { isJunk:true };
-  }
-
-  if (FORCE_INCLUDE_BY_NAME.has(nameKey) || FORCE_INCLUDE_BY_PATH.some(p => path.includes(p))) {
-    return { finalCat:'Melee', isRescued:true, scoreBoost:400000, isJunk:false };
-  }
-
-  if (nameKey === 'runway') return { finalCat:'K-Drive', isRescued:true, scoreBoost:500000 };
-  if (nameKey === 'helminth charger') return { finalCat:'Kubrow', isRescued:true, scoreBoost:500000 };
-  if (nameKey === 'jat kittag') return { finalCat:'Melee', isRescued:true, scoreBoost:400000, isJunk:false };
-
-  const ZAW_SLOP = ['jai','ruhang','ekwana','vargeet','jayap','laka','korb','shtung','peye','kwath','kroostra','seekalla'];
-  const junkKeywords = [
-    'glyph','noggle','theme','shawzin','floof','mandala','pattern','narta','display','poster','scene',
-    'extractor','decoration','syandana','finish','lacquer','ephemera','sigil','skin','blueprint',
-    'helmet','stencil','vignette','globule','token','steel path','domestik','pedestal','maggot',
-    'ascaris','tag','casing','capsule','engine','weapon pod','barrel','receiver','stock','statue',
-    'necramite','cells','component','node','misc','resource','gear','fish','quest','box','basket',
-    'book','bop','trophy','shard','instrument','debt-bond','booster','segment','pizza','lunch',
-    'cardboard','theorem','lure','pheromone','genetic','upgrade','bust','egg','collar','code',
-    'specter','howl of','lucky','twin kavats','core','gyro','bracket','stabilizer','mutagen',
-    'antigen','incarnon genesis','helminth'
-  ];
-
-  const ZERO_MASTERY = [
-    'plexus', 'bondi k-drive',
-    "garuda's talons", "garuda prime talons", 'iron staff', 'iron staff prime',
-    'regulators', 'regulators prime', 'dex pixia', 'dex pixia prime',
-    'desert wind', 'desert wind prime', 'artemis bow', 'artemis bow prime',
-    'balefire charger', 'diwata', 'diwata prime', 'valkyr talons', 'valkyr prime talons',
-    'shadow claws', 'noctowl'
-  ];
-
-  if (ZERO_MASTERY.includes(nameKey) || junkKeywords.some(k => nameKey.includes(k)) || ZAW_SLOP.some(s => nameKey.includes(s)) || apiCat === 'Mods' || path.includes('/upgrades/'))
-    return { isJunk:true };
 
   const isZaw = DB_CONFIG.ZAW_STRIKES.includes(nameKey);
   const isKitgun = DB_CONFIG.KITGUN_CHAMBERS.includes(nameKey);
@@ -88,7 +61,7 @@ function classifyItem(item) {
   const isHound = path.includes('zanukapetparthead') || nameKey.includes('hound');
   const isKDrive = path.includes('kdrives/boards') || ['bad baby','feverspine','flatbelly','needlenose','runway'].some(k => nameKey.includes(k));
   const isMech = nameKey === 'voidrig' || nameKey === 'bonewidow' || path.includes('entratimech');
-  const isAmp = (nameKey.includes('prism') && !nameKey.includes('prisma')) || nameKey === 'sirocco' || nameKey.includes('phahd') || apiCat === 'Amps';
+  const isAmp = (nameKey.includes('prism') && !nameKey.includes('prisma')) || nameKey === 'sirocco' || apiCat === 'Amps';
   const isSentinelWep = apiCat === 'Sentinel Weapons' || path.includes('sentinelweapons') || ['akaten','batoten','cryotra','helstrum','lacerten','multron','tazicor','vulcax','deconstructor','verglas','sweeper','stinger','vulklok','artax','burst laser'].some(k => nameKey.includes(k));
   const isVulp = nameKey.includes('vulpaphyla');
   const isPred = nameKey.includes('predasite');
@@ -104,20 +77,40 @@ function classifyItem(item) {
   else if (isSentinelWep) finalCat = 'Sentinel Weapons';
   else if (isVulp) finalCat = 'Vulpaphyla';
   else if (isPred) finalCat = 'Predasite';
+  else if (nameKey === 'helminth charger') finalCat = 'Kubrow';
   else if (nameKey.includes('kavat') || nameKey.includes('venari')) finalCat = 'Kavat';
   else if (nameKey.includes('kubrow')) finalCat = 'Kubrow';
   else if (nameKey === 'wyrm prime' || (apiCat === 'Sentinels' && !isSentinelWep)) finalCat = 'Sentinels';
   else if (nameKey.includes('sybaris') || ['strun','paris','enkaus'].includes(nameKey)) finalCat = 'Primary';
   else if (nameKey.includes('gammacor') || ['lato','lex'].includes(nameKey) || nameKey === 'grimoire') finalCat = 'Secondary';
 
-  const isRescued = DB_CONFIG.RESCUE_LIST.includes(nameKey) || isMoa || isHound || isKDrive || isMech || isZaw || isKitgun || isSentinelWep || isAmp || isVulp || isPred;
+  return { finalCat, isZaw, isKitgun, isMoa, isHound, isKDrive, isMech, isAmp };
+}
 
-  return { finalCat, isRescued, isZaw, isKitgun, isMoa, isHound, isKDrive, isMech, isAmp, scoreBoost: isRescued ? 400000 : 0, isJunk:false };
+// Fetches every source file in parallel. A failed file is reported in
+// `missing` rather than failing the whole DB.
+async function fetchItemSources() {
+  const results = await Promise.all(ITEM_SOURCE_FILES.map(async file => {
+    try {
+      const resp = await fetch(ITEM_SOURCE_BASE + encodeURIComponent(file) + '.json');
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const items = await resp.json();
+      if (!Array.isArray(items)) throw new Error('Unexpected response shape');
+      return { file, items };
+    } catch (err) {
+      console.warn(`Item source ${file} failed:`, err);
+      return { file, items: null };
+    }
+  }));
+  return {
+    items: results.flatMap(r => r.items || []),
+    missing: results.filter(r => !r.items).map(r => r.file),
+  };
 }
 
 async function fetchItemDb() {
   try {
-    const cached = await dbGet('cache', 'item_db');
+    const cached = await dbGet('cache', ITEM_DB_KEY);
     const normalizeRank40Items = (db) => {
       if (!db || typeof db !== 'object') return db;
       for (const [path, item] of Object.entries(db)) {
@@ -130,35 +123,33 @@ async function fetchItemDb() {
       }
       return db;
     };
-    if (cached && (Date.now() - cached.t) < CACHE_TTL) return normalizeRank40Items(cached.v);
+    if (cached?.v?.items) {
+      // A partial DB (some source files failed) expires sooner so it gets retried.
+      const missing = cached.v.missing || [];
+      const ttl = missing.length ? PARTIAL_CACHE_TTL : CACHE_TTL;
+      if ((Date.now() - cached.t) < ttl) {
+        ST.itemDbMissing = missing;
+        return normalizeRank40Items(cached.v.items);
+      }
+    }
 
-    const resp = await fetch('https://raw.githubusercontent.com/wfcd/warframe-items/master/data/json/All.json');
-    const items = await resp.json();
+    const { items, missing } = await fetchItemSources();
+    ST.itemDbMissing = missing;
+    if (!items.length) return {}; // total failure: nothing worth caching
     const db = {}, dbByName = {};
-
-    const canonicalItemName = (name) => {
-      const key = String(name || '').toLowerCase();
-      return ITEM_NAME_ALIASES[key] || String(name || '');
-    };
 
     items.forEach(item => {
       if (!item || !item.uniqueName || !item.name) return;
-      const res = classifyItem(item);
-      if (res.isJunk) return;
+      if (!isTrackable(item)) return;
 
-      const { finalCat, isRescued, isZaw, isKitgun, isMoa, isHound, isVulpaphyla, isPredasite, isKDrive, isMech, isAmp, scoreBoost } = res;
+      const { finalCat, isMech } = classifyItem(item);
       const pathLower = item.uniqueName.toLowerCase();
-      const isModular = pathLower.includes('/modular/') || pathLower.includes('/modularmelee') || pathLower.includes('/zaw/') || pathLower.includes('/kitgun/') || pathLower.includes('/kdrive/') || pathLower.includes('/pets/');
-      if (isModular && !isZaw && !isKitgun && !isMoa && !isHound && !isKDrive && !isMech && !isAmp && !isRescued) return;
 
-      const isRecognized = DB_CONFIG.VALID_CATS.some(c => c === finalCat || (c.endsWith('s') && c.slice(0, -1) === finalCat));
-      if (!isRecognized && !isRescued) return;
-
-      let score = (item.masteryExp || 0) + scoreBoost;
+      let score = item.masteryExp || 0;
       if (item.introduced) score += 5000;
       if (pathLower.includes('/npc/')) score -= 500000;
 
-      const displayName = canonicalItemName(item.name);
+      const displayName = item.name;
       const nameKey = displayName.toLowerCase();
       if (dbByName[nameKey] && score <= dbByName[nameKey].score) return;
 
@@ -185,9 +176,13 @@ async function fetchItemDb() {
     if (typeof localStorage !== 'undefined' && localStorage.getItem('wft_auto_audit') === '1') {
       try { validateItemCounts(db); } catch (e) { console.warn('Auto-audit failed', e); }
     }
-    await dbSet('cache', 'item_db', db);
+    await dbSet('cache', ITEM_DB_KEY, { items: db, missing });
     return db;
-  } catch (err) { return {}; }
+  } catch (err) {
+    console.error('Item DB build failed:', err);
+    ST.itemDbMissing = ITEM_SOURCE_FILES.slice();
+    return {};
+  }
 }
 
 function validateItemCounts(db) {
@@ -286,159 +281,36 @@ async function fetchUpdateNames() {
   }
 }
 
-const MISSION_DB_KEY = 'mission_db_v2';
-const NODE_MASTERY_MAP_URL = 'data/node-mastery.json';
+const MISSION_DB_KEY = 'mission_db_v3';
+const NODES_URL = 'data/nodes.json';
 
-function toIntOrZero(v) {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : 0;
-}
-
-function getByIndex(list, idx) {
-  if (!Array.isArray(list)) return '';
-  const i = Number(idx);
-  if (!Number.isInteger(i) || i < 0 || i >= list.length) return '';
-  const val = list[i];
-  return (typeof val === 'string') ? val : '';
-}
-
-async function fetchNodeMasteryMap() {
-  try {
-    const resp = await fetch(NODE_MASTERY_MAP_URL, { cache: 'no-cache' });
-    if (!resp.ok) return {};
-    const parsed = await resp.json();
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
-    return parsed;
-  } catch (_) {
-    return {};
-  }
-}
-
-function buildMissionDbFromExports(regions, missionTypes, factions, masteryMap) {
-  const out = {};
-  const rows = Array.isArray(regions) ? regions : [];
-
-  for (const r of rows) {
-    if (!r || typeof r !== 'object') continue;
-    const key = String(r.uniqueName || r.InternalName || '').trim();
-    if (!key) continue;
-
-    const rawMastery = Object.prototype.hasOwnProperty.call(masteryMap, key) ? masteryMap[key] : null;
-    const masteryExp = (rawMastery === null || rawMastery === undefined || rawMastery === '')
-      ? null
-      : toIntOrZero(rawMastery);
-
-    out[key] = {
-      name: String(r.name || key),
-      planet: String(r.systemName || ''),
-      type: String(getByIndex(missionTypes, r.missionIndex) || ''),
-      enemy: String(getByIndex(factions, r.factionIndex) || ''),
-      minLevel: toIntOrZero(r.minEnemyLevel),
-      maxLevel: toIntOrZero(r.maxEnemyLevel),
-      masteryExp,
-    };
-  }
-
-  return out;
-}
-
-async function fetchMissionDbFromWiki() {
-  const resp = await fetch('https://wiki.warframe.com/api.php?action=parse&page=Module:Missions/data&prop=wikitext&format=json&origin=*');
-  if (!resp.ok) throw new Error('Mission wiki fetch failed');
-  const data = await resp.json();
-  const text = data.parse?.wikitext?.['*'] || '';
-
-  const db = {};
-  const blocks = text.split(/(?=\s*\{[^{}]*InternalName)/);
-  blocks.forEach(block => {
-    const internalName = block.match(/InternalName\s*=\s*"([^"]+)"/)?.[1];
-    if (!internalName) return;
-    const masteryExp  = block.match(/MasteryExp\s*=\s*(\d+)/)?.[1];
-    const name        = block.match(/\bName\s*=\s*"([^"]+)"/)?.[1];
-    const planet      = block.match(/Planet\s*=\s*"([^"]+)"/)?.[1];
-    const type        = block.match(/\bType\s*=\s*"([^"]+)"/)?.[1];
-    const enemy       = block.match(/Enemy\s*=\s*"([^"]+)"/)?.[1];
-    const minLevel    = block.match(/MinLevel\s*=\s*(\d+)/)?.[1];
-    const maxLevel    = block.match(/MaxLevel\s*=\s*(\d+)/)?.[1];
-    db[internalName] = {
-      name:      name || internalName,
-      planet:    planet || '',
-      type:      type || '',
-      enemy:     enemy || '',
-      minLevel:  minLevel ? parseInt(minLevel) : 0,
-      maxLevel:  maxLevel ? parseInt(maxLevel) : 0,
-      masteryExp: masteryExp ? parseInt(masteryExp) : 0,
-    };
-  });
-
-  return db;
-}
-
+// Node metadata + mastery XP come from data/nodes.json, which a scheduled build
+// (build_nodes.py) merges from DE's export and the wiki. Always revalidate so a
+// rebuilt file reaches users on their next load; the cached copy is only used
+// when the request fails.
 async function fetchMissionDb() {
   if (ST.missionDb) return ST.missionDb;
   if (ST._missionDbPromise) return ST._missionDbPromise;
 
   ST._missionDbPromise = (async () => {
     try {
-      const cached = await dbGet('cache', MISSION_DB_KEY);
-      if (cached && (Date.now() - cached.t) < MISSION_DB_TTL) {
-        ST.missionDb = cached.v;
-        return ST.missionDb;
-      }
-
-      // Primary path: machine-readable exports + static mastery map.
-      try {
-        const [regionsResp, missionTypesResp, factionsResp, masteryMap] = await Promise.all([
-          fetch('https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/ExportRegions.json'),
-          fetch('https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/missionTypes.json'),
-          fetch('https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/factions.json'),
-          fetchNodeMasteryMap(),
-        ]);
-
-        if (!regionsResp.ok || !missionTypesResp.ok || !factionsResp.ok) {
-          throw new Error('Export-based mission metadata fetch failed');
-        }
-
-        const [regions, missionTypes, factions] = await Promise.all([
-          regionsResp.json(),
-          missionTypesResp.json(),
-          factionsResp.json(),
-        ]);
-
-        const db = buildMissionDbFromExports(regions, missionTypes, factions, masteryMap || {});
-        if (!db || Object.keys(db).length === 0) {
-          throw new Error('Export-based mission metadata empty');
-        }
-
-        // Guard for mirrored behavior: if mastery map is missing/unpopulated,
-        // fall back to wiki parser so per-node mastery XP remains available.
-        const masteryKnownCount = Object.values(db).filter(r => {
-          const mxp = r?.masteryExp;
-          return mxp !== null && mxp !== undefined;
-        }).length;
-        if (masteryKnownCount === 0) {
-          throw new Error('Export-based metadata missing mastery map values');
-        }
-
-        ST.missionDb = db;
-        await dbSet('cache', MISSION_DB_KEY, db);
-        return ST.missionDb;
-      } catch (primaryErr) {
-        console.warn('Export-based mission DB build failed, falling back to wiki parser:', primaryErr);
-      }
-
-      // Compatibility fallback: preserve current behavior if primary path fails.
-      const fallbackDb = await fetchMissionDbFromWiki();
-      ST.missionDb = fallbackDb;
-      await dbSet('cache', MISSION_DB_KEY, fallbackDb);
-      return ST.missionDb;
+      const resp = await fetch(NODES_URL, { cache: 'no-cache' });
+      if (!resp.ok) throw new Error(`Node data fetch failed (HTTP ${resp.status})`);
+      const data = await resp.json();
+      if (!data?.nodes || !Object.keys(data.nodes).length) throw new Error('Node data has no nodes');
+      ST.missionDb = data.nodes;
+      ST.missionDbError = null;
+      try { await dbSet('cache', MISSION_DB_KEY, data.nodes); } catch (_) {}
     } catch (e) {
-      console.warn('Mission DB fetch failed:', e);
-      ST.missionDb = {};
-      return ST.missionDb;
+      console.warn('Node data fetch failed, using cached copy if any:', e);
+      let cached = null;
+      try { cached = await dbGet('cache', MISSION_DB_KEY); } catch (_) {}
+      ST.missionDb = cached?.v || {};
+      ST.missionDbError = cached ? 'stale' : 'missing';
     } finally {
       ST._missionDbPromise = null;
     }
+    return ST.missionDb;
   })();
 
   return ST._missionDbPromise;
@@ -446,6 +318,9 @@ async function fetchMissionDb() {
 
 window.__wfData = Object.assign(window.__wfData || {}, {
   ITEM_EXPECTED_COUNTS,
+  ITEM_DB_KEY,
+  ITEM_SOURCE_FILES,
+  isTrackable,
   classifyItem,
   fetchItemDb,
   fetchUpdateNames,

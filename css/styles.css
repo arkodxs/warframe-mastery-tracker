@@ -413,6 +413,7 @@ body.hide-notes .card-note{display:none}
 .sc-node.sp-done .sc-node-name{color:#aa99ee}
 .sc-node.sp-done .sc-node-icon{color:#8866e8}
 .sc-node:not(.done) .sc-node-status{color:var(--tx3)}
+.data-warning{background:var(--s2);border-bottom:1px solid var(--err);color:var(--tx);padding:.5rem 1.4rem;font-size:.8rem}
 #toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--s3);border:1px solid var(--acc);border-radius:6px;padding:.45rem .85rem;font-size:.78rem;color:var(--acc);z-index:100;opacity:0;transition:opacity .25s;pointer-events:none}
 #toast.show{opacity:1}
 
